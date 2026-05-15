@@ -10,6 +10,7 @@ import {
   Phone, 
   Instagram, 
   ChevronRight, 
+  ChevronLeft,
   Award, 
   Shield, 
   Sword, 
@@ -21,6 +22,25 @@ import {
   Zap,
   CheckCircle2
 } from 'lucide-react';
+import { AnimatePresence } from 'motion/react';
+
+const heroImages = [
+  {
+    url: "https://picsum.photos/seed/coach-ishtiaq/1000/1000",
+    caption: "First WBC Referee BD",
+    title: "BANGLADESH"
+  },
+  {
+    url: "https://picsum.photos/seed/mma-training-1/1000/1000",
+    caption: "Head Coach",
+    title: "INVITCTUS"
+  },
+  {
+    url: "https://picsum.photos/seed/boxing-match-1/1000/1000",
+    caption: "Founder",
+    title: "BMMAA"
+  }
+];
 
 const schedule = [
   { 
@@ -164,13 +184,25 @@ const skills = [
 ];
 
 export default function PortfolioPage() {
+  const [currentSlide, setCurrentSlide] = React.useState(0);
+
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % heroImages.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % heroImages.length);
+  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + heroImages.length) % heroImages.length);
+
   return (
     <main className="min-h-screen bg-neutral-950 text-neutral-100 overflow-x-hidden">
       {/* Navbar */}
       <nav className="fixed top-0 w-full z-50 border-b border-neutral-800/50 bg-neutral-950/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="font-display font-bold text-xl tracking-tighter">
-            ISHTIAK <span className="text-neutral-500">AHMED</span>
+            COACH <span className="text-neutral-500">ISHTIAK</span>
           </div>
             <div className="hidden md:flex gap-8 text-sm font-medium text-neutral-400">
               <a href="#about" className="hover:text-white transition-colors">About</a>
@@ -224,19 +256,58 @@ export default function PortfolioPage() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 1, delay: 0.2 }}
-              className="relative aspect-square rounded-3xl overflow-hidden bg-neutral-900 border border-neutral-800"
+              className="relative aspect-square rounded-3xl overflow-hidden bg-neutral-900 border border-neutral-800 group"
             >
-              <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-transparent to-transparent z-10" />
-              <Image 
-                src="https://picsum.photos/seed/mma-coach/1000/1000" 
-                alt="Coach Ishtiak" 
-                fill
-                className="w-full h-full object-cover grayscale brightness-75 hover:grayscale-0 transition-all duration-700"
-                referrerPolicy="no-referrer"
-              />
-              <div className="absolute bottom-8 left-8 z-20">
-                <div className="text-xs font-bold uppercase tracking-widest text-neutral-500 mb-2">First WBC Referee</div>
-                <div className="text-4xl font-display font-black">BANGLADESH</div>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentSlide}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.5, ease: "easeInOut" }}
+                  className="absolute inset-0"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-transparent to-transparent z-10" />
+                  <Image 
+                    src={heroImages[currentSlide].url} 
+                    alt={heroImages[currentSlide].caption} 
+                    fill
+                    className="w-full h-full object-cover grayscale brightness-75 transition-all duration-700"
+                    priority
+                  />
+                  <div className="absolute bottom-12 left-8 z-20">
+                    <div className="text-xs font-bold uppercase tracking-widest text-neutral-500 mb-2">{heroImages[currentSlide].caption}</div>
+                    <div className="text-4xl font-display font-black tracking-tighter">{heroImages[currentSlide].title}</div>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+
+              {/* Navigation Controls */}
+              <div className="absolute bottom-8 right-8 z-30 flex gap-2">
+                <button 
+                  onClick={prevSlide}
+                  className="p-3 rounded-full bg-neutral-900/50 border border-neutral-800 hover:bg-white hover:text-black transition-all"
+                  aria-label="Previous slide"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button 
+                  onClick={nextSlide}
+                  className="p-3 rounded-full bg-neutral-900/50 border border-neutral-800 hover:bg-white hover:text-black transition-all"
+                  aria-label="Next slide"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Progress Indicators */}
+              <div className="absolute top-8 right-8 z-30 flex gap-1.5">
+                {heroImages.map((_, idx) => (
+                  <div 
+                    key={idx}
+                    className={`h-1 transition-all duration-500 rounded-full ${idx === currentSlide ? 'w-8 bg-white' : 'w-2 bg-white/20'}`}
+                  />
+                ))}
               </div>
             </motion.div>
           </div>
