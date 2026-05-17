@@ -4,11 +4,19 @@
 @theme {
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-space), ui-sans-serif, system-ui, sans-serif;
+  
+  --color-brand-primary: #000000;
+  --color-brand-secondary: #09090b;
+  --color-brand-surface: #FFFFFF;
+  --color-brand-accent: #FCFF00;
+  --color-brand-accent-hover: #E2E600;
+  --color-brand-muted: #71717a;
+  --color-brand-border: #27272a;
 }
 
 :root {
-  --background: #0a0a0a;
-  --foreground: #ededed;
+  --background: #000000;
+  --foreground: #FFFFFF;
 }
 
 body {
