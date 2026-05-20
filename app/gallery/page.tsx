@@ -26,31 +26,31 @@ export default function GalleryPage() {
   const filteredImages = filter === 'All' ? galleryImages : galleryImages.filter(img => img.category === filter);
 
   return (
-    <main className="min-h-screen bg-brand-primary text-white py-20 px-6 sm:px-12 lg:px-24">
+    <main className="min-h-screen bg-brand-primary text-white py-12 px-4 sm:py-20 sm:px-8 lg:px-24">
       {/* Header */}
-      <div className="max-w-7xl mx-auto mb-16">
+      <div className="container max-w-7xl mx-auto mb-10 sm:mb-16">
         <Link 
           href="/" 
-          className="inline-flex items-center gap-2 text-brand-muted hover:text-brand-accent transition-colors mb-8 group"
+          className="inline-flex items-center gap-2 text-brand-muted hover:text-brand-accent transition-colors mb-6 sm:mb-8 group text-sm font-semibold"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
           Back to Home
         </Link>
-        <h1 className="text-5xl md:text-7xl font-display font-black tracking-tight mb-6 text-white">
+        <h1 className="text-4xl sm:text-5xl md:text-7xl font-display font-black tracking-tight mb-4 sm:mb-6 text-white leading-none">
           VISUAL <span className="text-brand-accent italic">JOURNEY</span>
         </h1>
-        <p className="text-xl text-brand-muted max-w-2xl leading-relaxed">
+        <p className="text-base sm:text-lg md:text-xl text-brand-muted max-w-2xl leading-relaxed">
           Moments from the ring, training sessions, and international events documenting the evolution of combat sports in Bangladesh.
         </p>
       </div>
 
       {/* Filter */}
-      <div className="max-w-7xl mx-auto mb-12 flex flex-wrap gap-4">
+      <div className="container max-w-7xl mx-auto mb-8 sm:mb-12 flex flex-wrap gap-2 sm:gap-4">
         {categories.map((cat) => (
           <button
             key={cat}
             onClick={() => setFilter(cat)}
-            className={`px-6 py-2 rounded-full text-sm font-medium border transition-all ${
+            className={`px-4 py-2 sm:px-6 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold uppercase tracking-wider border transition-all cursor-pointer min-h-[40px] flex items-center justify-center ${
               filter === cat 
                 ? 'bg-brand-accent text-black border-brand-accent' 
                 : 'bg-transparent text-brand-muted border-brand-border hover:border-brand-accent/50'
@@ -62,7 +62,7 @@ export default function GalleryPage() {
       </div>
 
       {/* Grid */}
-      <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="container max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <AnimatePresence mode="popLayout">
           {filteredImages.map((image, idx) => (
             <motion.div

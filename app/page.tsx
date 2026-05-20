@@ -24,9 +24,17 @@ import {
   CheckCircle2,
   Images,
   ShoppingBag,
-  Send
+  Send,
+  Menu,
+  X
 } from 'lucide-react';
 import { AnimatePresence } from 'motion/react';
+import { 
+  MmaCageDecal, 
+  BoxingRingDecal, 
+  BoxingGloveGraphic, 
+  MmaGloveGraphic 
+} from '../components/CombatGraphics';
 
 const heroImages = [
   {
@@ -106,25 +114,25 @@ const achievements = [
     title: "BJJ Blue Belt",
     description: "Awarded by Chad Reiner, UFC & Bellator veteran",
     year: "2024",
-    icon: <Shield className="w-6 h-6 text-brand-accent" />
+    icon: Shield
   },
   {
     title: "National Jiu-Jitsu Coach & Referee",
     description: "Received from Bangladesh Jiu Jitsu Association",
     year: "2021",
-    icon: <Award className="w-6 h-6 text-brand-accent" />
+    icon: Award
   },
   {
     title: "Boxing Coach Award",
     description: "Honored by Box Boxing Promotion, Kolkata, India",
     year: "2022",
-    icon: <Trophy className="w-6 h-6 text-brand-accent" />
+    icon: Trophy
   },
   {
     title: "Bronze Medalist",
     description: "India Open International BJJ Championship",
     year: "2022",
-    icon: <Star className="w-6 h-6 text-brand-accent" />
+    icon: Star
   }
 ];
 
@@ -189,6 +197,7 @@ const skills = [
 
 export default function PortfolioPage() {
   const [currentSlide, setCurrentSlide] = React.useState(0);
+  const [menuOpen, setMenuOpen] = React.useState(false);
 
   React.useEffect(() => {
     const timer = setInterval(() => {
@@ -203,122 +212,262 @@ export default function PortfolioPage() {
   return (
     <main className="min-h-screen bg-brand-primary text-white overflow-x-hidden">
       {/* Navbar */}
-      <nav className="fixed top-0 w-full z-50 border-b border-brand-border/50 bg-brand-primary/80 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="font-display font-bold text-xl tracking-tighter">
+      <nav className="fixed top-0 w-full z-50 border-b border-brand-border/50 bg-brand-primary/80 backdrop-blur-md px-4 sm:px-6">
+        <div className="container max-w-7xl mx-auto h-16 sm:h-20 flex items-center justify-between gap-4">
+          <Link href="/" className="font-display font-bold text-base sm:text-xl tracking-tighter shrink-0 hover:text-brand-accent transition-colors">
             COACH <span className="text-brand-muted">ISHTIAK</span>
+          </Link>
+          <div className="hidden lg:flex gap-6 xl:gap-8 text-xs sm:text-sm font-medium text-brand-muted">
+            <a href="#about" className="hover:text-brand-accent transition-colors">About</a>
+            <a href="#schedule" className="hover:text-brand-accent transition-colors">Schedule</a>
+            <Link href="/gallery" className="hover:text-brand-accent transition-colors">Gallery</Link>
+            <Link href="/shop" className="hover:text-brand-accent transition-colors flex items-center gap-1.5">
+              Shop
+              <span className="text-[8px] bg-brand-accent text-black px-1.5 py-0.5 rounded-full font-black">NEW</span>
+            </Link>
+            <a href="#contact" className="hover:text-brand-accent transition-colors">Contact</a>
+            <a href="#pricing" className="hover:text-brand-accent transition-colors">Pricing</a>
           </div>
-            <div className="hidden md:flex gap-8 text-sm font-medium text-brand-muted">
-              <a href="#about" className="hover:text-brand-accent transition-colors">About</a>
-              <a href="#schedule" className="hover:text-brand-accent transition-colors">Schedule</a>
-              <Link href="/gallery" className="hover:text-brand-accent transition-colors">Gallery</Link>
-              <Link href="/shop" className="hover:text-brand-accent transition-colors flex items-center gap-1.5">
-                Shop
-                <span className="text-[8px] bg-brand-accent text-black px-1.5 py-0.5 rounded-full font-black">NEW</span>
-              </Link>
-              <a href="#contact" className="hover:text-brand-accent transition-colors">Contact</a>
-              <a href="#pricing" className="hover:text-brand-accent transition-colors">Pricing</a>
-            </div>
-          <a 
-            href="mailto:coachishtiak@gmail.com"
-            className="px-5 py-2 bg-brand-accent text-black text-sm font-bold rounded-full hover:bg-brand-accent-hover transition-colors shadow-lg shadow-brand-accent/20"
-          >
-            GET IN TOUCH
-          </a>
+          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+            {/* Direct Shop/Gallery Links on mobile navbar */}
+            <Link href="/shop" className="hidden sm:inline-block lg:hidden text-xs font-bold text-brand-accent border border-brand-accent/30 bg-brand-secondary/50 px-2.5 py-1.5 rounded-full hover:bg-brand-accent hover:text-black transition-colors">
+              Shop
+            </Link>
+            <a 
+              href="mailto:coachishtiak@gmail.com"
+              className="px-3.5 py-1.5 sm:px-5 sm:py-2 bg-brand-accent text-black text-[10px] sm:text-sm font-black rounded-full hover:bg-brand-accent-hover transition-colors shadow-lg shadow-brand-accent/20 uppercase"
+            >
+              Contact
+            </a>
+
+            {/* Hamburger Button */}
+            <button 
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="lg:hidden p-2 text-brand-muted hover:text-brand-accent transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center border border-brand-border/30 rounded-full bg-brand-secondary/50"
+              aria-label="Toggle Menu"
+            >
+              {menuOpen ? <X className="w-5 h-5 text-brand-accent animate-in spin-in-90 duration-250" /> : <Menu className="w-5 h-5 text-white animate-in spin-in-180 duration-250" />}
+            </button>
+          </div>
         </div>
+
+        {/* Mobile slide-down navigation menu options */}
+        <AnimatePresence>
+          {menuOpen && (
+            <motion.div 
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3, ease: 'easeInOut' }}
+              className="lg:hidden overflow-hidden border-t border-brand-border/50 bg-brand-primary/95 backdrop-blur-md"
+            >
+              <div className="px-4 py-6 space-y-4 flex flex-col font-display font-bold uppercase tracking-widest text-xs">
+                <a 
+                  href="#about" 
+                  onClick={() => setMenuOpen(false)}
+                  className="py-2.5 border-b border-brand-border/30 text-white hover:text-brand-accent transition-colors flex items-center justify-between"
+                >
+                  <span>About Coach</span>
+                  <ChevronRight className="w-4 h-4 text-brand-accent/60" />
+                </a>
+                <a 
+                  href="#schedule" 
+                  onClick={() => setMenuOpen(false)}
+                  className="py-2.5 border-b border-brand-border/30 text-white hover:text-brand-accent transition-colors flex items-center justify-between"
+                >
+                  <span>Class Schedule</span>
+                  <ChevronRight className="w-4 h-4 text-brand-accent/60" />
+                </a>
+                <Link 
+                  href="/gallery" 
+                  onClick={() => setMenuOpen(false)}
+                  className="py-2.5 border-b border-brand-border/30 text-white hover:text-brand-accent transition-colors flex items-center justify-between"
+                >
+                  <span>Gallery</span>
+                  <ChevronRight className="w-4 h-4 text-brand-accent/60" />
+                </Link>
+                <Link 
+                  href="/shop" 
+                  onClick={() => setMenuOpen(false)}
+                  className="py-2.5 border-b border-brand-border/30 text-white hover:text-brand-accent transition-colors flex items-center justify-between"
+                >
+                  <span className="flex items-center gap-2">
+                    Shop
+                    <span className="text-[8px] bg-brand-accent text-black px-1.5 py-0.5 rounded-full font-black tracking-normal uppercase">NEW</span>
+                  </span>
+                  <ChevronRight className="w-4 h-4 text-brand-accent/60" />
+                </Link>
+                <a 
+                  href="#pricing" 
+                  onClick={() => setMenuOpen(false)}
+                  className="py-2.5 border-b border-brand-border/30 text-white hover:text-brand-accent transition-colors flex items-center justify-between"
+                >
+                  <span>Pricing plans</span>
+                  <ChevronRight className="w-4 h-4 text-brand-accent/60" />
+                </a>
+                <a 
+                  href="#contact" 
+                  onClick={() => setMenuOpen(false)}
+                  className="py-2.5 text-white hover:text-brand-accent transition-colors flex items-center justify-between"
+                >
+                  <span>Get In Touch</span>
+                  <ChevronRight className="w-4 h-4 text-brand-accent/60" />
+                </a>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-40 pb-20 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+      <section className="relative pt-28 pb-12 sm:pt-44 sm:pb-20 px-4 sm:px-6 overflow-hidden border-b-2 border-brand-border bg-black">
+        {/* Ambient Dark-Glow Cyberpunk Gradients */}
+        <div className="absolute top-1/4 left-[-10%] w-[500px] h-[500px] rounded-full bg-brand-accent/15 blur-[120px] pointer-events-none -z-20 animate-pulse duration-[8s]" />
+        <div className="absolute bottom-10 right-[-10%] w-[600px] h-[600px] rounded-full bg-brand-accent/10 blur-[150px] pointer-events-none -z-20" />
+        <div className="absolute top-10 right-1/4 w-[300px] h-[300px] rounded-full bg-red-600/5 blur-[100px] pointer-events-none -z-20" />
+
+        {/* Industrial Diagonal Caution Stripe Accents */}
+        <div className="absolute top-0 left-0 w-full h-[6px] bg-[repeating-linear-gradient(45deg,#FCFF00_0,#FCFF00_15px,#000000_15px,#000000_30px)] opacity-100 pointer-events-none -z-10" />
+        <div className="absolute -top-6 -right-6 w-32 h-32 bg-[repeating-linear-gradient(-45deg,#FCFF00_0,#FCFF00_8px,transparent_8px,transparent_16px)] opacity-[0.07] pointer-events-none rotate-12 -z-10" />
+        <div className="absolute bottom-4 left-4 w-48 h-12 bg-[repeating-linear-gradient(45deg,#FCFF00_0,#FCFF00_6px,transparent_6px,transparent_12px)] opacity-[0.05] pointer-events-none -z-10" />
+
+        {/* Massive Outline Brutalist Backdrop Text */}
+        <div className="absolute top-[20%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-[14vw] font-display font-black leading-none text-transparent select-none pointer-events-none -z-10 tracking-widest uppercase opacity-[0.04] whitespace-nowrap" style={{ WebkitTextStroke: '1.5px rgba(255,255,255,0.8)' }}>
+          INVICTUS
+        </div>
+        <div className="absolute bottom-[-10%] left-[10%] text-[8vw] font-display font-black leading-none text-transparent select-none pointer-events-none -z-10 tracking-wider uppercase opacity-[0.02] whitespace-nowrap" style={{ WebkitTextStroke: '1px rgba(255,255,255,0.6)' }}>
+          FIGHT LAB
+        </div>
+
+        {/* Brutalist Grid Pattern Background */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#2a2a2a_1px,transparent_1px),linear-gradient(to_bottom,#2a2a2a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_65%_50%_at_50%_40%,#000_80%,transparent_100%)] opacity-35 pointer-events-none -z-10" />
+        
+        {/* Decorative Technical Crosshairs / Coordinates / Corner Decals */}
+        <div className="absolute top-28 left-8 text-[9px] font-mono text-brand-muted uppercase tracking-widest hidden xl:block select-none">
+          [ SYS_ACTIVE: COORD_23.7509.DHAKA ]
+        </div>
+        <div className="absolute top-28 right-8 text-[9px] font-mono text-brand-muted uppercase tracking-widest hidden xl:block select-none flex items-center gap-2">
+          <span>[ PANEL_OFFICIAL_WBC_REFS_LEVEL_1 ]</span>
+          <span className="w-1.5 h-1.5 bg-brand-accent rounded-full animate-ping" />
+        </div>
+
+        {/* Tech Corner brackets */}
+        <div className="absolute top-24 left-6 w-3 h-3 border-t-2 border-l-2 border-brand-border hidden lg:block" />
+        <div className="absolute top-24 right-6 w-3 h-3 border-t-2 border-r-2 border-brand-border hidden lg:block" />
+        <div className="absolute bottom-6 left-6 w-3 h-3 border-b-2 border-l-2 border-brand-border hidden lg:block" />
+        <div className="absolute bottom-6 right-6 w-3 h-3 border-b-2 border-r-2 border-brand-border hidden lg:block" />
+
+        <div className="container max-w-7xl mx-auto relative">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
             <motion.div 
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-secondary border border-brand-border text-xs font-bold tracking-widest text-brand-muted mb-6 uppercase">
-                <span className="w-2 h-2 rounded-full bg-brand-accent animate-pulse" />
-                Available for elite coaching
+              {/* Brutalist Stamp badge */}
+              <div className="inline-flex items-center gap-3 px-4 py-2 bg-brand-secondary border-2 border-brand-accent text-[11px] font-mono font-black tracking-widest text-brand-accent mb-8 uppercase transform hover:-translate-y-0.5 transition-transform">
+                <span className="w-2.5 h-2.5 bg-brand-accent animate-[ping_1.5s_infinite] shrink-0" />
+                [ REGISTRATION OPEN // ELITE DIVISION ]
               </div>
-              <h1 className="font-display text-6xl md:text-8xl font-black tracking-tighter leading-[0.9] mb-8 text-white">
+
+              <h1 className="font-display text-4xl sm:text-6xl md:text-8xl font-black tracking-tighter leading-[0.9] sm:leading-[0.85] mb-6 sm:mb-8 text-white uppercase">
                 MASTERING THE <br />
-                <span className="text-brand-accent italic underline decoration-[#FCFF00]/30">ART OF COMBAT</span>
+                <span className="relative inline-block text-black bg-brand-accent px-3 py-1.5 sm:px-4 sm:py-2 mt-2 sm:mt-4 transform -skew-x-6 hover:-translate-x-1 hover:-translate-y-1 transition-transform duration-200 cursor-default select-none shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] sm:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] text-2xl sm:text-5xl md:text-8xl">
+                  ART OF COMBAT
+                </span>
               </h1>
-              <p className="text-lg md:text-xl text-brand-muted max-w-xl mb-10 leading-relaxed">
+
+              <p className="text-sm sm:text-base md:text-lg text-brand-muted max-w-xl mb-8 sm:mb-12 leading-relaxed font-sans border-l-4 border-brand-border pl-4">
                 A Coach, A Student & An Athlete. <br />
-                Experienced and accomplished combat sports coach with over a decade in MMA, BJJ, and Boxing. 
-                Founder of key organizations driving sport development through elite training.
+                Over a decade forging champions in MMA, BJJ, and Boxing. Founder of core combat sport institutions in Bangladesh.
               </p>
               
-              <div className="flex flex-wrap gap-4 mb-10">
+              <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 mb-8 sm:mb-12">
                 <a 
                   href="#contact" 
-                  className="px-8 py-4 bg-brand-accent text-black font-black uppercase tracking-widest text-sm rounded-full hover:bg-brand-accent-hover transition-all shadow-xl shadow-brand-accent/20 flex items-center gap-2 group"
+                  className="px-6 py-4 sm:px-8 sm:py-5 bg-brand-accent text-black font-black uppercase tracking-wider text-xs sm:text-sm border-2 border-black font-mono transition-all duration-150 shadow-[4px_4px_0px_0px_#FFFFFF] sm:shadow-[6px_6px_0px_0px_#FFFFFF] relative hover:-translate-x-[3px] hover:-translate-y-[3px] flex items-center justify-center gap-3 group text-center min-h-[48px]"
                 >
                   Join Training
                   <Zap className="w-4 h-4 fill-black group-hover:scale-110 transition-transform" />
                 </a>
                 <a 
                   href="#schedule" 
-                  className="px-8 py-4 border border-brand-border text-white font-black uppercase tracking-widest text-sm rounded-full hover:bg-brand-secondary transition-all"
+                  className="px-6 py-4 sm:px-8 sm:py-5 bg-brand-primary text-white font-black uppercase tracking-wider text-xs sm:text-sm border-2 border-brand-border font-mono transition-all duration-150 shadow-[4px_4px_0px_0px_#27272a] sm:shadow-[6px_6px_0px_0px_#27272a] relative hover:-translate-x-[3px] hover:-translate-y-[3px] flex items-center justify-center gap-3 text-center min-h-[48px]"
                 >
                   View Schedule
                 </a>
               </div>
 
-              <div className="flex flex-wrap gap-4">
-                 <div className="flex items-center gap-2 text-sm text-brand-muted">
-                    <MapPin className="w-4 h-4 text-brand-accent" /> Kalabagan, Dhaka
-                 </div>
-                 <div className="flex items-center gap-2 text-sm text-brand-muted">
-                    <Shield className="w-4 h-4 text-brand-accent" /> Invictus BJJ & MMA
-                 </div>
+              <div className="grid grid-cols-2 max-w-md border-2 border-brand-border bg-brand-secondary divide-x-2 divide-brand-border">
+                <div className="p-3 sm:p-4 flex flex-col justify-between hover:bg-brand-border/20 transition-colors">
+                  <div className="text-[8px] sm:text-[9px] font-mono text-brand-muted tracking-widest font-black uppercase mb-1 sm:mb-2">[ LOCATION ]</div>
+                  <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-bold text-white">
+                    <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-brand-accent shrink-0" />
+                    <span>KALABAGAN, DHAKA</span>
+                  </div>
+                </div>
+                <div className="p-3 sm:p-4 flex flex-col justify-between hover:bg-brand-border/20 transition-colors">
+                  <div className="text-[8px] sm:text-[9px] font-mono text-brand-muted tracking-widest font-black uppercase mb-1 sm:mb-2">[ HEADQUARTERS ]</div>
+                  <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-bold text-white">
+                    <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-brand-accent shrink-0" />
+                    <span>INVICTUS BJJ & MMA</span>
+                  </div>
+                </div>
               </div>
             </motion.div>
 
             <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 1, delay: 0.2 }}
-              className="relative aspect-square rounded-3xl overflow-hidden bg-brand-secondary border border-brand-border group"
+              className="relative aspect-square rounded-none bg-brand-secondary border-4 border-white group select-none shadow-[8px_8px_0px_0px_#FCFF00] md:shadow-[12px_12px_0px_0px_#FCFF00] w-full max-w-md lg:max-w-none mx-auto"
             >
+              {/* Mechanical / Tactical Frame Overlays */}
+              <div className="absolute top-4 left-4 z-40 bg-black/80 px-3 py-1 text-[8px] font-mono text-brand-accent tracking-widest uppercase border border-brand-accent select-none">
+                [ CAMERA FEED // {`0${currentSlide + 1}_REF`} ]
+              </div>
+              
+              <div className="absolute top-4 right-4 z-40 bg-black/80 px-3 py-1 text-[8px] font-mono text-brand-accent tracking-widest uppercase border border-brand-accent select-none flex items-center gap-1">
+                <span className="w-1.5 h-1.5 bg-red-600 rounded-full animate-pulse" />
+                REC_LIVE
+              </div>
+
               <AnimatePresence mode="wait">
                 <motion.div
                   key={currentSlide}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.5, ease: "easeInOut" }}
+                  initial={{ opacity: 0, filter: "brightness(0%) contrast(150%)" }}
+                  animate={{ opacity: 1, filter: "brightness(65%) contrast(110%)" }}
+                  exit={{ opacity: 0, filter: "brightness(0%) contrast(150%)" }}
+                  transition={{ duration: 0.4 }}
                   className="absolute inset-0"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-t from-brand-primary via-transparent to-transparent z-10" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent z-10" />
                   <Image 
                     src={heroImages[currentSlide].url} 
                     alt={heroImages[currentSlide].caption} 
                     fill
-                    className="w-full h-full object-cover grayscale brightness-75 transition-all duration-700"
+                    className="w-full h-full object-cover grayscale transition-transform duration-700"
                     priority
                   />
-                  <div className="absolute bottom-12 left-8 z-20">
-                    <div className="text-xs font-bold uppercase tracking-widest text-brand-muted mb-2">{heroImages[currentSlide].caption}</div>
-                    <div className="text-4xl font-display font-black tracking-tighter text-white">{heroImages[currentSlide].title}</div>
+                  <div className="absolute bottom-8 left-8 z-20">
+                    <div className="text-[10px] font-mono font-black uppercase tracking-widest text-[#FCFF00] mb-2">[ {heroImages[currentSlide].caption} ]</div>
+                    <div className="text-4xl font-display font-black tracking-tighter text-white uppercase">{heroImages[currentSlide].title}</div>
                   </div>
                 </motion.div>
               </AnimatePresence>
  
               {/* Navigation Controls */}
-              <div className="absolute bottom-8 right-8 z-30 flex gap-2">
+              <div className="absolute bottom-6 right-6 z-30 flex">
                 <button 
                   onClick={prevSlide}
-                  className="p-3 rounded-full bg-brand-primary/50 border border-brand-border hover:bg-brand-accent hover:text-black transition-all"
+                  className="p-4 bg-brand-primary border-2 border-brand-border text-white hover:bg-[#FCFF00] hover:text-black transition-all hover:-translate-y-1 cursor-pointer"
                   aria-label="Previous slide"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
                 <button 
                   onClick={nextSlide}
-                  className="p-3 rounded-full bg-brand-primary/50 border border-brand-border hover:bg-brand-accent hover:text-black transition-all"
+                  className="p-4 bg-brand-primary border-y-2 border-r-2 border-brand-border text-white hover:bg-[#FCFF00] hover:text-black transition-all hover:-translate-y-1 cursor-pointer"
                   aria-label="Next slide"
                 >
                   <ChevronRight className="w-4 h-4" />
@@ -326,11 +475,11 @@ export default function PortfolioPage() {
               </div>
  
               {/* Progress Indicators */}
-              <div className="absolute top-8 right-8 z-30 flex gap-1.5">
+              <div className="absolute bottom-6 left-6 z-30 flex gap-1.5">
                 {heroImages.map((_, idx) => (
                   <div 
                     key={idx}
-                    className={`h-1 transition-all duration-500 rounded-full ${idx === currentSlide ? 'w-8 bg-brand-accent' : 'w-2 bg-white/20'}`}
+                    className={`h-1.5 transition-all duration-500 rounded-none ${idx === currentSlide ? 'w-8 bg-brand-accent' : 'w-2 bg-white/20'}`}
                   />
                 ))}
               </div>
@@ -340,9 +489,9 @@ export default function PortfolioPage() {
       </section>
 
       {/* Stats/Highlight Section */}
-      <section className="py-12 border-y border-brand-border bg-brand-secondary">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+      <section className="py-8 sm:py-12 border-y border-brand-border bg-brand-secondary px-4">
+        <div className="container max-w-7xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
             <div className="text-center">
               <div className="text-4xl font-display font-black mb-1 tracking-tighter text-brand-accent">10+</div>
               <div className="text-xs uppercase font-bold text-brand-muted tracking-widest">Years Experience</div>
@@ -364,17 +513,24 @@ export default function PortfolioPage() {
       </section>
 
       {/* About Section */}
-      <section id="about" className="py-24 px-6 overflow-hidden bg-brand-primary">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-12 gap-16">
+      <section id="about" className="py-12 sm:py-24 px-4 sm:px-6 overflow-hidden bg-brand-primary relative">
+        {/* Subtle Background Glow Spot */}
+        <div className="absolute top-1/2 right-0 -translate-y-1/2 w-[350px] h-[350px] bg-brand-accent/5 rounded-full blur-[80px] pointer-events-none -z-10" />
+        
+        {/* MMA Cage Wireframe Background Decal */}
+        <MmaCageDecal className="absolute -right-28 -top-28 w-[500px] h-[500px] text-brand-accent/25 rotate-12 pointer-events-none select-none" />
+        <MmaCageDecal className="absolute -left-36 -bottom-36 w-[600px] h-[600px] text-brand-muted/20 -rotate-12 pointer-events-none select-none" />
+
+        <div className="container max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-12 gap-8 lg:gap-16">
             <div className="lg:col-span-5">
-              <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-brand-accent mb-6 font-display">Philosophy</h2>
-              <h3 className="text-4xl md:text-5xl font-display font-black leading-tight tracking-tighter mb-8 text-white">
+              <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-brand-accent mb-4 sm:mb-6 font-display">Philosophy</h2>
+              <h3 className="text-2xl sm:text-4xl md:text-5xl font-display font-black leading-tight tracking-tighter mb-6 sm:mb-8 text-white">
                 Building champions inside and outside the cage.
               </h3>
             </div>
             <div className="lg:col-span-7">
-              <div className="space-y-8 text-brand-muted text-lg leading-relaxed">
+              <div className="space-y-6 sm:space-y-8 text-brand-muted text-sm sm:text-base md:text-lg leading-relaxed">
                 <p>
                   Recognized as Bangladesh&apos;s first WBC-certified boxing referee, my journey has been defined by a relentless 
                   pursuit of excellence and the development of combat sports on a national level. 
@@ -393,38 +549,52 @@ export default function PortfolioPage() {
       </section>
 
       {/* Achievements Grid */}
-      <section id="achievements" className="py-24 px-6 bg-brand-secondary/50">
-        <div className="max-w-7xl mx-auto text-center mb-16">
-          <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-brand-accent mb-6 font-display">Recognition</h2>
-          <h3 className="text-5xl font-display font-black tracking-tighter uppercase text-white">Key Achievements</h3>
+      <section id="achievements" className="py-12 sm:py-24 px-4 sm:px-6 bg-brand-secondary/50 relative overflow-hidden border-t border-b border-brand-border/30">
+        {/* Deep Yellow Glow Background Gradient */}
+        <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] bg-brand-accent/5 rounded-full blur-[100px] pointer-events-none -z-10" />
+
+        {/* Technical Glove Decals to anchor the layout */}
+        <BoxingGloveGraphic className="absolute -left-16 -bottom-16 w-80 h-80 text-brand-accent/25 rotate-12 pointer-events-none select-none" />
+        <MmaGloveGraphic className="absolute -right-20 -top-20 w-80 h-80 text-brand-muted/20 -rotate-12 pointer-events-none select-none" />
+
+        <div className="container max-w-7xl mx-auto text-center mb-10 sm:mb-16 relative z-10">
+          <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-brand-accent mb-4 sm:mb-6 font-display">Recognition</h2>
+          <h3 className="text-3xl sm:text-5xl font-display font-black tracking-tighter uppercase text-white">Key Achievements</h3>
         </div>
-        <div className="max-w-7xl mx-auto grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {achievements.map((item, idx) => (
-            <motion.div 
-              key={idx}
-              whileHover={{ y: -10 }}
-              className="p-8 rounded-2xl bg-brand-secondary border border-brand-border hover:border-brand-accent/50 transition-all group"
-            >
-              <div className="mb-6 inline-block p-3 rounded-xl bg-brand-primary border border-brand-border group-hover:scale-110 group-hover:bg-brand-accent transition-all">
-                {/* Dynamically adjust icon color if it was using achievement mapping, but here they are hardcoded in the array above */}
-                {/* The accomplishments array uses hardcoded Tailwind colors, I should probably update those too if I want full consistency, but let's see. */}
-                {item.icon}
-              </div>
-              <div className="text-2xl font-display font-bold mb-2 leading-tight text-white">{item.title}</div>
-              <p className="text-brand-muted text-sm mb-4 leading-relaxed">{item.description}</p>
-              <div className="text-xs font-black tracking-widest text-brand-accent/80 uppercase italic">Year: {item.year}</div>
-            </motion.div>
-          ))}
+        <div className="container max-w-7xl mx-auto grid md:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
+          {achievements.map((item, idx) => {
+            const IconComponent = item.icon;
+            return (
+              <motion.div 
+                key={idx}
+                whileHover={{ y: -10, scale: 1.02 }}
+                className="p-8 rounded-[1.5rem] bg-brand-secondary border-2 border-brand-border hover:border-brand-accent transition-all duration-300 group shadow-[4px_4px_0px_0px_rgba(0,0,0,0.5)] hover:shadow-[6px_6px_0px_0px_#FCFF00] cursor-default"
+              >
+                <div className="mb-6 inline-block p-3 rounded-xl bg-brand-primary border border-brand-border text-brand-accent group-hover:scale-110 group-hover:bg-brand-accent group-hover:text-black transition-all duration-300">
+                  <IconComponent className="w-6 h-6 transition-colors duration-300" />
+                </div>
+                <div className="text-2xl font-display font-bold mb-2 leading-tight text-white group-hover:text-brand-accent transition-colors duration-300">{item.title}</div>
+                <p className="text-brand-muted text-sm mb-4 leading-relaxed">{item.description}</p>
+                <div className="text-xs font-black tracking-widest text-brand-accent/80 uppercase italic">Year: {item.year}</div>
+              </motion.div>
+            );
+          })}
         </div>
       </section>
 
       {/* Class Schedule Section */}
-      <section id="schedule" className="py-24 px-6 border-y border-brand-border bg-brand-primary">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-end gap-8 mb-16">
+      <section id="schedule" className="py-12 sm:py-24 px-4 sm:px-6 border-y border-brand-border bg-brand-primary relative overflow-hidden">
+        {/* Subtle Backdrop Gradients */}
+        <div className="absolute top-1/2 left-0 -translate-y-1/2 w-[500px] h-[500px] bg-brand-accent/5 rounded-full blur-[120px] pointer-events-none -z-10" />
+        
+        {/* Boxing Ring Rope Decal stretching behind schedule */}
+        <BoxingRingDecal className="absolute left-1/2 -translate-x-1/2 top-[15%] w-full max-w-6xl text-brand-accent/20 pointer-events-none select-none" />
+
+        <div className="container max-w-7xl mx-auto relative z-10">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 sm:gap-8 mb-8 sm:mb-16">
             <div>
-              <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-brand-accent mb-4 font-display">Training Hours</h2>
-              <h3 className="text-5xl font-display font-black tracking-tighter text-white">WEEKLY CLASS SCHEDULE</h3>
+              <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-brand-accent mb-3 sm:mb-4 font-display">Training Hours</h2>
+              <h3 className="text-3xl sm:text-5xl font-display font-black tracking-tighter text-white uppercase leading-none">WEEKLY CLASS SCHEDULE</h3>
             </div>
             <div className="p-4 rounded-xl bg-brand-secondary border border-brand-accent/30 flex items-center gap-4">
               <div className="p-2 rounded-full bg-brand-accent text-black">
@@ -444,7 +614,7 @@ export default function PortfolioPage() {
                 initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.1 }}
-                className="p-8 rounded-3xl bg-brand-secondary border border-brand-border hover:border-brand-accent transition-colors"
+                className="p-8 rounded-3xl bg-brand-secondary/95 backdrop-blur-sm border border-brand-border hover:border-brand-accent transition-colors"
               >
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center">
@@ -474,12 +644,19 @@ export default function PortfolioPage() {
       </section>
 
       {/* Experience Timeline */}
-      <section id="experience" className="py-24 px-6 bg-brand-primary">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-12 gap-16">
+      <section id="experience" className="py-12 sm:py-24 px-4 sm:px-6 bg-brand-primary relative overflow-hidden border-b border-brand-border/30">
+        {/* Soft Red Combat Glow backdrop */}
+        <div className="absolute top-1/3 right-1/4 w-[450px] h-[450px] bg-red-600/5 rounded-full blur-[110px] pointer-events-none -z-10" />
+
+        {/* Tactical graphics: MMA Cage on left, Boxing glove on right */}
+        <MmaCageDecal className="absolute -left-36 -top-36 w-[600px] h-[600px] text-brand-accent/15 rotate-[45deg] pointer-events-none select-none" />
+        <BoxingGloveGraphic className="absolute -right-16 bottom-[10%] w-80 h-80 text-brand-muted/15 -rotate-12 pointer-events-none select-none" />
+
+        <div className="container max-w-7xl mx-auto relative z-10">
+          <div className="grid lg:grid-cols-12 gap-10 lg:gap-16">
             <div className="lg:col-span-4 lg:sticky lg:top-32 h-fit">
-              <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-brand-accent mb-6 font-display">The Journey</h2>
-              <h3 className="text-5xl font-display font-black leading-none tracking-tighter mb-8 text-white">
+              <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-brand-accent mb-4 sm:mb-6 font-display">The Journey</h2>
+              <h3 className="text-3xl sm:text-5xl font-display font-black leading-none tracking-tighter mb-6 sm:mb-8 text-white">
                 PROFESSIONAL <br /> EXPERIENCE
               </h3>
               <p className="text-brand-muted mb-8">
@@ -501,11 +678,11 @@ export default function PortfolioPage() {
                 <div key={idx} className="relative pl-8 border-l border-brand-border pb-12 last:pb-0">
                   <div className="absolute left-[-5px] top-0 w-2 h-2 rounded-full bg-brand-accent" />
                   <div className="text-xs font-bold text-brand-muted uppercase tracking-widest mb-2">{exp.period}</div>
-                  <div className="text-3xl font-display font-black mb-1 group flex items-center gap-3 text-white">
+                  <div className="text-xl sm:text-3xl font-display font-black mb-1 group flex items-center gap-3 text-white">
                     {exp.role}
                   </div>
-                  <div className="text-lg font-bold text-brand-accent mb-4">{exp.company}</div>
-                  <p className="text-brand-muted leading-relaxed max-w-2xl">{exp.description}</p>
+                  <div className="text-base sm:text-lg font-bold text-brand-accent mb-4">{exp.company}</div>
+                  <p className="text-sm sm:text-base text-brand-muted leading-relaxed max-w-2xl">{exp.description}</p>
                 </div>
               ))}
             </div>
@@ -514,14 +691,17 @@ export default function PortfolioPage() {
       </section>
 
       {/* Skills Section */}
-      <section id="skills" className="py-24 px-6 bg-brand-secondary/20 backdrop-blur-sm border-t border-brand-border">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-brand-accent mb-4 font-display">Expertise</h2>
-            <h3 className="text-5xl font-display font-black tracking-tighter text-white">TECHNICAL PROFICIENCY</h3>
+      <section id="skills" className="py-12 sm:py-24 px-4 sm:px-6 bg-brand-secondary/20 backdrop-blur-sm border-t border-b border-brand-border relative overflow-hidden">
+        {/* Subtle arena ropes backdrop */}
+        <BoxingRingDecal className="absolute left-1/2 -translate-x-1/2 bottom-[10%] w-full max-w-6xl text-white/5 pointer-events-none select-none" />
+
+        <div className="container max-w-7xl mx-auto relative z-10">
+          <div className="text-center mb-10 sm:mb-16">
+            <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-brand-accent mb-3 sm:mb-4 font-display">Expertise</h2>
+            <h3 className="text-3xl sm:text-5xl font-display font-black tracking-tighter text-white uppercase leading-none">TECHNICAL PROFICIENCY</h3>
           </div>
           
-          <div className="grid md:grid-cols-2 gap-x-20 gap-y-12 max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-x-12 sm:grid-cols-2 lg:grid-cols-2 gap-y-8 sm:gap-y-12 max-w-4xl mx-auto">
             {skills.map((skill, idx) => (
               <div key={idx} className="space-y-4">
                 <div className="flex justify-between items-end">
@@ -543,19 +723,26 @@ export default function PortfolioPage() {
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="py-24 px-6 bg-brand-primary">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-brand-accent mb-4 font-display">Investment</h2>
-            <h3 className="text-5xl font-display font-black tracking-tighter uppercase text-white">PRICING PLAN</h3>
+      <section id="pricing" className="py-12 sm:py-24 px-4 sm:px-6 bg-brand-primary relative overflow-hidden">
+        {/* Spot light radial gradient */}
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-brand-accent/5 rounded-full blur-[130px] pointer-events-none -z-10" />
+
+        {/* MMA Glove on Left & Boxing Glove on Right */}
+        <MmaGloveGraphic className="absolute -left-12 -bottom-12 w-80 h-80 text-brand-accent/15 -rotate-12 pointer-events-none select-none" />
+        <BoxingGloveGraphic className="absolute -right-12 -top-12 w-80 h-80 text-brand-muted/15 rotate-45 pointer-events-none select-none" />
+
+        <div className="container max-w-7xl mx-auto relative z-10">
+          <div className="text-center mb-10 sm:mb-16">
+            <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-brand-accent mb-3 sm:mb-4 font-display">Investment</h2>
+            <h3 className="text-3xl sm:text-5xl font-display font-black tracking-tighter uppercase text-white">PRICING PLAN</h3>
           </div>
  
-          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-6 sm:gap-8 max-w-5xl mx-auto">
             {pricing.map((plan, idx) => (
               <motion.div 
                 key={idx}
                 whileHover={{ scale: 1.02 }}
-                className={`p-10 rounded-[2.5rem] border ${plan.highlight ? 'bg-brand-accent text-black border-brand-accent' : 'bg-brand-secondary border-brand-border text-white'} relative`}
+                className={`p-6 sm:p-10 rounded-[1.5rem] sm:rounded-[2.5rem] border ${plan.highlight ? 'bg-brand-accent text-black border-brand-accent' : 'bg-brand-secondary border-brand-border text-white'} relative`}
               >
                 {plan.badge && (
                   <div className="absolute top-8 right-8 px-3 py-1 bg-black text-brand-accent text-[10px] font-black uppercase tracking-widest rounded-full">
@@ -594,7 +781,7 @@ export default function PortfolioPage() {
 
       {/* Gallery Preview Section */}
       <section className="py-32 px-6 sm:px-12 lg:px-24 bg-brand-secondary/30">
-        <div className="max-w-7xl mx-auto">
+        <div className="container max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
             <div>
               <h2 className="text-5xl md:text-7xl font-display font-black tracking-tight mb-6 text-white">
@@ -699,20 +886,20 @@ export default function PortfolioPage() {
       </section>
 
       {/* Elite Gear / Shop Preview Section */}
-      <section className="py-32 px-6 sm:px-12 lg:px-24 bg-brand-primary">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
+      <section className="py-16 px-4 sm:px-12 lg:px-24 bg-brand-primary">
+        <div className="container max-w-7xl mx-auto">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-16 gap-6 sm:gap-8">
             <div>
-              <h2 className="text-5xl md:text-7xl font-display font-black tracking-tight mb-6 text-white">
+              <h2 className="text-3xl sm:text-5xl md:text-7xl font-display font-black tracking-tight mb-4 sm:mb-6 text-white leading-none">
                 ELITE <span className="text-brand-accent">GEAR</span>
               </h2>
-              <p className="text-xl text-brand-muted max-w-xl leading-relaxed">
+              <p className="text-base sm:text-lg md:text-xl text-brand-muted max-w-xl leading-relaxed">
                 Hand-picked equipment and apparel designed for high-performance training. Tested in the gym, proven in the ring.
               </p>
             </div>
             <Link 
               href="/shop" 
-              className="inline-flex items-center gap-3 bg-brand-accent text-black px-8 py-4 rounded-full font-bold hover:bg-brand-accent-hover transition-all group shadow-lg shadow-brand-accent/20"
+              className="inline-flex items-center gap-3 bg-brand-accent text-black px-6 py-3.5 sm:px-8 sm:py-4 rounded-full font-bold hover:bg-brand-accent-hover transition-all group shadow-lg shadow-brand-accent/20 text-sm"
             >
               Shop All Equipment
               <ShoppingBag className="w-5 h-5 group-hover:scale-110 transition-transform" />
@@ -756,16 +943,23 @@ export default function PortfolioPage() {
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="py-32 px-6 bg-brand-secondary/10 border-t border-brand-border">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-16 items-start">
+      <section id="contact" className="py-16 px-4 sm:px-12 lg:px-24 bg-brand-secondary/10 border-t border-brand-border relative overflow-hidden">
+        {/* Immersive Arena Fight Lights Spot gradients */}
+        <div className="absolute top-[30%] left-[10%] w-[450px] h-[450px] bg-brand-accent/5 rounded-full blur-[100px] pointer-events-none -z-10" />
+        <div className="absolute bottom-10 right-10 w-[400px] h-[400px] bg-red-600/5 rounded-full blur-[100px] pointer-events-none -z-10" />
+
+        {/* MMA Cage wireframe background anchor */}
+        <MmaCageDecal className="absolute -left-36 bottom-[-20%] w-[600px] h-[600px] text-brand-accent/15 rotate-[15deg] pointer-events-none select-none" />
+
+        <div className="container max-w-7xl mx-auto relative z-10">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-start">
             <div>
-              <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-brand-accent mb-6 font-display">Get Started</h2>
-              <h3 className="text-5xl md:text-7xl font-display font-black tracking-tighter mb-8 text-white uppercase leading-none">
+              <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-brand-accent mb-4 sm:mb-6 font-display">Get Started</h2>
+              <h3 className="text-3xl sm:text-5xl md:text-7xl font-display font-black tracking-tighter mb-6 sm:mb-8 text-white uppercase leading-none">
                 COMMIT TO <br />
                 <span className="text-brand-accent italic">BE FIT.</span>
               </h3>
-              <p className="text-xl text-brand-muted max-w-md leading-relaxed mb-12">
+              <p className="text-base sm:text-lg md:text-xl text-brand-muted max-w-md leading-relaxed mb-8 sm:mb-12">
                 Have questions about our classes or looking for private mentorship? Send us a message and start your journey today.
               </p>
               
@@ -795,10 +989,14 @@ export default function PortfolioPage() {
               initial={{ opacity: 0, x: 20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="p-8 md:p-12 rounded-[2.5rem] bg-brand-secondary border border-brand-border shadow-2xl relative overflow-hidden"
+              className="p-5 sm:p-8 md:p-12 rounded-[1.5rem] sm:rounded-[2.5rem] bg-brand-secondary border border-brand-border shadow-2xl relative overflow-hidden"
             >
+              {/* Overlapping technical overlays */}
               <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
                 <Send className="w-32 h-32 text-brand-accent" />
+              </div>
+              <div className="absolute -right-20 -bottom-20 opacity-[0.14] pointer-events-none">
+                <MmaGloveGraphic className="w-80 h-80 text-brand-accent !static" />
               </div>
               
               <form className="space-y-6 relative z-10" onSubmit={(e) => e.preventDefault()}>
@@ -846,28 +1044,32 @@ export default function PortfolioPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-32 px-6 relative overflow-hidden bg-brand-primary">
+      <section className="py-16 px-4 relative overflow-hidden bg-brand-primary border-t border-brand-border/30">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_#27272a66_0%,_#000000_70%)] -z-10" />
-        <div className="max-w-4xl mx-auto text-center">
+        
+        {/* Background Boxing ropes running through the CTA */}
+        <BoxingRingDecal className="absolute left-1/2 -translate-x-1/2 top-4 w-full text-brand-accent/20 pointer-events-none select-none" />
+
+        <div className="max-w-4xl mx-auto text-center relative z-10">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <h2 className="text-5xl md:text-7xl font-display font-black tracking-tighter mb-12 uppercase leading-none text-white">
+              <h2 className="text-3xl sm:text-5xl md:text-7xl font-display font-black tracking-tighter mb-8 sm:mb-12 uppercase leading-none text-white">
                 READY TO TRAIN WITH <br /> THE <span className="text-brand-accent italic">BEST?</span>
               </h2>
-              <div className="flex flex-wrap justify-center gap-6">
+              <div className="flex flex-wrap justify-center gap-4 sm:gap-6">
                 <a 
                   href="mailto:coachishtiak@gmail.com"
-                  className="px-12 py-5 bg-brand-accent text-black font-black uppercase tracking-widest text-sm rounded-full hover:scale-105 transition-transform shadow-2xl shadow-brand-accent/40"
+                  className="px-8 py-4 sm:px-12 sm:py-5 bg-brand-accent text-black font-black uppercase tracking-widest text-xs sm:text-sm rounded-full hover:scale-105 transition-transform shadow-2xl shadow-brand-accent/40"
                 >
                   Book a Session
                 </a>
                 <a 
                   href="https://instagram.com/ishtiakofficial"
                   target="_blank"
-                  className="px-12 py-5 border border-brand-border text-white font-black uppercase tracking-widest text-sm rounded-full hover:bg-brand-secondary transition-all flex items-center gap-2"
+                  className="px-8 py-4 sm:px-12 sm:py-5 border border-brand-border text-white font-black uppercase tracking-widest text-xs sm:text-sm rounded-full hover:bg-brand-secondary transition-all flex items-center gap-2"
                 >
                   <Instagram className="w-4 h-4 text-brand-accent" /> Follow
                 </a>
@@ -877,9 +1079,9 @@ export default function PortfolioPage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 px-6 border-t border-brand-border bg-brand-secondary">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-3 gap-12 mb-12">
+      <footer className="py-12 px-4 sm:px-6 border-t border-brand-border bg-brand-secondary">
+        <div className="container max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-8 sm:gap-12 mb-12 text-center md:text-left">
             <div>
               <div className="font-display font-black text-2xl mb-6 text-white leading-none">
                 INVICTUS <span className="text-brand-accent">.</span>
@@ -913,9 +1115,9 @@ export default function PortfolioPage() {
               </ul>
             </div>
           </div>
-          <div className="pt-12 border-t border-brand-border flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] uppercase font-bold tracking-[0.2em] text-brand-muted">
+          <div className="pt-12 border-t border-brand-border flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] uppercase font-bold tracking-[0.2em] text-brand-muted text-center md:text-left">
             <div>© 2024 INVICTUS MMA. ALL RIGHTS RESERVED.</div>
-            <div className="flex gap-8">
+            <div className="flex justify-center md:justify-start gap-8">
                 <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
                 <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
             </div>

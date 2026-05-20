@@ -89,11 +89,11 @@ export default function ShopPage() {
   return (
     <main className="min-h-screen bg-brand-primary text-white">
       {/* Dynamic Header */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-brand-primary/80 backdrop-blur-md border-b border-brand-border px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-brand-primary/80 backdrop-blur-md border-b border-brand-border px-4 sm:px-6 py-3 sm:py-4">
+        <div className="container max-w-7xl mx-auto flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 text-brand-muted hover:text-brand-accent transition-colors group">
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-            <span className="font-bold text-sm uppercase tracking-widest">Back to Hub</span>
+            <span className="font-bold text-xs sm:text-sm uppercase tracking-widest">Back to Hub</span>
           </Link>
           
           <div className="hidden md:flex items-center gap-8">
@@ -101,7 +101,7 @@ export default function ShopPage() {
           </div>
 
           <div className="relative">
-            <button className="p-2 hover:bg-brand-secondary rounded-full transition-colors relative group">
+            <button className="p-2 hover:bg-brand-secondary rounded-full transition-colors relative group min-h-[44px] min-w-[44px] flex items-center justify-center">
               <ShoppingBag className="w-6 h-6 group-hover:text-brand-accent transition-colors text-white" />
               {cartCount > 0 && (
                 <span className="absolute top-0 right-0 bg-brand-accent text-black text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full animate-in zoom-in">
@@ -114,23 +114,23 @@ export default function ShopPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-6 sm:px-12 lg:px-24">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-6xl md:text-8xl font-display font-black tracking-tight mb-8 text-white uppercase">
+      <section className="pt-24 pb-12 sm:pt-32 sm:pb-20 px-4 sm:px-12 lg:px-24">
+        <div className="container max-w-7xl mx-auto">
+          <h1 className="text-4xl sm:text-6xl md:text-8xl font-display font-black tracking-tight mb-4 sm:mb-8 text-white uppercase leading-none">
             ELITE <span className="text-brand-accent block sm:inline">GEAR.</span>
           </h1>
-          <p className="text-xl text-brand-muted max-w-2xl leading-relaxed mb-12">
+          <p className="text-base sm:text-lg md:text-xl text-brand-muted max-w-2xl leading-relaxed mb-8 sm:mb-12">
             Curated equipment and training resources designed for those who take their craft seriously. Battle-tested by Coach Ishtiaq.
           </p>
 
           {/* Controls */}
-          <div className="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between border-b border-brand-border pb-12">
+          <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 items-stretch lg:items-center justify-between border-b border-brand-border pb-8 sm:pb-12">
             <div className="flex flex-wrap gap-2">
               {categories.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setFilter(cat)}
-                  className={`px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest border transition-all ${
+                  className={`px-4 py-2 sm:px-6 sm:py-2.5 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider border transition-all cursor-pointer min-h-[40px] flex items-center justify-center ${
                     filter === cat 
                       ? 'bg-brand-accent text-black border-brand-accent shadow-lg shadow-brand-accent/20' 
                       : 'bg-transparent text-brand-muted border-brand-border hover:border-brand-accent/50'
@@ -141,7 +141,7 @@ export default function ShopPage() {
               ))}
             </div>
 
-            <div className="relative w-full md:w-80">
+            <div className="relative w-full lg:w-80">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-accent" />
               <input 
                 type="text" 
@@ -156,9 +156,9 @@ export default function ShopPage() {
       </section>
 
       {/* Product Grid */}
-      <section className="pb-32 px-6 sm:px-12 lg:px-24">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      <section className="pb-16 sm:pb-32 px-4 sm:px-12 lg:px-24">
+        <div className="container max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             <AnimatePresence mode="popLayout">
               {filteredProducts.map((product, idx) => (
                 <motion.div
@@ -223,16 +223,16 @@ export default function ShopPage() {
       </section>
 
       {/* Footnote */}
-      <footer className="border-t border-brand-border py-20 px-6 bg-brand-secondary/30">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
-          <div className="flex items-center gap-2 text-brand-muted">
-            <Info className="w-4 h-4 text-brand-accent" />
-            <p className="text-xs font-bold uppercase tracking-widest">Ships within Bangladesh & International Regions</p>
+      <footer className="border-t border-brand-border py-12 px-4 sm:py-20 sm:px-6 bg-brand-secondary/30">
+        <div className="container max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-center md:text-left gap-6">
+          <div className="flex flex-col sm:flex-row items-center gap-2 text-brand-muted">
+            <Info className="w-4 h-4 text-brand-accent shrink-0" />
+            <p className="text-xs font-bold uppercase tracking-wider">Ships within Bangladesh & International Regions</p>
           </div>
-          <div className="flex gap-8">
-            <a href="#" className="text-xs font-bold uppercase tracking-widest text-brand-muted hover:text-brand-accent transition-colors">Returns</a>
-            <a href="#" className="text-xs font-bold uppercase tracking-widest text-brand-muted hover:text-brand-accent transition-colors">Privacy</a>
-            <a href="#" className="text-xs font-bold uppercase tracking-widest text-brand-muted hover:text-brand-accent transition-colors">Terms</a>
+          <div className="flex flex-wrap justify-center gap-6 sm:gap-8">
+            <a href="#" className="text-xs font-bold uppercase tracking-wider text-brand-muted hover:text-brand-accent transition-colors">Returns</a>
+            <a href="#" className="text-xs font-bold uppercase tracking-wider text-brand-muted hover:text-brand-accent transition-colors">Privacy</a>
+            <a href="#" className="text-xs font-bold uppercase tracking-wider text-brand-muted hover:text-brand-accent transition-colors">Terms</a>
           </div>
         </div>
       </footer>
