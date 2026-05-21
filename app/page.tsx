@@ -201,12 +201,72 @@ export default function PortfolioPage() {
   const [currentSlide, setCurrentSlide] = React.useState(0);
   const [menuOpen, setMenuOpen] = React.useState(false);
 
+  // Dynamic schedule, pricing, and contact states loaded from localStorage if browser-side
+  const [currentSchedule, setCurrentSchedule] = React.useState(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('invictus_schedule');
+      return stored ? JSON.parse(stored) : schedule;
+    }
+    return schedule;
+  });
+
+  const [currentPricing, setCurrentPricing] = React.useState(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('invictus_pricing');
+      return stored ? JSON.parse(stored) : pricing;
+    }
+    return pricing;
+  });
+
+  const [formData, setFormData] = React.useState({ name: '', email: '', message: '' });
+  const [successToast, setSuccessToast] = React.useState(false);
+
   React.useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroImages.length);
     }, 5000);
+
     return () => clearInterval(timer);
   }, []);
+
+  const handleContactSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.name || !formData.email || !formData.message) return;
+
+    if (typeof window !== 'undefined') {
+      const storedInquiriesStr = localStorage.getItem('invictus_inquiries');
+      const storedInquiries = storedInquiriesStr ? JSON.parse(storedInquiriesStr) : [];
+      
+      const newInquiry = {
+        id: "inq-" + Date.now(),
+        name: formData.name,
+        email: formData.email,
+        message: formData.message,
+        date: new Date().toISOString().split('T')[0],
+        read: false
+      };
+
+      localStorage.setItem('invictus_inquiries', JSON.stringify([newInquiry, ...storedInquiries]));
+
+      // Automatically register athlete lead as "Pending" for a brilliant simulation!
+      const storedStudentsStr = localStorage.getItem('invictus_students');
+      const storedStudents = storedStudentsStr ? JSON.parse(storedStudentsStr) : [];
+      const newStudentBooking = {
+        id: "st-" + Date.now(),
+        name: formData.name,
+        email: formData.email,
+        phone: "017" + Math.floor(10000000 + Math.random() * 90000000), // Dynamic BD number
+        course: "3 Months Course",
+        status: "Pending",
+        enrolledDate: new Date().toISOString().split('T')[0]
+      };
+      localStorage.setItem('invictus_students', JSON.stringify([newStudentBooking, ...storedStudents]));
+    }
+
+    setSuccessToast(true);
+    setFormData({ name: '', email: '', message: '' });
+    setTimeout(() => setSuccessToast(false), 5000);
+  };
 
   const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % heroImages.length);
   const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + heroImages.length) % heroImages.length);
@@ -227,8 +287,11 @@ export default function PortfolioPage() {
               Shop
               <span className="text-[8px] bg-brand-accent text-black px-1.5 py-0.5 rounded-full font-black">NEW</span>
             </Link>
-            <a href="#contact" className="hover:text-brand-accent transition-colors">Contact</a>
             <a href="#pricing" className="hover:text-brand-accent transition-colors">Pricing</a>
+            <a href="#contact" className="hover:text-brand-accent transition-colors">Contact</a>
+            <Link href="/admin" className="hover:text-brand-accent transition-colors flex items-center gap-1 font-bold text-brand-accent border-l border-brand-border/40 pl-6 shrink-0">
+              Console 🛡️
+            </Link>
           </div>
           <div className="flex items-center gap-2 sm:gap-4 shrink-0">
             {/* Direct Shop/Gallery Links on mobile navbar */}
@@ -310,11 +373,19 @@ export default function PortfolioPage() {
                 <a 
                   href="#contact" 
                   onClick={() => setMenuOpen(false)}
-                  className="py-2.5 text-white hover:text-brand-accent transition-colors flex items-center justify-between"
+                  className="py-2.5 border-b border-brand-border/30 text-white hover:text-brand-accent transition-colors flex items-center justify-between"
                 >
                   <span>Get In Touch</span>
                   <ChevronRight className="w-4 h-4 text-brand-accent/60" />
                 </a>
+                <Link 
+                  href="/admin" 
+                  onClick={() => setMenuOpen(false)}
+                  className="py-2.5 text-brand-accent hover:text-white transition-colors flex items-center justify-between font-extrabold"
+                >
+                  <span>Coach Console 🛡️</span>
+                  <ChevronRight className="w-4 h-4 text-brand-accent" />
+                </Link>
               </div>
             </motion.div>
           )}
@@ -681,7 +752,7 @@ export default function PortfolioPage() {
           </div>
  
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {schedule.map((item, idx) => (
+            {currentSchedule.map((item: any, idx: number) => (
               <motion.div 
                 key={idx}
                 initial={{ opacity: 0, y: 10 }}
@@ -696,7 +767,7 @@ export default function PortfolioPage() {
                   <h4 className="text-xl font-display font-black tracking-tight text-white">{item.day}</h4>
                 </div>
                 <div className="space-y-4">
-                  {item.classes.map((cls, cIdx) => (
+                  {item.classes.map((cls: any, cIdx: number) => (
                     <div key={cIdx} className="group cursor-default">
                       <div className="text-xs font-mono text-brand-muted mb-1">{cls.time}</div>
                       <div className="text-lg font-bold text-white group-hover:text-brand-accent transition-colors">{cls.activity}</div>
@@ -811,7 +882,7 @@ export default function PortfolioPage() {
           </div>
  
           <div className="grid md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto">
-            {pricing.map((plan, idx) => (
+            {currentPricing.map((plan: any, idx: number) => (
               <motion.div 
                 key={idx}
                 whileHover={{ scale: 1.01 }}
@@ -834,7 +905,7 @@ export default function PortfolioPage() {
                     <span className={`text-xs sm:text-sm font-bold ${plan.highlight ? 'text-black/70' : 'text-brand-muted'}`}>/ COURSE</span>
                   </div>
                   <ul className="space-y-4 sm:space-y-5 mb-8 sm:mb-10 lg:mb-12">
-                    {plan.features.map((feature, fIdx) => (
+                    {plan.features.map((feature: string, fIdx: number) => (
                       <li key={fIdx} className="flex items-start gap-3 sm:gap-4">
                         <CheckCircle2 className={`w-4 h-4 sm:w-5 sm:h-5 mt-0.5 shrink-0 ${plan.highlight ? 'text-black' : 'text-brand-accent'}`} />
                         <span className="text-sm sm:text-base font-medium leading-tight">{feature}</span>
@@ -1074,12 +1145,24 @@ export default function PortfolioPage() {
                 <MmaGloveGraphic className="w-80 h-80 text-brand-accent !static" />
               </div>
               
-              <form className="space-y-6 relative z-10" onSubmit={(e) => e.preventDefault()}>
+              <form className="space-y-6 relative z-10" onSubmit={handleContactSubmit}>
+                {successToast && (
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="p-4 bg-brand-accent/10 border border-brand-accent text-brand-accent rounded-2xl text-xs font-black uppercase tracking-wider flex items-center gap-3"
+                  >
+                    <CheckCircle2 className="w-5 h-5 text-brand-accent shrink-0" />
+                    <span>Message logged! Athlete lead created in Coach Console.</span>
+                  </motion.div>
+                )}
                 <div className="space-y-2">
                   <label htmlFor="name" className="text-xs font-black uppercase tracking-widest text-brand-muted ml-1">Full Name</label>
                   <input 
                     type="text" 
                     id="name"
+                    value={formData.name}
+                    onChange={(e) => setFormData({...formData, name: e.target.value})}
                     placeholder="John Doe"
                     className="w-full bg-brand-primary border border-brand-border rounded-2xl py-4 px-6 focus:outline-none focus:border-brand-accent transition-colors text-white placeholder:text-white/10"
                     required
@@ -1090,6 +1173,8 @@ export default function PortfolioPage() {
                   <input 
                     type="email" 
                     id="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({...formData, email: e.target.value})}
                     placeholder="john@example.com"
                     className="w-full bg-brand-primary border border-brand-border rounded-2xl py-4 px-6 focus:outline-none focus:border-brand-accent transition-colors text-white placeholder:text-white/10"
                     required
@@ -1100,6 +1185,8 @@ export default function PortfolioPage() {
                   <textarea 
                     id="message"
                     rows={4}
+                    value={formData.message}
+                    onChange={(e) => setFormData({...formData, message: e.target.value})}
                     placeholder="I'm interested in the 3-month MMA course..."
                     className="w-full bg-brand-primary border border-brand-border rounded-2xl py-4 px-6 focus:outline-none focus:border-brand-accent transition-colors text-white placeholder:text-white/10"
                     required
@@ -1107,7 +1194,7 @@ export default function PortfolioPage() {
                 </div>
                 <button 
                   type="submit"
-                  className="w-full py-5 bg-brand-accent text-black font-black uppercase tracking-widest text-sm rounded-2xl hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-brand-accent/20 flex items-center justify-center gap-3 group"
+                  className="w-full py-5 bg-brand-accent text-black font-black uppercase tracking-widest text-sm rounded-2xl hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-brand-accent/20 flex items-center justify-center gap-3 group cursor-pointer"
                 >
                   Send Message
                   <Send className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />

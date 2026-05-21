@@ -2,5 +2,7 @@
   "name": "Ishtiak Ahmed Portfolio",
   "description": "Professional portfolio for Ishtiak Ahmed, MMA & Boxing Coach and Founder of BMMAA.",
   "requestFramePermissions": [],
-  "majorCapabilities": []
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }
