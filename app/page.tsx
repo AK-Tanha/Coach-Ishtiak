@@ -26,7 +26,9 @@ import {
   ShoppingBag,
   Send,
   Menu,
-  X
+  X,
+  Facebook,
+  Linkedin
 } from 'lucide-react';
 import { AnimatePresence } from 'motion/react';
 import { 
@@ -365,15 +367,23 @@ export default function PortfolioPage() {
               transition={{ duration: 0.8 }}
             >
               {/* Brutalist Stamp badge */}
-              <div className="inline-flex items-center gap-3 px-4 py-2 bg-brand-secondary border-2 border-brand-accent text-[11px] font-mono font-black tracking-widest text-brand-accent mb-8 uppercase transform hover:-translate-y-0.5 transition-transform">
+              <div className="hidden sm:inline-flex items-center gap-3 px-4 py-2 bg-brand-secondary border-2 border-brand-accent text-[11px] font-mono font-black tracking-widest text-brand-accent mb-8 uppercase transform hover:-translate-y-0.5 transition-transform">
                 <span className="w-2.5 h-2.5 bg-brand-accent animate-[ping_1.5s_infinite] shrink-0" />
                 [ REGISTRATION OPEN // ELITE DIVISION ]
               </div>
 
-              <h1 className="font-display text-4xl sm:text-6xl md:text-8xl font-black tracking-tighter leading-[0.9] sm:leading-[0.85] mb-6 sm:mb-8 text-white uppercase">
-                MASTERING THE <br />
-                <span className="relative inline-block text-black bg-brand-accent px-3 py-1.5 sm:px-4 sm:py-2 mt-2 sm:mt-4 transform -skew-x-6 hover:-translate-x-1 hover:-translate-y-1 transition-transform duration-200 cursor-default select-none shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] sm:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] text-2xl sm:text-5xl md:text-8xl">
+              <h1 className="font-display mb-6 sm:mb-8">
+                <span className="block text-xs sm:text-sm font-mono font-black tracking-[0.25em] text-brand-muted uppercase mb-2">
+                  MASTERING THE
+                </span>
+                <span className="block text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tighter uppercase leading-[0.95] mb-4">
                   ART OF COMBAT
+                </span>
+                <span className="block mt-5 sm:mt-7 text-[10px] sm:text-xs font-mono font-bold text-brand-muted uppercase tracking-widest leading-none mb-2">
+                  {"// WITH"}
+                </span>
+                <span className="relative inline-block text-black bg-brand-accent px-4 py-2 sm:px-6 sm:py-3.5 transform -skew-x-6 hover:-translate-x-1 hover:-translate-y-1 transition-transform duration-200 cursor-default select-none shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] sm:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] text-3xl sm:text-5xl md:text-7xl font-display font-black leading-none uppercase">
+                  COACH ISHTIAK
                 </span>
               </h1>
 
@@ -398,7 +408,7 @@ export default function PortfolioPage() {
                 </a>
               </div>
 
-              <div className="grid grid-cols-2 max-w-md border-2 border-brand-border bg-brand-secondary divide-x-2 divide-brand-border">
+              <div className="hidden sm:grid grid-cols-2 max-w-md border-2 border-brand-border bg-brand-secondary divide-x-2 divide-brand-border">
                 <div className="p-3 sm:p-4 flex flex-col justify-between hover:bg-brand-border/20 transition-colors">
                   <div className="text-[8px] sm:text-[9px] font-mono text-brand-muted tracking-widest font-black uppercase mb-1 sm:mb-2">[ LOCATION ]</div>
                   <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-bold text-white">
@@ -489,24 +499,51 @@ export default function PortfolioPage() {
       </section>
 
       {/* Stats/Highlight Section */}
-      <section className="py-8 sm:py-12 border-y border-brand-border bg-brand-secondary px-4">
-        <div className="container max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
-            <div className="text-center">
-              <div className="text-4xl font-display font-black mb-1 tracking-tighter text-brand-accent">10+</div>
-              <div className="text-xs uppercase font-bold text-brand-muted tracking-widest">Years Experience</div>
+      <section className="py-8 sm:py-16 border-y border-brand-border bg-black/40 relative overflow-hidden">
+        {/* Decorative background grid effect */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none opacity-20" />
+        
+        <div className="container max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div className="group relative p-5 sm:p-8 bg-brand-secondary/40 border border-brand-border/60 hover:border-brand-accent/50 transition-all duration-300 flex flex-col justify-center items-center text-center overflow-hidden shadow-[4px_4px_0px_0px_#111111] hover:shadow-[4px_4px_0px_0px_rgba(252,255,0,0.15)] hover:-translate-y-0.5 min-h-[120px] sm:min-h-[160px]">
+              {/* Tactical Corner brackets */}
+              <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-brand-border/40 group-hover:border-brand-accent/60 transition-colors" />
+              <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-brand-border/40 group-hover:border-brand-accent/60 transition-colors" />
+              <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-brand-border/40 group-hover:border-brand-accent/60 transition-colors" />
+              <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-brand-border/40 group-hover:border-brand-accent/60 transition-colors" />
+              
+              <div className="text-3xl sm:text-4xl md:text-5xl font-display font-black text-brand-accent tracking-tighter mb-2 leading-none">10+</div>
+              <div className="text-[10px] sm:text-xs uppercase font-extrabold text-brand-muted tracking-widest leading-tight">Years Experience</div>
             </div>
-            <div className="text-center">
-              <div className="text-4xl font-display font-black mb-1 tracking-tighter text-brand-accent">500+</div>
-              <div className="text-xs uppercase font-bold text-brand-muted tracking-widest">Total Students</div>
+
+            <div className="group relative p-5 sm:p-8 bg-brand-secondary/40 border border-brand-border/60 hover:border-brand-accent/50 transition-all duration-300 flex flex-col justify-center items-center text-center overflow-hidden shadow-[4px_4px_0px_0px_#111111] hover:shadow-[4px_4px_0px_0px_rgba(252,255,0,0.15)] hover:-translate-y-0.5 min-h-[120px] sm:min-h-[160px]">
+              <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-brand-border/40 group-hover:border-brand-accent/60 transition-colors" />
+              <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-brand-border/40 group-hover:border-brand-accent/60 transition-colors" />
+              <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-brand-border/40 group-hover:border-brand-accent/60 transition-colors" />
+              <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-brand-border/40 group-hover:border-brand-accent/60 transition-colors" />
+              
+              <div className="text-3xl sm:text-4xl md:text-5xl font-display font-black text-brand-accent tracking-tighter mb-2 leading-none">500+</div>
+              <div className="text-[10px] sm:text-xs uppercase font-extrabold text-brand-muted tracking-widest leading-tight">Total Students</div>
             </div>
-            <div className="text-center">
-              <div className="text-4xl font-display font-black mb-1 tracking-tighter text-brand-accent">1st</div>
-              <div className="text-xs uppercase font-bold text-brand-muted tracking-widest">WBC Referee BD</div>
+
+            <div className="group relative p-5 sm:p-8 bg-brand-secondary/40 border border-brand-border/60 hover:border-brand-accent/50 transition-all duration-300 flex flex-col justify-center items-center text-center overflow-hidden shadow-[4px_4px_0px_0px_#111111] hover:shadow-[4px_4px_0px_0px_rgba(252,255,0,0.15)] hover:-translate-y-0.5 min-h-[120px] sm:min-h-[160px]">
+              <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-brand-border/40 group-hover:border-brand-accent/60 transition-colors" />
+              <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-brand-border/40 group-hover:border-brand-accent/60 transition-colors" />
+              <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-brand-border/40 group-hover:border-brand-accent/60 transition-colors" />
+              <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-brand-border/40 group-hover:border-brand-accent/60 transition-colors" />
+              
+              <div className="text-3xl sm:text-4xl md:text-5xl font-display font-black text-brand-accent tracking-tighter mb-2 leading-none">1st</div>
+              <div className="text-[10px] sm:text-xs uppercase font-extrabold text-brand-muted tracking-widest leading-tight">WBC Referee BD</div>
             </div>
-            <div className="text-center">
-              <div className="text-4xl font-display font-black mb-1 tracking-tighter text-brand-accent">Founder</div>
-              <div className="text-xs uppercase font-bold text-brand-muted tracking-widest">BMMAA Bangladesh</div>
+
+            <div className="group relative p-5 sm:p-8 bg-brand-secondary/40 border border-brand-border/60 hover:border-brand-accent/50 transition-all duration-300 flex flex-col justify-center items-center text-center overflow-hidden shadow-[4px_4px_0px_0px_#111111] hover:shadow-[4px_4px_0px_0px_rgba(252,255,0,0.15)] hover:-translate-y-0.5 min-h-[120px] sm:min-h-[160px]">
+              <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-brand-border/40 group-hover:border-brand-accent/60 transition-colors" />
+              <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-brand-border/40 group-hover:border-brand-accent/60 transition-colors" />
+              <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-brand-border/40 group-hover:border-brand-accent/60 transition-colors" />
+              <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-brand-border/40 group-hover:border-brand-accent/60 transition-colors" />
+              
+              <div className="text-2xl sm:text-3xl md:text-4xl font-display font-black text-brand-accent tracking-tighter mb-2 leading-none uppercase">Founder</div>
+              <div className="text-[10px] sm:text-xs uppercase font-extrabold text-brand-muted tracking-widest leading-tight">BMMAA Bangladesh</div>
             </div>
           </div>
         </div>
@@ -737,39 +774,41 @@ export default function PortfolioPage() {
             <h3 className="text-3xl sm:text-5xl font-display font-black tracking-tighter uppercase text-white">PRICING PLAN</h3>
           </div>
  
-          <div className="grid md:grid-cols-2 gap-6 sm:gap-8 max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto">
             {pricing.map((plan, idx) => (
               <motion.div 
                 key={idx}
-                whileHover={{ scale: 1.02 }}
-                className={`p-6 sm:p-10 rounded-[1.5rem] sm:rounded-[2.5rem] border ${plan.highlight ? 'bg-brand-accent text-black border-brand-accent' : 'bg-brand-secondary border-brand-border text-white'} relative`}
+                whileHover={{ scale: 1.01 }}
+                className={`p-5 sm:p-8 lg:p-10 rounded-[1.5rem] lg:rounded-[2.5rem] border ${plan.highlight ? 'bg-brand-accent text-black border-brand-accent shadow-2xl shadow-brand-accent/10' : 'bg-brand-secondary border-brand-border text-white'} relative flex flex-col justify-between`}
               >
-                {plan.badge && (
-                  <div className="absolute top-8 right-8 px-3 py-1 bg-black text-brand-accent text-[10px] font-black uppercase tracking-widest rounded-full">
-                    {plan.badge}
-                  </div>
-                )}
-                <div className={`text-xs font-black uppercase tracking-widest mb-6 ${plan.highlight ? 'text-black/70' : 'text-brand-muted'}`}>
-                  {plan.title}
-                </div>
-                <div className="flex items-baseline gap-2 mb-8">
-                  {plan.originalPrice && (
-                    <span className={`text-lg line-through font-bold ${plan.highlight ? 'text-black/60' : 'text-brand-muted'}`}>{plan.originalPrice}</span>
+                <div>
+                  {plan.badge && (
+                    <div className="absolute top-5 right-5 sm:top-8 sm:right-8 px-2.5 py-0.5 sm:px-3 sm:py-1 bg-black text-brand-accent text-[9px] sm:text-[10px] font-black uppercase tracking-widest rounded-full">
+                      {plan.badge}
+                    </div>
                   )}
-                  <span className="text-6xl font-display font-black tracking-tighter">{plan.price}</span>
-                  <span className={`text-sm font-bold ${plan.highlight ? 'text-black/70' : 'text-brand-muted'}`}>/ COURSE</span>
+                  <div className={`text-[10px] sm:text-xs font-black uppercase tracking-widest mb-4 sm:mb-6 ${plan.highlight ? 'text-black/70' : 'text-brand-muted'}`}>
+                    {plan.title}
+                  </div>
+                  <div className="flex items-baseline gap-1.5 sm:gap-2 mb-6 sm:mb-8 flex-wrap">
+                    {plan.originalPrice && (
+                      <span className={`text-base sm:text-lg line-through font-bold ${plan.highlight ? 'text-black/60' : 'text-brand-muted'}`}>{plan.originalPrice}</span>
+                    )}
+                    <span className="text-4xl sm:text-5xl lg:text-6xl font-display font-black tracking-tighter leading-none">{plan.price}</span>
+                    <span className={`text-xs sm:text-sm font-bold ${plan.highlight ? 'text-black/70' : 'text-brand-muted'}`}>/ COURSE</span>
+                  </div>
+                  <ul className="space-y-4 sm:space-y-5 mb-8 sm:mb-10 lg:mb-12">
+                    {plan.features.map((feature, fIdx) => (
+                      <li key={fIdx} className="flex items-start gap-3 sm:gap-4">
+                        <CheckCircle2 className={`w-4 h-4 sm:w-5 sm:h-5 mt-0.5 shrink-0 ${plan.highlight ? 'text-black' : 'text-brand-accent'}`} />
+                        <span className="text-sm sm:text-base font-medium leading-tight">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <ul className="space-y-6 mb-12">
-                  {plan.features.map((feature, fIdx) => (
-                    <li key={fIdx} className="flex items-center gap-4">
-                      <CheckCircle2 className={`w-5 h-5 ${plan.highlight ? 'text-black' : 'text-brand-accent'}`} />
-                      <span className="text-base font-medium">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
                 <a 
                   href="mailto:coachishtiak@gmail.com"
-                  className={`w-full py-5 rounded-2xl font-black uppercase tracking-widest text-sm flex items-center justify-center transition-all ${plan.highlight ? 'bg-brand-primary text-brand-accent hover:bg-black' : 'bg-brand-accent text-black hover:bg-brand-accent-hover'}`}
+                  className={`w-full py-3.5 sm:py-5 rounded-xl sm:rounded-2xl font-black uppercase tracking-widest text-xs sm:text-sm flex items-center justify-center transition-all min-h-[44px] ${plan.highlight ? 'bg-brand-primary text-brand-accent hover:bg-black' : 'bg-brand-accent text-black hover:bg-brand-accent-hover'}`}
                 >
                   Join Now
                 </a>
@@ -780,20 +819,20 @@ export default function PortfolioPage() {
       </section>
 
       {/* Gallery Preview Section */}
-      <section className="py-32 px-6 sm:px-12 lg:px-24 bg-brand-secondary/30">
+      <section className="py-16 px-4 sm:py-32 sm:px-12 lg:px-24 bg-brand-secondary/30">
         <div className="container max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-16 gap-6 sm:gap-8">
             <div>
-              <h2 className="text-5xl md:text-7xl font-display font-black tracking-tight mb-6 text-white">
+              <h2 className="text-3xl sm:text-5xl md:text-7xl font-display font-black tracking-tight mb-4 sm:mb-6 text-white leading-none">
                 MOMENTS <span className="text-brand-accent italic">IN MOTION</span>
               </h2>
-              <p className="text-xl text-brand-muted max-w-xl leading-relaxed">
+              <p className="text-base sm:text-lg md:text-xl text-brand-muted max-w-xl leading-relaxed">
                 Take a look at our highlight events, training sessions, and the journey of combat sports in Bangladesh.
               </p>
             </div>
             <Link 
               href="/gallery" 
-              className="inline-flex items-center gap-3 bg-brand-accent text-black px-8 py-4 rounded-full font-bold hover:bg-brand-accent-hover transition-all group shadow-lg shadow-brand-accent/20"
+              className="inline-flex items-center gap-3 bg-brand-accent text-black px-6 py-3.5 sm:px-8 sm:py-4 rounded-full font-bold hover:bg-brand-accent-hover transition-all group shadow-lg shadow-brand-accent/20 text-sm self-start md:self-auto"
             >
               View Full Gallery
               <Images className="w-5 h-5 group-hover:scale-110 transition-transform" />
@@ -806,7 +845,7 @@ export default function PortfolioPage() {
               initial={{ opacity: 0, y: 20 }}
               viewport={{ once: true }}
               whileHover={{ scale: 0.98 }}
-              className="md:col-span-2 relative rounded-3xl overflow-hidden group border border-brand-border shadow-xl"
+              className="md:col-span-2 relative h-[250px] md:h-full rounded-2xl sm:rounded-3xl overflow-hidden group border border-brand-border shadow-xl"
             >
               <Image 
                 src="https://picsum.photos/seed/gall-1/1200/800" 
@@ -815,20 +854,20 @@ export default function PortfolioPage() {
                 className="object-cover transition-transform duration-700 group-hover:scale-110"
                 referrerPolicy="no-referrer"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-brand-primary/90 via-transparent to-transparent p-8 flex flex-col justify-end">
-                <p className="text-xs font-bold uppercase tracking-widest text-brand-accent mb-1">International Presence</p>
-                <p className="text-2xl font-bold font-display text-white">WBC Global Refereeing</p>
+              <div className="absolute inset-0 bg-gradient-to-t from-brand-primary/95 via-transparent to-transparent p-6 sm:p-8 flex flex-col justify-end">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-brand-accent mb-1">International Presence</p>
+                <p className="text-xl sm:text-2xl font-bold font-display text-white">WBC Global Refereeing</p>
               </div>
             </motion.div>
             
-            <div className="grid grid-rows-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-4 md:h-full">
               <motion.div 
                 whileInView={{ opacity: 1, y: 0 }}
                 initial={{ opacity: 0, y: 20 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.1 }}
                 whileHover={{ scale: 0.98 }}
-                className="relative rounded-3xl overflow-hidden group border border-brand-border shadow-lg"
+                className="relative h-[180px] sm:h-[220px] md:h-full rounded-2xl sm:rounded-3xl overflow-hidden group border border-brand-border shadow-lg"
               >
                 <Image 
                   src="https://picsum.photos/seed/gall-2/600/600" 
@@ -837,8 +876,8 @@ export default function PortfolioPage() {
                   className="object-cover transition-transform duration-700 group-hover:scale-110"
                   referrerPolicy="no-referrer"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-brand-primary/90 via-transparent to-transparent p-6 flex flex-col justify-end">
-                  <p className="text-xl font-bold font-display leading-tight text-white">Elite Workshops</p>
+                <div className="absolute inset-0 bg-gradient-to-t from-brand-primary/95 via-transparent to-transparent p-5 sm:p-6 flex flex-col justify-end">
+                  <p className="text-lg sm:text-xl font-bold font-display leading-tight text-white">Elite Workshops</p>
                 </div>
               </motion.div>
               <motion.div 
@@ -847,7 +886,7 @@ export default function PortfolioPage() {
                 viewport={{ once: true }}
                 transition={{ delay: 0.2 }}
                 whileHover={{ scale: 0.98 }}
-                className="relative rounded-3xl overflow-hidden group border border-brand-border shadow-lg"
+                className="relative h-[180px] sm:h-[220px] md:h-full rounded-2xl sm:rounded-3xl overflow-hidden group border border-brand-border shadow-lg"
               >
                 <Image 
                   src="https://picsum.photos/seed/gall-3/600/600" 
@@ -856,8 +895,8 @@ export default function PortfolioPage() {
                   className="object-cover transition-transform duration-700 group-hover:scale-110"
                   referrerPolicy="no-referrer"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-brand-primary/90 via-transparent to-transparent p-6 flex flex-col justify-end">
-                  <p className="text-xl font-bold font-display leading-tight text-white">Championship Nights</p>
+                <div className="absolute inset-0 bg-gradient-to-t from-brand-primary/95 via-transparent to-transparent p-5 sm:p-6 flex flex-col justify-end">
+                  <p className="text-lg sm:text-xl font-bold font-display leading-tight text-white">Championship Nights</p>
                 </div>
               </motion.div>
             </div>
@@ -868,7 +907,7 @@ export default function PortfolioPage() {
               viewport={{ once: true }}
               transition={{ delay: 0.3 }}
               whileHover={{ scale: 0.98 }}
-              className="relative rounded-3xl overflow-hidden group border border-brand-border shadow-xl"
+              className="relative h-[250px] sm:h-[350px] md:h-full rounded-2xl sm:rounded-3xl overflow-hidden group border border-brand-border shadow-xl col-span-1 sm:col-span-2 md:col-span-1"
             >
               <Image 
                 src="https://picsum.photos/seed/gall-4/600/1000" 
@@ -877,8 +916,8 @@ export default function PortfolioPage() {
                 className="object-cover transition-transform duration-700 group-hover:scale-110"
                 referrerPolicy="no-referrer"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-brand-primary/90 via-transparent to-transparent p-8 flex flex-col justify-end">
-                <p className="text-xl font-bold font-display leading-tight text-white">Private Mentorship</p>
+              <div className="absolute inset-0 bg-gradient-to-t from-brand-primary/95 via-transparent to-transparent p-6 sm:p-8 flex flex-col justify-end">
+                <p className="text-xl sm:text-2xl font-bold font-display leading-tight text-white">Private Mentorship</p>
               </div>
             </motion.div>
           </div>
@@ -1079,47 +1118,81 @@ export default function PortfolioPage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 px-4 sm:px-6 border-t border-brand-border bg-brand-secondary">
-        <div className="container max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-3 gap-8 sm:gap-12 mb-12 text-center md:text-left">
-            <div>
-              <div className="font-display font-black text-2xl mb-6 text-white leading-none">
+      <footer className="py-16 px-4 sm:px-6 border-t border-brand-border bg-brand-secondary relative overflow-hidden">
+        {/* Subtle decorative grid lines / details */}
+        <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-brand-accent/35 to-transparent" />
+        
+        <div className="container max-w-7xl mx-auto relative z-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 mb-12 text-center md:text-left">
+            {/* Column 1: Brand Info */}
+            <div className="border-b border-brand-border/30 pb-8 md:border-b-0 md:pb-0">
+              <div className="font-display font-black text-2xl mb-4 text-white leading-none">
                 INVICTUS <span className="text-brand-accent">.</span>
               </div>
-              <p className="text-brand-muted text-sm leading-relaxed max-w-xs">
+              <p className="text-brand-muted text-sm leading-relaxed max-w-xs mx-auto md:mx-0">
                 Pioneering professional MMA & Boxing development in Bangladesh. 
-                Elite training for elite fighters.
+                Elite training and guidance for dedicated athletes.
               </p>
             </div>
-            <div>
-              <h4 className="text-xs font-bold uppercase tracking-widest text-brand-accent mb-6">Contact Details</h4>
+
+            {/* Column 2: Contact Details */}
+            <div className="border-b border-brand-border/30 pb-8 md:border-b-0 md:pb-0">
+              <h4 className="text-xs font-bold uppercase tracking-widest text-brand-accent mb-4 sm:mb-6">Contact Details</h4>
               <ul className="space-y-4 text-sm text-brand-muted">
-                <li className="flex items-center gap-3">
-                  <Mail className="w-4 h-4 text-brand-accent" /> coachishtiak@gmail.com
+                <li className="flex items-center justify-center md:justify-start gap-3">
+                  <Mail className="w-4 h-4 text-brand-accent shrink-0" />
+                  <a href="mailto:coachishtiak@gmail.com" className="hover:text-white transition-colors">coachishtiak@gmail.com</a>
                 </li>
-                <li className="flex items-center gap-3">
-                  <Phone className="w-4 h-4 text-brand-accent" /> 016-2233-9080
+                <li className="flex items-center justify-center md:justify-start gap-3">
+                  <Phone className="w-4 h-4 text-brand-accent shrink-0" />
+                  <a href="tel:01622339080" className="hover:text-white transition-colors">016-2233-9080</a>
                 </li>
-                <li className="flex items-center gap-3">
-                  <MapPin className="w-4 h-4 shrink-0 text-brand-accent" /> 
-                  <span>46/B Dolphin Goli, Kalabagan, Dhaka</span>
+                <li className="flex items-start justify-center md:justify-start gap-3 max-w-xs mx-auto md:mx-0">
+                  <MapPin className="w-4 h-4 shrink-0 text-brand-accent mt-0.5" />
+                  <span className="text-center md:text-left">46/B Dolphin Goli, Kalabagan, Dhaka</span>
                 </li>
               </ul>
             </div>
+
+            {/* Column 3: Social & Connect */}
             <div>
-              <h4 className="text-xs font-bold uppercase tracking-widest text-brand-accent mb-6">Social</h4>
-              <ul className="space-y-4 text-sm text-brand-muted">
-                <li><a href="https://instagram.com/ishtiakofficial" className="hover:text-brand-accent transition-colors">Instagram</a></li>
-                <li><a href="#" className="hover:text-brand-accent transition-colors">LinkedIn</a></li>
-                <li><a href="#" className="hover:text-brand-accent transition-colors">Facebook</a></li>
-              </ul>
+              <h4 className="text-xs font-bold uppercase tracking-widest text-brand-accent mb-4 sm:mb-6">Connect With Us</h4>
+              <p className="text-brand-muted text-xs leading-relaxed mb-6 max-w-xs mx-auto md:mx-0">
+                Follow Coach Ishtiak for daily training clips, fighter highlights, and scheduling updates.
+              </p>
+              <div className="flex items-center justify-center md:justify-start gap-3">
+                <a 
+                  href="https://instagram.com/ishtiakofficial" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="w-11 h-11 rounded-full bg-brand-primary border border-brand-border/80 text-brand-muted hover:text-white hover:border-brand-accent focus:border-brand-accent flex items-center justify-center transition-all group min-w-[44px] min-h-[44px]"
+                  aria-label="Instagram"
+                >
+                  <Instagram className="w-5 h-5 group-hover:scale-110 transition-transform text-brand-accent" />
+                </a>
+                <a 
+                  href="#"
+                  className="w-11 h-11 rounded-full bg-brand-primary border border-brand-border/80 text-brand-muted hover:text-white hover:border-brand-accent focus:border-brand-accent flex items-center justify-center transition-all group min-w-[44px] min-h-[44px]"
+                  aria-label="Facebook"
+                >
+                  <Facebook className="w-5 h-5 group-hover:scale-110 transition-transform hover:text-brand-accent" />
+                </a>
+                <a 
+                  href="#"
+                  className="w-11 h-11 rounded-full bg-brand-primary border border-brand-border/80 text-brand-muted hover:text-white hover:border-brand-accent focus:border-brand-accent flex items-center justify-center transition-all group min-w-[44px] min-h-[44px]"
+                  aria-label="LinkedIn"
+                >
+                  <Linkedin className="w-5 h-5 group-hover:scale-110 transition-transform hover:text-brand-accent" />
+                </a>
+              </div>
             </div>
           </div>
-          <div className="pt-12 border-t border-brand-border flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] uppercase font-bold tracking-[0.2em] text-brand-muted text-center md:text-left">
+
+          <div className="pt-8 border-t border-brand-border flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] uppercase font-bold tracking-[0.2em] text-brand-muted text-center md:text-left">
             <div>© 2024 INVICTUS MMA. ALL RIGHTS RESERVED.</div>
             <div className="flex justify-center md:justify-start gap-8">
-                <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-                <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+              <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
+              <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
             </div>
           </div>
         </div>
