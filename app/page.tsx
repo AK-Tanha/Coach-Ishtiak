@@ -559,19 +559,55 @@ export default function PortfolioPage() {
         <MmaCageDecal className="absolute -left-36 -bottom-36 w-[600px] h-[600px] text-brand-muted/20 -rotate-12 pointer-events-none select-none" />
 
         <div className="container max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-12 gap-8 lg:gap-16">
-            <div className="lg:col-span-5">
-              <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-brand-accent mb-4 sm:mb-6 font-display">Philosophy</h2>
-              <h3 className="text-2xl sm:text-4xl md:text-5xl font-display font-black leading-tight tracking-tighter mb-6 sm:mb-8 text-white">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
+            {/* Left Column: Premium Coach Action Image */}
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="lg:col-span-5 relative group"
+            >
+              {/* Brutalist design corner details */}
+              <div className="absolute -top-2 -left-2 w-4 h-4 border-t-2 border-l-2 border-brand-accent z-20" />
+              <div className="absolute -top-2 -right-2 w-4 h-4 border-t-2 border-r-2 border-brand-accent z-20" />
+              <div className="absolute -bottom-2 -left-2 w-4 h-4 border-b-2 border-l-2 border-brand-accent z-20" />
+              <div className="absolute -bottom-2 -right-2 w-4 h-4 border-b-2 border-r-2 border-brand-accent z-20" />
+
+              <div className="relative h-[320px] sm:h-[480px] lg:h-[560px] w-full rounded-2xl sm:rounded-3xl overflow-hidden border-2 border-brand-border/80 group-hover:border-brand-accent/60 transition-all duration-350 shadow-[8px_8px_0px_0px_#111111] lg:shadow-[12px_12px_0px_0px_rgba(252,255,0,0.15)]">
+                <Image 
+                  src="https://picsum.photos/seed/coach-ishtiaq/800/1000" 
+                  alt="Coach Ishtiak Philosophy"
+                  fill
+                  className="object-cover object-top transition-transform duration-700 group-hover:scale-105"
+                  referrerPolicy="no-referrer"
+                />
+                {/* Visual design badge detailing */}
+                <div className="absolute top-4 left-4 bg-black/90 px-3 py-1.5 border border-brand-border text-[9px] font-mono uppercase tracking-widest text-brand-accent">
+                  [ PROFILE // LEAD COACH ]
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Right Column: Title, Headline, and Descriptions */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.15 }}
+              className="lg:col-span-7 flex flex-col justify-center"
+            >
+              <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-brand-accent mb-4 sm:mb-6 font-display">{"// Philosophy"}</h2>
+              
+              <h3 className="text-2xl sm:text-4xl md:text-5xl font-display font-black leading-tight tracking-tighter mb-6 sm:mb-8 text-white uppercase">
                 Building champions inside and outside the cage.
               </h3>
-            </div>
-            <div className="lg:col-span-7">
-              <div className="space-y-6 sm:space-y-8 text-brand-muted text-sm sm:text-base md:text-lg leading-relaxed">
+
+              <div className="space-y-6 sm:space-y-8 text-brand-muted text-sm sm:text-base md:text-lg leading-relaxed font-sans">
                 <p>
                   Recognized as Bangladesh&apos;s first WBC-certified boxing referee, my journey has been defined by a relentless 
                   pursuit of excellence and the development of combat sports on a national level. 
-                  As the Founder and General Secretary of the <span className="text-brand-accent font-medium">Bangladesh Mixed Martial Arts Association (BMMAA)</span>, 
+                  As the Founder and General Secretary of the <span className="text-brand-accent font-semibold">Bangladesh Mixed Martial Arts Association (BMMAA)</span>, 
                   I have pioneered the first organized MMA events in our nation.
                 </p>
                 <p>
@@ -580,7 +616,7 @@ export default function PortfolioPage() {
                   development of my athletes.
                 </p>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
