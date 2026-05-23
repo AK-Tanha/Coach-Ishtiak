@@ -29,7 +29,11 @@ import {
   TrendingUp,
   Sliders,
   DollarSign,
-  Briefcase
+  Briefcase,
+  Menu,
+  X,
+  ShoppingBag,
+  Package
 } from 'lucide-react';
 
 // Default mock data to populate localStorage if empty
@@ -115,6 +119,36 @@ interface PricingPlan {
   originalPrice?: string;
 }
 
+const defaultProducts = [
+  {
+    id: 1,
+    name: "Invictus Elite Boxing Gloves",
+    price: 89.99,
+    category: "Equipment",
+    image: "https://picsum.photos/seed/gloves/800/800",
+    rating: 4.9,
+    description: "Professional grade leather gloves used by Coach Ishtiaq in training sessions."
+  },
+  {
+    id: 2,
+    name: "WBC Referee Commemorative Tee",
+    price: 34.99,
+    category: "Apparel",
+    image: "https://picsum.photos/seed/shirt/800/800",
+    rating: 4.8,
+    description: "Limited edition t-shirt celebrating Bangladesh's first WBC referee."
+  },
+  {
+    id: 3,
+    name: "Invictus MMA Shinguards",
+    price: 59.99,
+    category: "Equipment",
+    image: "https://picsum.photos/seed/shinguard/800/800",
+    rating: 4.7,
+    description: "Triple-density foam for maximum protection during sparring."
+  }
+];
+
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = React.useState(() => {
     if (typeof window !== 'undefined') {
@@ -126,7 +160,7 @@ export default function AdminPage() {
   const [loginError, setLoginError] = React.useState('');
   
   // Dashboard states
-  const [activeTab, setActiveTab] = React.useState<'students' | 'schedule' | 'pricing' | 'inquiries'>('students');
+  const [activeTab, setActiveTab] = React.useState<'students' | 'schedule' | 'pricing' | 'inquiries' | 'products' | 'orders'>('students');
   const [students, setStudents] = React.useState<typeof defaultStudents>(() => {
     if (typeof window !== 'undefined') {
       const stored = localStorage.getItem('invictus_students');
@@ -155,6 +189,28 @@ export default function AdminPage() {
     }
     return defaultInquiries;
   });
+
+  const [products, setProducts] = React.useState<any[]>(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('invictus_products');
+      return stored ? JSON.parse(stored) : defaultProducts;
+    }
+    return defaultProducts;
+  });
+
+  const [orders, setOrders] = React.useState<any[]>(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('invictus_orders');
+      if (stored) return JSON.parse(stored);
+      // default mock orders
+      const defaultOrders = [
+        { id: "ord-1", athleteName: "Saadman Sakib", phone: "01819283746", email: "saadman.sk@gmail.com", address: "Dhanmondi Rd 27, Dhaka", items: "Invictus Elite Boxing Gloves (Qty: 1)", totalPrice: 89.99, status: "Pending", paymentMethod: "bKash", date: "2026-05-22" },
+        { id: "ord-2", athleteName: "Zarin Subah", phone: "01722883399", email: "zarin.sb@gmail.com", address: "Gulshan-1, Dhaka", items: "WBC Referee Commemorative Tee (Qty: 2)", totalPrice: 69.98, status: "Shipped", paymentMethod: "Nagad", date: "2026-05-20" }
+      ];
+      return defaultOrders;
+    }
+    return [];
+  });
   
   // Search & Filters
   const [studentSearch, setStudentSearch] = React.useState('');
@@ -165,6 +221,8 @@ export default function AdminPage() {
   const [editingPlanId, setEditingPlanId] = React.useState<string | null>(null);
   const [editingPlanForm, setEditingPlanForm] = React.useState({ title: '', price: '', originalPrice: '', highlight: false, badge: '', features: '' });
   
+  const [newProduct, setNewProduct] = React.useState({ name: '', price: '', category: 'Equipment', description: '', image: '', rating: '5.0' });
+
   // Schedule quick add
   const [selectedDay, setSelectedDay] = React.useState('Sunday');
   const [newClassTime, setNewClassTime] = React.useState('');
@@ -172,6 +230,7 @@ export default function AdminPage() {
 
   // Toast / System status notification
   const [systemNotification, setSystemNotification] = React.useState<{ text: string; type: 'success' | 'error' } | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
   // Synchronize initial default values to localStorage if they do not exist
   React.useEffect(() => {
@@ -187,6 +246,16 @@ export default function AdminPage() {
       }
       if (!localStorage.getItem('invictus_inquiries')) {
         localStorage.setItem('invictus_inquiries', JSON.stringify(defaultInquiries));
+      }
+      if (!localStorage.getItem('invictus_products')) {
+        localStorage.setItem('invictus_products', JSON.stringify(defaultProducts));
+      }
+      if (!localStorage.getItem('invictus_orders')) {
+        const defaultOrders = [
+          { id: "ord-1", athleteName: "Saadman Sakib", phone: "01819283746", email: "saadman.sk@gmail.com", address: "Dhanmondi Rd 27, Dhaka", items: "Invictus Elite Boxing Gloves (Qty: 1)", totalPrice: 89.99, status: "Pending", paymentMethod: "bKash", date: "2026-05-22" },
+          { id: "ord-2", athleteName: "Zarin Subah", phone: "01722883399", email: "zarin.sb@gmail.com", address: "Gulshan-1, Dhaka", items: "WBC Referee Commemorative Tee (Qty: 2)", totalPrice: 69.98, status: "Shipped", paymentMethod: "Nagad", date: "2026-05-20" }
+        ];
+        localStorage.setItem('invictus_orders', JSON.stringify(defaultOrders));
       }
     }
   }, []);
@@ -387,6 +456,67 @@ export default function AdminPage() {
     return acc;
   }, 0);
 
+  // Shop Sales revenue
+  const shopSalesRevenue = orders.reduce((acc, current) => {
+    if (current.status === 'Canceled') return acc;
+    return acc + (parseFloat(current.totalPrice) || 0);
+  }, 0);
+
+  // Product Actions
+  const handleDeleteProduct = (id: number, name: string) => {
+    if (confirm(`Are you sure you want to remove ${name} from shop?`)) {
+      const updated = products.filter(p => p.id !== id);
+      setProducts(updated);
+      syncToStorage('invictus_products', updated);
+      triggerNotification(`Removed ${name} from store inventory.`);
+    }
+  };
+
+  const handleAddProduct = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newProduct.name || !newProduct.price) {
+      triggerNotification('Product Name and Price are required.', 'error');
+      return;
+    }
+    const newlyCreated = {
+      id: Date.now(),
+      name: newProduct.name,
+      price: parseFloat(newProduct.price) || 0,
+      category: newProduct.category,
+      description: newProduct.description || "Elite training product.",
+      image: newProduct.image || "https://picsum.photos/seed/invictus-gear/800/800",
+      rating: parseFloat(newProduct.rating) || 5.0
+    };
+    const updated = [newlyCreated, ...products];
+    setProducts(updated);
+    syncToStorage('invictus_products', updated);
+    setNewProduct({ name: '', price: '', category: 'Equipment', description: '', image: '', rating: '5.0' });
+    triggerNotification(`Successfully registered product: ${newlyCreated.name}`);
+  };
+
+  // Order Actions
+  const handleToggleOrderStatus = (id: string, currentStatus: string) => {
+    const nextStatus = currentStatus === 'Pending' ? 'Shipped' : currentStatus === 'Shipped' ? 'Delivered' : currentStatus === 'Delivered' ? 'Canceled' : 'Pending';
+    const updated = orders.map(o => {
+      if (o.id === id) {
+        return { ...o, status: nextStatus };
+      }
+      return o;
+    });
+    setOrders(updated);
+    syncToStorage('invictus_orders', updated);
+    triggerNotification(`Order ${id} status updated to ${nextStatus}.`);
+  };
+
+  const handleDeleteOrder = (id: string) => {
+    if (confirm(`Remove order record ${id}?`)) {
+      const updated = orders.filter(o => o.id !== id);
+      setOrders(updated);
+      syncToStorage('invictus_orders', updated);
+      triggerNotification(`Order ${id} record removed.`);
+    }
+  };
+
   const filteredStudents = students.filter(s => {
     const matchesSearch = s.name.toLowerCase().includes(studentSearch.toLowerCase()) || 
                           s.phone.includes(studentSearch) || 
@@ -396,42 +526,42 @@ export default function AdminPage() {
   });
 
   return (
-    <div className="min-h-screen bg-brand-primary text-white font-sans antialiased relative">
-      {/* Background Decorative Layout Lines */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#18181b_1px,transparent_1px),linear-gradient(to_bottom,#18181b_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-20 pointer-events-none -z-50" />
-      <div className="absolute top-0 left-0 w-full h-[6px] bg-[repeating-linear-gradient(45deg,#FCFF00_0,#FCFF00_15px,#000000_15px,#000000_30px)] z-50 pointer-events-none" />
+    <div className="min-h-screen bg-brand-primary text-white font-sans antialiased relative flex flex-col md:flex-row">
+      {/* Background Decorative Grid */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#141417_1px,transparent_1px),linear-gradient(to_bottom,#141417_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-25 pointer-events-none -z-50" />
+      <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-brand-accent/40 to-transparent z-50 pointer-events-none" />
 
-      {/* Persistent Technical Status Notification Banner */}
+      {/* Modern Status Notification Toast */}
       {systemNotification && (
-        <div className={`fixed top-6 right-6 z-50 p-4 border-2 shadow-2xl flex items-center gap-3 backdrop-blur-md max-w-sm ${systemNotification.type === 'success' ? 'bg-black/90 border-brand-accent text-brand-accent' : 'bg-red-950/90 border-red-500 text-red-100'}`}>
-          <Zap className="w-5 h-5 shrink-0 animate-bounce" />
-          <div className="text-xs font-mono font-black uppercase tracking-wider">{systemNotification.text}</div>
+        <div className={`fixed top-6 right-6 z-50 p-4 rounded-2xl border backdrop-blur-md max-w-sm shadow-xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300 ${
+          systemNotification.type === 'success' 
+            ? 'bg-neutral-900/90 border-brand-accent/30 text-brand-accent shadow-brand-accent/5' 
+            : 'bg-red-950/90 border-red-500/30 text-red-100 shadow-red-500/5'
+        }`}>
+          <Zap className="w-4 h-4 shrink-0 animate-pulse text-brand-accent" />
+          <div className="text-xs font-mono font-bold uppercase tracking-wider">{systemNotification.text}</div>
         </div>
       )}
 
-      {/* AUTH SCREEN FOR SECURITY GUARD */}
+      {/* AUTHENTICATION PORTAL (IF NOT LOGGED IN) */}
       {!isAuthenticated ? (
-        <div className="min-h-screen flex items-center justify-center p-4">
-          <div className="absolute top-12 left-12 flex items-center gap-2">
+        <div className="min-h-screen w-full flex items-center justify-center p-4 relative">
+          <div className="absolute top-12 left-12">
             <Link href="/" className="inline-flex items-center gap-2 text-xs font-mono font-bold text-brand-muted hover:text-brand-accent transition-colors">
-              <ArrowLeft className="w-4 h-4" /> [ BACK TO FIGHT LAB ]
+              <ArrowLeft className="w-4 h-4" /> ← BACK TO HOME
             </Link>
           </div>
 
-          <div className="w-full max-w-md p-6 sm:p-10 bg-brand-secondary border-2 border-brand-border hover:border-brand-accent/50 transition-colors duration-300 relative shadow-[10px_10px_0px_0px_#111111]">
-            <div className="absolute top-0 right-0 py-2 px-3 text-[8px] font-mono text-brand-muted border-b border-l border-brand-border">
-              SYSSEC_v1.0.8
-            </div>
-
+          <div className="w-full max-w-md p-8 sm:p-10 bg-brand-secondary/80 backdrop-blur-xl border border-brand-border/80 hover:border-brand-accent/20 transition-all duration-500 relative shadow-2xl rounded-[2.5rem]">
             <div className="mb-8 text-center sm:text-left">
-              <div className="inline-flex p-3 rounded-full bg-brand-primary border border-brand-border text-brand-accent mb-4">
+              <div className="inline-flex p-4 rounded-full bg-brand-accent/10 border border-brand-accent/25 text-brand-accent mb-4">
                 <Shield className="w-6 h-6 animate-pulse" />
               </div>
-              <h1 className="text-2xl sm:text-3xl font-display font-black uppercase tracking-tight text-white mb-2">
+              <h1 className="text-2xl sm:text-3xl font-display font-black uppercase tracking-tight text-white mb-1.5">
                 COACH <span className="text-brand-accent">CONSOLE</span>
               </h1>
-              <p className="text-xs font-semibold text-brand-muted tracking-widest uppercase">
-                INVICTUS ATHLETICS SECURITY PORTAL
+              <p className="text-xs font-bold text-brand-muted tracking-widest uppercase">
+                INVICTUS ATHLETICS SECURE AUDIT
               </p>
             </div>
 
@@ -445,381 +575,624 @@ export default function AdminPage() {
                   value={passcode}
                   onChange={(e) => setPasscode(e.target.value)}
                   placeholder="Enter Pin code (Default: 1234)"
-                  className="w-full h-[48px] bg-brand-primary border border-brand-border text-center font-mono focus:border-brand-accent focus:outline-none text-white tracking-widest"
+                  className="w-full h-[52px] bg-brand-primary border border-brand-border/80 rounded-xl text-center font-mono focus:border-brand-accent focus:outline-none text-white tracking-[0.2em] transition-all text-sm"
                   required
                 />
               </div>
 
               {loginError && (
-                <div className="p-3 bg-red-950/40 border border-red-500/50 text-red-200 text-xs font-mono font-bold flex items-center gap-2">
+                <div className="p-3.5 bg-red-950/25 border border-red-500/30 text-red-200 text-xs font-mono font-bold flex items-center gap-2.5 rounded-xl">
                   <CircleAlert className="w-4 h-4 shrink-0 text-red-400" />
                   <span>{loginError}</span>
                 </div>
               )}
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-3.5">
                 <button 
                   type="submit"
-                  className="py-4 bg-brand-accent text-black font-black uppercase tracking-wider text-xs border border-transparent hover:bg-brand-accent-hover transition-colors min-h-[44px]"
+                  className="py-4 bg-brand-accent text-black font-black uppercase tracking-wider text-xs rounded-xl hover:bg-brand-accent-hover transition-colors min-h-[48px] cursor-pointer shadow-lg shadow-brand-accent/15"
                 >
                   INITIALIZE
                 </button>
                 <button 
                   type="button"
                   onClick={handleBypass}
-                  className="py-4 bg-brand-primary text-brand-muted font-bold font-mono uppercase tracking-wider text-[10px] border border-brand-border hover:text-white hover:border-white transition-colors min-h-[44px]"
+                  className="py-4 bg-transparent text-brand-muted hover:text-white font-mono uppercase tracking-widest text-[10px] rounded-xl border border-brand-border hover:border-white/20 transition-all h-[48px] cursor-pointer"
                 >
-                  {"BYPASS // DEV"}
+                  BYPASS DEV
                 </button>
               </div>
             </form>
 
-            <div className="mt-8 pt-6 border-t border-brand-border text-center text-xs text-brand-muted leading-relaxed">
-              *Designed for instant full-screen coaching workflows. Supports student registrations, schedules editing, and course structure setups.
+            <div className="mt-8 pt-6 border-t border-brand-border/60 text-center text-xs text-brand-muted leading-relaxed">
+              Designed for intuitive mobile-and-desktop coaching workflows. Instantly modify training plans, schedules, and approve athlete logs.
             </div>
           </div>
         </div>
       ) : (
-        /* ACTUAL LOGGED-IN ADMINISTRATIVE DASHBOARD PANEL */
-        <div className="min-h-screen flex flex-col">
-          {/* Dashboard Header */}
-          <header className="border-b border-brand-border bg-brand-secondary px-4 sm:px-6 relative">
-            <div className="container max-w-7xl mx-auto h-20 sm:h-24 flex items-center justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <Link href="/" className="p-2 border border-brand-border hover:bg-brand-primary hover:border-brand-accent text-brand-muted hover:text-brand-accent transition-all rounded-lg shrink-0">
-                  <ArrowLeft className="w-5 h-5" />
+        /* FULL ATHLETE & BRAND ACTION PLAN (LOGGED-IN VIEW) */
+        <div className="min-h-screen w-full flex flex-col md:flex-row bg-brand-primary">
+          
+          {/* 1. PREMIUM COLLAPSIBLE/RESPONSIVE LEFT SIDEBAR (DESKTOP) */}
+          <aside className="hidden md:flex flex-col w-72 h-screen sticky top-0 bg-brand-secondary border-r border-brand-border/50 p-6 shrink-0 justify-between z-40">
+            <div className="space-y-8">
+              {/* Brand Signature Banner */}
+              <div className="px-2">
+                <Link href="/" className="inline-block group">
+                  <span className="text-xl font-display font-black tracking-tight text-white group-hover:text-brand-accent transition-colors">
+                    INVICTUS <span className="text-brand-accent font-extrabold text-2xl">.</span>
+                  </span>
+                  <span className="block text-[10px] uppercase tracking-widest font-mono text-brand-muted mt-1 font-bold">
+                    COACH ADMIN PORTAL
+                  </span>
                 </Link>
+              </div>
+
+              {/* Navigation Items (Action Links) */}
+              <nav className="space-y-1">
+                {[
+                  { id: 'students', label: 'Athlete Leads', icon: Users, count: students.length },
+                  { id: 'schedule', label: 'Weekly Schedule', icon: Calendar },
+                  { id: 'pricing', label: 'Configure Plans', icon: Sliders },
+                  { id: 'inquiries', label: 'Client Inbox', icon: Mail, count: inquiries.filter(i => !i.read).length, isInbox: true },
+                  { id: 'products', label: 'Manage Shop', icon: ShoppingBag, count: products.length },
+                  { id: 'orders', label: 'Shop Orders', icon: Package, count: orders.filter(o => o.status === 'Pending').length, isInbox: true },
+                ].map((item) => {
+                  const TabIcon = item.icon;
+                  const isActive = activeTab === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => setActiveTab(item.id as any)}
+                      className={`w-full flex items-center justify-between px-4 py-3 text-xs font-bold uppercase tracking-wider rounded-xl transition-all cursor-pointer ${
+                        isActive
+                          ? 'bg-brand-accent text-black font-black shadow-lg shadow-brand-accent/15'
+                          : 'text-brand-muted hover:text-white hover:bg-white/[0.02]'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <TabIcon className={`w-4 h-4 shrink-0 transition-colors ${isActive ? 'text-black' : 'text-brand-muted group-hover:text-white'}`} />
+                        <span>{item.label}</span>
+                      </div>
+                      {item.count !== undefined && item.count > 0 && (
+                        <span className={`px-2 py-0.5 text-[9px] font-mono font-bold rounded-full ${
+                          isActive 
+                            ? 'bg-black text-brand-accent' 
+                            : item.isInbox 
+                              ? 'bg-brand-accent text-black font-bold animate-pulse'
+                              : 'bg-brand-primary border border-brand-border text-brand-muted'
+                        }`}>
+                          {item.count}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </nav>
+            </div>
+
+            {/* Profile badge & System actions */}
+            <div className="pt-6 border-t border-brand-border/60">
+              <div className="flex items-center gap-3 px-2 mb-5">
+                <div className="w-10 h-10 rounded-full bg-brand-accent/10 border border-brand-accent/25 flex items-center justify-center text-brand-accent font-black text-sm">
+                  CI
+                </div>
                 <div>
-                  <div className="flex items-center gap-2">
-                    <h1 className="text-lg sm:text-xl font-display font-black text-white uppercase tracking-tight">
-                      COACH CONSOLE <span className="text-brand-accent">.</span>
-                    </h1>
-                    <span className="hidden sm:inline bg-brand-accent/10 border border-brand-accent/25 px-2 py-0.5 text-[8px] font-mono text-brand-accent font-black tracking-widest uppercase">
-                      ACTIVE SESSION
-                    </span>
-                  </div>
-                  <div className="text-[10px] font-mono font-bold text-brand-muted uppercase tracking-wider hidden sm:block">
-                    INVICTUS BJJ, BOXING & MMA DHAKA
-                  </div>
+                  <div className="text-xs font-bold text-white uppercase tracking-wider">Coach Ishtiak</div>
+                  <div className="text-[9px] font-mono text-brand-muted uppercase">WBC Boxer & Coach</div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
-                <button 
+              <div className="grid grid-cols-2 gap-2.5">
+                <Link 
+                  href="/"
+                  className="px-3 py-2 border border-brand-border/60 hover:border-brand-accent/30 text-[9px] font-mono font-extrabold uppercase tracking-widest text-center text-brand-muted hover:text-white rounded-lg transition-all flex items-center justify-center min-h-[36px]"
+                >
+                  GO BACK
+                </Link>
+                <button
                   onClick={handleLogout}
-                  className="px-4 py-2 sm:px-5 sm:py-2.5 bg-brand-primary border border-brand-border hover:border-red-500 hover:text-red-400 font-mono text-[10px] font-black uppercase tracking-widest rounded-lg transition-colors cursor-pointer"
+                  className="px-3 py-2 bg-red-500/10 border border-red-500/20 hover:bg-red-500 hover:border-red-500 hover:text-black text-[9px] font-mono font-extrabold uppercase tracking-widest text-center text-red-400 rounded-lg transition-all min-h-[36px] cursor-pointer"
                 >
-                  SECURE_EXIT
+                  SEC_EXIT
                 </button>
               </div>
             </div>
-          </header>
+          </aside>
 
-          {/* Quick Metrics Overview Row */}
-          <section className="bg-black/60 border-b border-brand-border py-6 px-4">
-            <div className="container max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="p-4 bg-brand-secondary/40 border border-brand-border flex items-center gap-4 hover:border-brand-accent/20 transition-colors">
-                <div className="p-3 bg-brand-accent/5 ring-1 ring-brand-accent/10 text-brand-accent rounded-xl hidden sm:block">
-                  <Users className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="text-[9px] font-mono font-extrabold text-brand-muted uppercase tracking-widest">Total Students Logged</div>
-                  <div className="text-2xl font-display font-black text-white leading-none mt-1">{totalLeads} <span className="text-xs text-brand-muted">MMA/BJJ</span></div>
-                </div>
-              </div>
+          {/* 2. RESPONSIVE MOBILE NOTIFICATION NAV BAR (MOBILE) */}
+          <div className="md:hidden flex flex-col bg-brand-secondary border-b border-brand-border/50 sticky top-0 z-40">
+            <div className="flex items-center justify-between p-4">
+              <Link href="/" className="font-display font-black text-lg tracking-tight text-white uppercase">
+                INVICTUS <span className="text-brand-accent">.</span>
+              </Link>
 
-              <div className="p-4 bg-brand-secondary/40 border border-brand-border flex items-center gap-4 hover:border-brand-accent/20 transition-colors">
-                <div className="p-3 bg-brand-accent/5 ring-1 ring-brand-accent/10 text-brand-accent rounded-xl hidden sm:block">
-                  <CheckCircle2 className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="text-[9px] font-mono font-extrabold text-brand-muted uppercase tracking-widest">Enrolled / Active</div>
-                  <div className="text-2xl font-display font-black text-[#52fa7c] leading-none mt-1">{activeStudentsCount} <span className="text-xs text-brand-muted">Approved</span></div>
-                </div>
-              </div>
-
-              <div className="p-4 bg-brand-secondary/40 border border-brand-border flex items-center gap-4 hover:border-brand-accent/20 transition-colors">
-                <div className="p-3 bg-brand-accent/5 ring-1 ring-brand-accent/10 text-brand-accent rounded-xl hidden sm:block">
-                  <Clock className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="text-[9px] font-mono font-extrabold text-brand-muted uppercase tracking-widest">Pending Review</div>
-                  <div className="text-2xl font-display font-black text-amber-400 leading-none mt-1">{pendingStudentsCount} <span className="text-xs text-brand-muted">New Leads</span></div>
-                </div>
-              </div>
-
-              <div className="p-4 bg-brand-secondary/40 border border-brand-border flex items-center gap-4 hover:border-brand-accent/20 transition-colors">
-                <div className="p-3 bg-brand-accent/5 ring-1 ring-brand-accent/10 text-brand-accent rounded-xl hidden sm:block">
-                  <DollarSign className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="text-[9px] font-mono font-extrabold text-brand-muted uppercase tracking-widest">Est. Monthly Revenue</div>
-                  <div className="text-2xl font-display font-black text-brand-accent leading-none mt-1">৳ {estimatedRevenue.toLocaleString()}</div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Interactive Navigation Tabs for Dashboard Options */}
-          <section className="bg-brand-secondary border-b border-brand-border/60 sticky top-0 z-30">
-            <div className="container max-w-7xl mx-auto px-4 sm:px-6">
-              <div className="flex whitespace-nowrap overflow-x-auto gap-1 sm:gap-4 py-3 justify-start sm:justify-start">
-                <button 
-                  onClick={() => setActiveTab('students')}
-                  className={`px-4 py-3 text-xs font-mono font-black uppercase tracking-widest border-b-2 transition-all cursor-pointer min-h-[44px] ${activeTab === 'students' ? 'border-brand-accent text-brand-accent bg-white/5' : 'border-transparent text-brand-muted hover:text-white'}`}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleLogout}
+                  className="px-2.5 py-1.5 border border-brand-border text-[9px] font-mono font-bold text-brand-muted rounded-lg hover:text-white uppercase transition-all"
                 >
-                  🏹 ATHLETE LEADS ({students.length})
+                  Exit
                 </button>
-                <button 
-                  onClick={() => setActiveTab('schedule')}
-                  className={`px-4 py-3 text-xs font-mono font-black uppercase tracking-widest border-b-2 transition-all cursor-pointer min-h-[44px] ${activeTab === 'schedule' ? 'border-brand-accent text-brand-accent bg-white/5' : 'border-transparent text-brand-muted hover:text-white'}`}
+                <button
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className="p-2 border border-brand-border/60 text-brand-muted hover:text-white rounded-lg transition-all min-w-[36px] min-h-[36px] flex items-center justify-center cursor-pointer"
                 >
-                  📅 WEEKLY SCHEDULE
-                </button>
-                <button 
-                  onClick={() => setActiveTab('pricing')}
-                  className={`px-4 py-3 text-xs font-mono font-black uppercase tracking-widest border-b-2 transition-all cursor-pointer min-h-[44px] ${activeTab === 'pricing' ? 'border-brand-accent text-brand-accent bg-white/5' : 'border-transparent text-brand-muted hover:text-white'}`}
-                >
-                  💎 CONFIGURE PLANS
-                </button>
-                <button 
-                  onClick={() => setActiveTab('inquiries')}
-                  className={`px-4 py-3 text-xs font-mono font-black uppercase tracking-widest border-b-2 transition-all cursor-pointer min-h-[44px] ${activeTab === 'inquiries' ? 'border-brand-accent text-brand-accent bg-white/5' : 'border-transparent text-brand-muted hover:text-white'}`}
-                >
-                  📨 CLIENT INBOX ({inquiries.filter(i => !i.read).length})
+                  {mobileMenuOpen ? <X className="w-4.5 h-4.5 text-brand-accent" /> : <Menu className="w-4.5 h-4.5" />}
                 </button>
               </div>
             </div>
-          </section>
 
-          {/* Core Content Body depending on active tab status */}
-          <main className="flex-1 container max-w-7xl mx-auto py-8 px-4 sm:px-6">
+            {/* Mobile Navigation Drawer Dropdown */}
+            {mobileMenuOpen && (
+              <div className="bg-brand-primary border-t border-brand-border/60 px-4 py-3 divide-y divide-brand-border/40 space-y-2 animate-in slide-in-from-top-4 duration-200">
+                <div className="py-2 space-y-1">
+                  {[
+                    { id: 'students', label: 'Athlete Leads', icon: Users, count: students.length },
+                    { id: 'schedule', label: 'Weekly Schedule', icon: Calendar },
+                    { id: 'pricing', label: 'Configure Plans', icon: Sliders },
+                    { id: 'inquiries', label: 'Client Inbox', icon: Mail, count: inquiries.filter(i => !i.read).length, isInbox: true },
+                    { id: 'products', label: 'Manage Shop', icon: ShoppingBag, count: products.length },
+                    { id: 'orders', label: 'Shop Orders', icon: Package, count: orders.filter(o => o.status === 'Pending').length, isInbox: true },
+                  ].map((item) => {
+                    const TabIcon = item.icon;
+                    const isActive = activeTab === item.id;
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => {
+                          setActiveTab(item.id as any);
+                          setMobileMenuOpen(false);
+                        }}
+                        className={`w-full flex items-center justify-between px-3 py-2.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all cursor-pointer ${
+                          isActive
+                            ? 'bg-brand-accent text-black font-black'
+                            : 'text-brand-muted hover:text-white'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <TabIcon className="w-4 h-4 shrink-0" />
+                          <span>{item.label}</span>
+                        </div>
+                        {item.count !== undefined && item.count > 0 && (
+                          <span className={`px-2 py-0.5 text-[9px] font-mono font-bold rounded ${
+                            isActive ? 'bg-black text-brand-accent' : 'bg-brand-secondary border border-brand-border text-brand-muted'
+                          }`}>
+                            {item.count}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+                
+                <div className="pt-3 pb-2 flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-full bg-brand-accent/10 border border-brand-accent/25 flex items-center justify-center text-brand-accent font-black text-xs">
+                      CI
+                    </div>
+                    <span className="text-xs font-bold text-white">Coach Ishtiak</span>
+                  </div>
+                  <Link 
+                    href="/"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="text-xs font-mono font-bold text-brand-accent hover:underline"
+                  >
+                    GO TO SITE →
+                  </Link>
+                </div>
+              </div>
+            )}
+          </div>
 
-            {/* TAB 1: STUDENTS / LEADS MANAGEMENT */}
-            {activeTab === 'students' && (
-              <div className="space-y-8">
-                {/* Responsive Setup Grid */}
-                <div className="grid lg:grid-cols-12 gap-8 items-start">
-                  {/* Left sub-column: Add student manual form */}
-                  <div className="lg:col-span-4 p-5 sm:p-6 bg-brand-secondary border border-brand-border rounded-2xl relative">
-                    <h2 className="text-sm font-black uppercase tracking-widest text-white border-b border-brand-border pb-4 mb-5 flex items-center gap-2">
-                      <UserPlus className="w-4 h-4 text-brand-accent" /> REGISTER NEW ATHLETE
-                    </h2>
+          {/* 3. DOCK CONTAINER & WORKSPACE SCREEN */}
+          <div className="flex-1 min-w-0 flex flex-col overflow-y-auto">
+            
+            {/* Elegant Workspace Header for Desktop */}
+            <header className="hidden md:flex items-center justify-between p-7 bg-brand-secondary/30 border-b border-brand-border/40">
+              <div>
+                <h1 className="text-sm font-black uppercase tracking-wider text-white">
+                  {activeTab === 'students' && '👥 Athlete Leads Center'}
+                  {activeTab === 'schedule' && '📅 Class & Timing Timetable'}
+                  {activeTab === 'pricing' && '💎 Configure Package Plans'}
+                  {activeTab === 'inquiries' && '📬 Dynamic Mail Inbox'}
+                  {activeTab === 'products' && '📦 Shop Inventory Manager'}
+                  {activeTab === 'orders' && '🛒 Store Orders Stream'}
+                </h1>
+                <p className="text-xs text-brand-muted mt-0.5 font-sans">
+                  Active directory synchronized directly to client modules.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3 select-none">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#52fa7c] animate-ping shrink-0" />
+                <span className="text-[10px] font-mono text-brand-muted uppercase tracking-wider">
+                  BMMAA ACTIVE SYSTEM
+                </span>
+              </div>
+            </header>
+
+            {/* Core Content Body depending on active state tab */}
+            <main className="flex-1 p-4 sm:p-8 space-y-8 max-w-7xl w-full mx-auto">
+              
+              {/* Quick Metrics Dashboard Row */}
+              <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+                <div className="p-5 bg-brand-secondary/40 border border-brand-border/80 rounded-2xl flex items-center gap-4 hover:border-brand-accent/30 hover:shadow-[0_0_20px_rgba(204,255,0,0.02)] transition-all duration-300 group">
+                  <div className="p-3 bg-brand-accent/5 border border-brand-accent/20 text-brand-accent rounded-xl hidden sm:block group-hover:scale-105 transition-transform duration-300">
+                    <Users className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="text-[9px] font-mono font-bold text-brand-muted uppercase tracking-widest">Athlete Inquiries</div>
+                    <div className="text-xl sm:text-2xl font-display font-black text-white leading-none mt-1 sm:mt-1.5">{totalLeads}</div>
+                  </div>
+                </div>
+
+                <div className="p-5 bg-brand-secondary/40 border border-brand-border/80 rounded-2xl flex items-center gap-4 hover:border-brand-accent/30 hover:shadow-[0_0_20px_rgba(204,255,0,0.02)] transition-all duration-300 group">
+                  <div className="p-3 bg-[#52fa7c]/5 border border-[#52fa7c]/20 text-[#52fa7c] rounded-xl hidden sm:block group-hover:scale-105 transition-transform duration-300">
+                    <CheckCircle2 className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="text-[9px] font-mono font-bold text-brand-muted uppercase tracking-widest">Active Approved</div>
+                    <div className="text-xl sm:text-2xl font-display font-black text-[#52fa7c] leading-none mt-1 sm:mt-1.5">{activeStudentsCount}</div>
+                  </div>
+                </div>
+
+                <div className="p-5 bg-brand-secondary/40 border border-brand-border/80 rounded-2xl flex items-center gap-4 hover:border-brand-accent/30 hover:shadow-[0_0_20px_rgba(204,255,0,0.02)] transition-all duration-300 group">
+                  <div className="p-3 bg-amber-400/5 border border-amber-400/20 text-amber-400 rounded-xl hidden sm:block group-hover:scale-105 transition-transform duration-300">
+                    <Clock className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="text-[9px] font-mono font-bold text-brand-muted uppercase tracking-widest">Pending Review</div>
+                    <div className="text-xl sm:text-2xl font-display font-black text-amber-400 leading-none mt-1 sm:mt-1.5">{pendingStudentsCount}</div>
+                  </div>
+                </div>
+
+                <div className="p-5 bg-brand-secondary/40 border border-brand-border/80 rounded-2xl flex items-center gap-4 hover:border-brand-accent/30 hover:shadow-[0_0_20px_rgba(204,255,0,0.02)] transition-all duration-300 group flex-wrap">
+                  <div className="p-3 bg-[#ccff00]/5 border border-[#ccff00]/20 text-brand-accent rounded-xl hidden sm:block group-hover:scale-105 transition-transform duration-300">
+                    <DollarSign className="w-5 h-5 animate-pulse" />
+                  </div>
+                  <div>
+                    <div className="text-[9px] font-mono font-bold text-brand-muted uppercase tracking-widest">Aggregate Income Stream</div>
+                    <div className="text-xl sm:text-2xl font-display font-black text-brand-accent leading-none mt-1 sm:mt-1.5">৳{(estimatedRevenue + shopSalesRevenue).toLocaleString()}</div>
+                    <div className="text-[9px] font-mono text-brand-muted mt-1 font-bold">Gym: ৳{estimatedRevenue.toLocaleString()} | Shop: ৳{shopSalesRevenue.toLocaleString()}</div>
+                  </div>
+                </div>
+              </section>
+
+              {/* TAB 1: STUDENTS / LEADS MANAGEMENT */}
+              {activeTab === 'students' && (
+                <div className="space-y-6">
+                  <div className="grid lg:grid-cols-12 gap-6 items-start">
                     
-                    <form onSubmit={handleAddStudent} className="space-y-4 font-mono text-xs">
-                      <div className="space-y-1.5">
-                        <label className="text-brand-muted uppercase font-bold tracking-wider">Full Name *</label>
-                        <input 
-                          type="text" 
-                          value={newStudent.name}
-                          onChange={(e) => setNewStudent({...newStudent, name: e.target.value})}
-                          placeholder="e.g. Shakib Al Hasan"
-                          className="w-full bg-brand-primary border border-brand-border p-3 rounded-lg text-white font-sans text-sm focus:border-brand-accent focus:outline-none"
-                          required
-                        />
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="text-brand-muted uppercase font-bold tracking-wider">Contact Phone *</label>
-                        <input 
-                          type="text" 
-                          value={newStudent.phone}
-                          onChange={(e) => setNewStudent({...newStudent, phone: e.target.value})}
-                          placeholder="e.g. 017-XXXX-XXXX"
-                          className="w-full bg-brand-primary border border-brand-border p-3 rounded-lg text-white focus:border-brand-accent focus:outline-none"
-                          required
-                        />
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="text-brand-muted uppercase font-bold tracking-wider">Email Address</label>
-                        <input 
-                          type="email" 
-                          value={newStudent.email}
-                          onChange={(e) => setNewStudent({...newStudent, email: e.target.value})}
-                          placeholder="e.g. fighter@gmail.com"
-                          className="w-full bg-brand-primary border border-brand-border p-3 rounded-lg text-white font-sans focus:border-brand-accent focus:outline-none"
-                        />
-                      </div>
-                      <div className="grid grid-cols-2 gap-3.5">
-                        <div className="space-y-1.5">
-                          <label className="text-brand-muted uppercase font-bold tracking-wider">Target Course</label>
-                          <select 
-                            value={newStudent.course}
-                            onChange={(e) => setNewStudent({...newStudent, course: e.target.value})}
-                            className="w-full bg-brand-primary border border-brand-border p-3 rounded-lg text-white font-sans focus:border-brand-accent focus:outline-none h-[44px]"
-                          >
-                            <option value="3 Months Course">3 Months Core</option>
-                            <option value="Monthly Plan">Monthly Plan</option>
-                          </select>
-                        </div>
-                        <div className="space-y-1.5">
-                          <label className="text-brand-muted uppercase font-bold tracking-wider">Initial Status</label>
-                          <select 
-                            value={newStudent.status}
-                            onChange={(e) => setNewStudent({...newStudent, status: e.target.value})}
-                            className="w-full bg-brand-primary border border-brand-border p-3 rounded-lg text-white font-sans focus:border-brand-accent focus:outline-none h-[44px]"
-                          >
-                            <option value="Pending">Pending</option>
-                            <option value="Active">Active</option>
-                            <option value="Canceled">Canceled</option>
-                          </select>
-                        </div>
-                      </div>
+                    {/* Athlete registration form */}
+                    <div className="lg:col-span-4 p-6 bg-brand-secondary/40 border border-brand-border/80 rounded-[2rem] relative shadow-lg">
+                      <h2 className="text-xs font-black uppercase tracking-[0.2em] text-white border-b border-brand-border/40 pb-4 mb-5 flex items-center gap-2 font-display">
+                        <UserPlus className="w-4 h-4 text-brand-accent" /> Register Athlete
+                      </h2>
                       
+                      <form onSubmit={handleAddStudent} className="space-y-4 text-xs">
+                        <div className="space-y-1.5">
+                          <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Full Name *</label>
+                          <input 
+                            type="text" 
+                            value={newStudent.name}
+                            onChange={(e) => setNewStudent({...newStudent, name: e.target.value})}
+                            placeholder="e.g. Shakib Al Hasan"
+                            className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                            required
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Contact Phone *</label>
+                          <input 
+                            type="text" 
+                            value={newStudent.phone}
+                            onChange={(e) => setNewStudent({...newStudent, phone: e.target.value})}
+                            placeholder="e.g. 017-XXXX-XXXX"
+                            className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm font-mono focus:border-brand-accent focus:outline-none transition-colors"
+                            required
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Email Address</label>
+                          <input 
+                            type="email" 
+                            value={newStudent.email}
+                            onChange={(e) => setNewStudent({...newStudent, email: e.target.value})}
+                            placeholder="e.g. fighter@gmail.com"
+                            className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                          />
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="space-y-1.5">
+                            <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Target Course</label>
+                            <select 
+                              value={newStudent.course}
+                              onChange={(e) => setNewStudent({...newStudent, course: e.target.value})}
+                              className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white focus:border-brand-accent focus:outline-none h-[44px] text-xs"
+                            >
+                              <option value="3 Months Course">3 Months Core</option>
+                              <option value="Monthly Plan">Monthly Plan</option>
+                            </select>
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Initial Status</label>
+                            <select 
+                              value={newStudent.status}
+                              onChange={(e) => setNewStudent({...newStudent, status: e.target.value})}
+                              className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white focus:border-brand-accent focus:outline-none h-[44px] text-xs"
+                            >
+                              <option value="Pending">Pending</option>
+                              <option value="Active">Active</option>
+                              <option value="Canceled">Canceled</option>
+                            </select>
+                          </div>
+                        </div>
+                        
+                        <button 
+                          type="submit"
+                          className="w-full py-4 mt-2 bg-brand-accent text-black font-bold uppercase tracking-widest rounded-xl hover:bg-brand-accent-hover transition-colors min-h-[44px] cursor-pointer shadow-md shadow-brand-accent/15 text-xs"
+                        >
+                          CONFIRM ENROLLMENT
+                        </button>
+                      </form>
+                    </div>
+
+                    {/* Athlete Leads Deck list */}
+                    <div className="lg:col-span-8 space-y-4">
+                      {/* Search Bar & Status Filter Pill Swapper */}
+                      <div className="p-4 bg-brand-secondary/40 border border-brand-border rounded-2xl flex flex-col sm:flex-row gap-3 justify-between items-center shadow-md">
+                        <div className="relative w-full sm:max-w-xs">
+                          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-muted" />
+                          <input 
+                            type="text" 
+                            placeholder="Search athletes..."
+                            value={studentSearch}
+                            onChange={(e) => setStudentSearch(e.target.value)}
+                            className="w-full pl-10 pr-4 py-2.5 bg-brand-primary border border-brand-border rounded-xl text-xs text-white placeholder:text-brand-muted/70 focus:border-brand-accent focus:outline-none transition-colors"
+                          />
+                        </div>
+
+                        <div className="flex gap-2 w-full sm:w-auto overflow-x-auto select-none no-scrollbar">
+                          {['All', 'Active', 'Pending', 'Canceled'].map((filterVal) => (
+                            <button
+                              key={filterVal}
+                              onClick={() => setStudentFilter(filterVal)}
+                              className={`px-3.5 py-2 text-[10px] font-bold uppercase tracking-wider rounded-lg border transition-colors cursor-pointer min-h-[36px] ${
+                                studentFilter === filterVal 
+                                  ? 'bg-brand-accent text-black border-brand-accent font-extrabold shadow-sm' 
+                                  : 'bg-brand-primary/80 border-brand-border text-brand-muted hover:text-white hover:border-white/20'
+                              }`}
+                            >
+                              {filterVal}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Desktop Table View */}
+                      <div className="hidden md:block overflow-hidden bg-brand-secondary/40 border border-brand-border rounded-2xl shadow-xl">
+                        <table className="w-full text-left border-collapse">
+                          <thead>
+                            <tr className="bg-brand-secondary/90 border-b border-brand-border text-brand-muted text-[10px] font-bold uppercase tracking-wider">
+                              <th className="p-4">Athlete Core details</th>
+                              <th className="p-4">Contact Info</th>
+                              <th className="p-4">Enrolled Course</th>
+                              <th className="p-4">Approved Status</th>
+                              <th className="p-4 text-right">Delete</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-brand-border/40 text-sm">
+                            {filteredStudents.length === 0 ? (
+                              <tr>
+                                <td colSpan={5} className="p-12 text-center text-brand-muted font-mono text-xs">
+                                  No records found in database.
+                                </td>
+                              </tr>
+                            ) : (
+                              filteredStudents.map((athlete) => (
+                                <tr key={athlete.id} className="hover:bg-brand-secondary/20 transition-colors">
+                                  <td className="p-4">
+                                    <div className="font-bold text-white text-sm">{athlete.name}</div>
+                                    <div className="text-[10px] text-brand-muted font-mono mt-0.5">REGISTERED: {athlete.enrolledDate}</div>
+                                  </td>
+                                  <td className="p-4">
+                                    <div className="font-mono text-xs text-brand-muted">{athlete.phone}</div>
+                                    <div className="text-xs text-brand-muted/75">{athlete.email}</div>
+                                  </td>
+                                  <td className="p-4">
+                                    <span className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-brand-primary border border-brand-border/60 text-white/90">
+                                      {athlete.course}
+                                    </span>
+                                  </td>
+                                  <td className="p-4">
+                                    <button
+                                      onClick={() => handleToggleStudentStatus(athlete.id, athlete.status)}
+                                      className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest transition-all border shrink-0 cursor-pointer ${
+                                        athlete.status === 'Active' ? 'bg-[#52fa7c]/10 text-[#2ee159] border-[#2ee159]/30' :
+                                        athlete.status === 'Pending' ? 'bg-amber-400/10 text-amber-500 border-amber-400/30' :
+                                        'bg-neutral-800 text-brand-muted border-brand-border'
+                                      }`}
+                                    >
+                                      {athlete.status}
+                                    </button>
+                                  </td>
+                                  <td className="p-4 text-right">
+                                    <button 
+                                      onClick={() => handleDeleteStudent(athlete.id, athlete.name)}
+                                      className="p-2.5 rounded-xl border border-brand-border hover:bg-red-500/10 hover:border-red-500 hover:text-red-500 transition-colors text-brand-muted group cursor-pointer min-h-[38px] min-w-[38px] flex items-center justify-center inline-block"
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </button>
+                                  </td>
+                                </tr>
+                              ))
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      {/* Mobile Card Deck View */}
+                      <div className="md:hidden space-y-4">
+                        {filteredStudents.length === 0 ? (
+                          <div className="p-10 text-center text-brand-muted bg-brand-secondary border border-brand-border rounded-xl font-mono text-xs">
+                            No records matching filter settings.
+                          </div>
+                        ) : (
+                          filteredStudents.map((athlete) => (
+                            <div key={athlete.id} className="p-5 bg-brand-secondary/40 border border-brand-border rounded-[1.5rem] space-y-4 shadow-sm">
+                              <div className="flex justify-between items-start gap-3">
+                                <div>
+                                  <h3 className="font-bold text-white leading-tight">{athlete.name}</h3>
+                                  <div className="text-[9px] text-brand-muted font-mono mt-0.5">ENROLLED: {athlete.enrolledDate}</div>
+                                </div>
+                                <button
+                                  onClick={() => handleToggleStudentStatus(athlete.id, athlete.status)}
+                                  className={`px-3 py-0.5 rounded-full text-[9px] font-bold uppercase border cursor-pointer ${
+                                    athlete.status === 'Active' ? 'bg-[#52fa7c]/10 text-[#2ee159] border-[#52fa7c]/30' :
+                                    athlete.status === 'Pending' ? 'bg-amber-400/10 text-amber-500 border-amber-400/30' :
+                                    'bg-neutral-800 text-brand-muted border-brand-border'
+                                  }`}
+                                >
+                                  {athlete.status}
+                                </button>
+                              </div>
+
+                              <div className="grid grid-cols-2 gap-3 text-xs bg-brand-primary/40 border border-brand-border/40 p-3 rounded-xl">
+                                <div>
+                                  <div className="text-[8px] text-brand-muted uppercase tracking-wider mb-0.5">PHONE</div>
+                                  <div className="text-white font-mono font-bold">{athlete.phone}</div>
+                                </div>
+                                <div>
+                                  <div className="text-[8px] text-brand-muted uppercase tracking-wider mb-0.5">COURSE</div>
+                                  <div className="text-brand-accent font-bold truncate">{athlete.course}</div>
+                                </div>
+                                <div className="col-span-2 border-t border-brand-border/30 pt-2 shrink-0">
+                                  <div className="text-[8px] text-brand-muted uppercase tracking-wider mb-0.5">EMAIL ID</div>
+                                  <div className="text-white/80 truncate font-sans">{athlete.email}</div>
+                                </div>
+                              </div>
+
+                              <div className="flex gap-2.5">
+                                <button 
+                                  onClick={() => handleToggleStudentStatus(athlete.id, athlete.status)}
+                                  className="flex-1 py-2.5 bg-brand-primary border border-brand-border text-[9px] font-bold tracking-widest text-white rounded-xl uppercase hover:bg-neutral-900 focus:outline-none min-h-[40px] cursor-pointer"
+                                >
+                                  CHANGE STATUS
+                                </button>
+                                <button 
+                                  onClick={() => handleDeleteStudent(athlete.id, athlete.name)}
+                                  className="w-10 h-10 bg-brand-primary border border-brand-border flex items-center justify-center text-brand-muted hover:text-red-500 hover:border-red-500 rounded-xl transition-colors min-h-[40px] min-w-[40px] cursor-pointer"
+                                  aria-label="Delete Student"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 2: WEEKLY SCHEDULE MANAGER */}
+              {activeTab === 'schedule' && (
+                <div className="grid lg:grid-cols-12 gap-8 items-start">
+                  
+                  {/* Left Column timing log addition form */}
+                  <div className="lg:col-span-4 p-6 bg-brand-secondary/40 border border-brand-border/80 rounded-[2rem] shadow-lg">
+                    <h2 className="text-xs font-black uppercase tracking-[0.2em] text-white border-b border-brand-border/40 pb-4 mb-5 flex items-center gap-2 font-display">
+                      <Calendar className="w-4 h-4 text-brand-accent" /> ADD SESSION RECORD
+                    </h2>
+
+                    <form onSubmit={handleAddClass} className="space-y-4 text-xs">
+                      <div className="space-y-1.5">
+                        <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Day of the Week</label>
+                        <select 
+                          value={selectedDay}
+                          onChange={(e) => setSelectedDay(e.target.value)}
+                          className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white focus:outline-none focus:border-brand-accent h-[44px]"
+                        >
+                          <option value="Saturday">Saturday</option>
+                          <option value="Sunday">Sunday</option>
+                          <option value="Monday">Monday</option>
+                          <option value="Tuesday">Tuesday</option>
+                          <option value="Wednesday">Wednesday</option>
+                          <option value="Thursday">Thursday</option>
+                          <option value="Friday">Friday</option>
+                        </select>
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Session Time Frame</label>
+                        <input 
+                          type="text" 
+                          value={newClassTime}
+                          onChange={(e) => setNewClassTime(e.target.value)}
+                          placeholder="e.g. 5:30 - 7:00 PM"
+                          className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:outline-none focus:border-brand-accent transition-colors"
+                          required
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Activity / Module</label>
+                        <input 
+                          type="text" 
+                          value={newClassActivity}
+                          onChange={(e) => setNewClassActivity(e.target.value)}
+                          placeholder="e.g. MMA / Tactical Muay Thai"
+                          className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:outline-none focus:border-brand-accent transition-colors"
+                          required
+                        />
+                      </div>
+
                       <button 
                         type="submit"
-                        className="w-full py-3.5 mt-2 bg-brand-accent text-black font-black uppercase tracking-wider rounded-xl hover:bg-brand-accent-hover transition-colors min-h-[44px] cursor-pointer"
+                        className="w-full py-4 bg-brand-accent text-black font-bold uppercase tracking-widest rounded-xl hover:bg-brand-accent-hover transition-colors min-h-[44px] cursor-pointer shadow-md shadow-brand-accent/15"
                       >
-                        LOG RECRUIT
+                        ADD TO TIMETABLE
                       </button>
                     </form>
                   </div>
 
-                  {/* Right sub-column: Students list table & responsive deck */}
-                  <div className="lg:col-span-8 space-y-4">
-                    {/* Filter and Search Bar */}
-                    <div className="p-4 bg-brand-secondary border border-brand-border rounded-2xl flex flex-col sm:flex-row gap-3 justify-between items-center">
-                      <div className="relative w-full sm:max-w-xs">
-                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-muted" />
-                        <input 
-                          type="text" 
-                          placeholder="Search athletes (name, phone, mail)..."
-                          value={studentSearch}
-                          onChange={(e) => setStudentSearch(e.target.value)}
-                          className="w-full pl-10 pr-4 py-2 bg-brand-primary border border-brand-border rounded-xl text-xs text-white focus:border-brand-accent focus:outline-none"
-                        />
-                      </div>
-
-                      <div className="flex gap-2 w-full sm:w-auto overflow-x-auto select-none">
-                        {['All', 'Active', 'Pending', 'Canceled'].map((filterVal) => (
-                          <button
-                            key={filterVal}
-                            onClick={() => setStudentFilter(filterVal)}
-                            className={`px-3 py-1.5 font-mono text-[10px] font-black uppercase tracking-wider rounded-lg border transition-colors cursor-pointer min-h-[36px] ${studentFilter === filterVal ? 'bg-brand-accent text-black border-brand-accent' : 'bg-brand-primary border-brand-border text-brand-muted hover:text-white'}`}
-                          >
-                            {filterVal}
-                          </button>
-                        ))}
-                      </div>
+                  {/* Right Column timetables breakdown list */}
+                  <div className="lg:col-span-8 space-y-6">
+                    <div>
+                      <h3 className="text-base font-bold uppercase text-white tracking-widest">Active Class Timetable</h3>
                     </div>
 
-                    {/* Desktop & Tablet Table view (Hidden on mobile) */}
-                    <div className="hidden md:block overflow-hidden bg-brand-secondary border border-brand-border rounded-2xl">
-                      <table className="w-full text-left border-collapse">
-                        <thead>
-                          <tr className="bg-black/40 border-b border-brand-border text-brand-muted text-[10px] font-mono font-black uppercase tracking-widest">
-                            <th className="p-4">ATHLETE DETAILS</th>
-                            <th className="p-4">CONTACTS</th>
-                            <th className="p-4">PLAN / COURSE</th>
-                            <th className="p-4">STATUS</th>
-                            <th className="p-4 text-right">OPERATIONS</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-brand-border/40 text-sm">
-                          {filteredStudents.length === 0 ? (
-                            <tr>
-                              <td colSpan={5} className="p-12 text-center text-brand-muted font-mono text-xs font-semibold">
-                                {"// No athlete booking matched search parameters"}
-                              </td>
-                            </tr>
-                          ) : (
-                            filteredStudents.map((athlete) => (
-                              <tr key={athlete.id} className="hover:bg-brand-border/10 transition-colors">
-                                <td className="p-4">
-                                  <div className="font-bold text-white text-base leading-tight">{athlete.name}</div>
-                                  <div className="text-[10px] text-brand-muted font-mono mt-1 uppercase">Enrolled: {athlete.enrolledDate}</div>
-                                </td>
-                                <td className="p-4 py-3">
-                                  <div className="font-mono text-xs text-brand-muted">{athlete.phone}</div>
-                                  <div className="text-xs text-brand-muted/70">{athlete.email}</div>
-                                </td>
-                                <td className="p-4">
-                                  <span className="px-2.5 py-1 text-xs font-bold rounded-md bg-brand-primary border border-brand-border">
-                                    {athlete.course}
-                                  </span>
-                                </td>
-                                <td className="p-4">
-                                  <button
-                                    onClick={() => handleToggleStudentStatus(athlete.id, athlete.status)}
-                                    className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all border ${
-                                      athlete.status === 'Active' ? 'bg-[#52fa7c]/10 text-[#2ee159] border-[#2ee159]/30' :
-                                      athlete.status === 'Pending' ? 'bg-amber-400/10 text-amber-400 border-amber-400/30' :
-                                      'bg-red-500/10 text-red-500 border-red-500/30'
-                                    }`}
-                                  >
-                                    ● {athlete.status}
-                                  </button>
-                                </td>
-                                <td className="p-4 text-right">
-                                  <button 
-                                    onClick={() => handleDeleteStudent(athlete.id, athlete.name)}
-                                    className="p-2.5 rounded-lg border border-brand-border hover:bg-red-500/10 hover:border-red-500 hover:text-red-500 transition-colors text-brand-muted group cursor-pointer"
-                                    aria-label="Delete Student"
-                                  >
-                                    <Trash2 className="w-4 h-4" />
-                                  </button>
-                                </td>
-                              </tr>
-                            ))
-                          )}
-                        </tbody>
-                      </table>
-                    </div>
-
-                    {/* Mobile Card Deck View (Exclusively rendered on Mobile layout) */}
-                    <div className="md:hidden space-y-4">
-                      {filteredStudents.length === 0 ? (
-                        <div className="p-12 text-center text-brand-muted bg-brand-secondary border border-brand-border rounded-xl font-mono text-xs font-semibold">
-                          {"// No recruiting matches in criteria"}
-                        </div>
+                    <div className="space-y-4">
+                      {scheduleData.length === 0 ? (
+                        <p className="p-10 text-center text-xs text-brand-muted border border-brand-border border-dashed rounded-2xl">
+                          No scheduled class hours set. Add a session record to begin.
+                        </p>
                       ) : (
-                        filteredStudents.map((athlete) => (
-                          <div key={athlete.id} className="p-5 bg-brand-secondary border border-brand-border rounded-2xl space-y-4 relative">
-                            <div className="flex justify-between items-start gap-4">
-                              <div>
-                                <h3 className="font-bold text-white text-base leading-tight">{athlete.name}</h3>
-                                <div className="text-[9px] text-brand-muted font-mono mt-0.5 uppercase">JOINED: {athlete.enrolledDate}</div>
-                              </div>
-                              <button
-                                onClick={() => handleToggleStudentStatus(athlete.id, athlete.status)}
-                                className={`px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider border shrink-0 ${
-                                  athlete.status === 'Active' ? 'bg-[#52fa7c]/10 text-[#2ee159] border-[#52fa7c]/30' :
-                                  athlete.status === 'Pending' ? 'bg-amber-400/10 text-amber-400 border-amber-400/30' :
-                                  'bg-red-500/10 text-red-500 border-red-500/30'
-                                }`}
-                              >
-                                ● {athlete.status}
-                              </button>
+                        scheduleData.map((dayGroup) => (
+                          <div key={dayGroup.day} className="p-6 bg-brand-secondary/40 border border-brand-border/80 rounded-[1.8rem] space-y-3.5 shadow-md">
+                            <div className="font-display font-black text-brand-accent text-sm border-b border-brand-border/40 pb-3 flex justify-between items-center uppercase tracking-wider">
+                              <span>{dayGroup.day} Classes</span>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4 text-xs bg-brand-primary/50 p-3 border border-brand-border/40 font-mono">
-                              <div>
-                                <div className="text-[8px] text-brand-muted uppercase tracking-widest mb-0.5">[ PHONE ]</div>
-                                <div className="text-white font-bold">{athlete.phone}</div>
-                              </div>
-                              <div>
-                                <div className="text-[8px] text-brand-muted uppercase tracking-widest mb-0.5">[ COURSE KEY ]</div>
-                                <div className="text-brand-accent font-bold truncate">{athlete.course}</div>
-                              </div>
-                              <div className="col-span-2 border-t border-brand-border/40 pt-2">
-                                <div className="text-[8px] text-brand-muted uppercase tracking-widest mb-0.5">[ EMAIL ]</div>
-                                <div className="text-white font-sans truncate">{athlete.email}</div>
-                              </div>
-                            </div>
-
-                            <div className="flex gap-2">
-                              <button 
-                                onClick={() => handleToggleStudentStatus(athlete.id, athlete.status)}
-                                className="flex-1 py-2.5 bg-brand-primary border border-brand-border text-[10px] font-mono leading-none tracking-wider font-extrabold text-white text-center rounded-xl hover:bg-neutral-900 focus:outline-none min-h-[44px]"
-                              >
-                                TOGGLE STATUS
-                              </button>
-                              <button 
-                                onClick={() => handleDeleteStudent(athlete.id, athlete.name)}
-                                className="w-11 h-11 bg-brand-primary border border-brand-border flex items-center justify-center text-brand-muted hover:text-red-500 hover:border-red-500 rounded-xl transition-colors min-h-[44px] min-w-[44px]"
-                                aria-label="Delete Athlete"
-                              >
-                                <Trash2 className="w-4.5 h-4.5" />
-                              </button>
+                            <div className="divide-y divide-brand-border/30">
+                              {dayGroup.classes.map((cls) => (
+                                <div key={cls.id} className="flex items-center justify-between py-3.5 hover:bg-white/[0.01]">
+                                  <div className="flex gap-4.5 items-center">
+                                    <div className="w-2 h-2 rounded-full bg-brand-accent shrink-0 shadow-[0_0_8px_rgba(204,255,0,0.5)]" />
+                                    <div>
+                                      <div className="text-xs font-mono text-brand-muted leading-none">{cls.time}</div>
+                                      <div className="text-base font-bold text-white mt-1.5">{cls.activity}</div>
+                                    </div>
+                                  </div>
+                                  <button
+                                    onClick={() => handleDeleteClass(dayGroup.day, cls.id)}
+                                    className="p-2.5 border border-brand-border hover:border-red-500 hover:text-red-500 rounded-xl transition-all min-w-[38px] min-h-[38px] flex items-center justify-center cursor-pointer text-brand-muted"
+                                    title="Remove timing option"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              ))}
                             </div>
                           </div>
                         ))
@@ -827,353 +1200,492 @@ export default function AdminPage() {
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* TAB 2: WEEKLY SCHEDULE MANAGER */}
-            {activeTab === 'schedule' && (
-              <div className="grid lg:grid-cols-12 gap-10 items-start">
-                {/* Left Form Column: Add timing item */}
-                <div className="lg:col-span-4 p-5 sm:p-6 bg-brand-secondary border border-brand-border rounded-2xl">
-                  <h2 className="text-sm font-black uppercase tracking-widest text-white border-b border-brand-border pb-4 mb-5 flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-brand-accent" /> ADD SESSION RECORD
-                  </h2>
+              {/* TAB 3: PLANS & PRICING CONFIGS */}
+              {activeTab === 'pricing' && (
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-base font-bold uppercase text-white tracking-widest">Dynamic Package Pricing Plans</h3>
+                  </div>
 
-                  <form onSubmit={handleAddClass} className="space-y-4 font-mono text-xs">
-                    <div className="space-y-1.5">
-                      <label className="text-brand-muted uppercase font-bold tracking-wider">Day of the Week</label>
-                      <select 
-                        value={selectedDay}
-                        onChange={(e) => setSelectedDay(e.target.value)}
-                        className="w-full bg-brand-primary border border-brand-border p-3 rounded-lg text-white font-sans focus:outline-none focus:border-brand-accent h-[44px]"
+                  <div className="grid md:grid-cols-2 gap-6 items-start">
+                    {pricingData.map((plan) => (
+                      <div 
+                        key={plan.id}
+                        className={`p-6 sm:p-8 border rounded-[2rem] bg-brand-secondary/45 relative space-y-6 transition-all duration-500 shadow-xl ${
+                          plan.highlight 
+                            ? 'border-brand-accent/50 shadow-[0_0_30px_rgba(204,255,0,0.06)]' 
+                            : 'border-brand-border/80'
+                        }`}
                       >
-                        <option value="Saturday">Saturday</option>
-                        <option value="Sunday">Sunday</option>
-                        <option value="Monday">Monday</option>
-                        <option value="Tuesday">Tuesday</option>
-                        <option value="Wednesday">Wednesday</option>
-                        <option value="Thursday">Thursday</option>
-                        <option value="Friday">Friday</option>
-                      </select>
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-brand-muted uppercase font-bold tracking-wider">Session Time Frame</label>
-                      <input 
-                        type="text" 
-                        value={newClassTime}
-                        onChange={(e) => setNewClassTime(e.target.value)}
-                        placeholder="e.g. 5:30 - 7:00 PM"
-                        className="w-full bg-brand-primary border border-brand-border p-3 rounded-lg text-white font-sans text-sm focus:outline-none focus:border-brand-accent"
-                        required
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-brand-muted uppercase font-bold tracking-wider">Activity / Training Module</label>
-                      <input 
-                        type="text" 
-                        value={newClassActivity}
-                        onChange={(e) => setNewClassActivity(e.target.value)}
-                        placeholder="e.g. MMA / Tactical Muay Thai"
-                        className="w-full bg-brand-primary border border-brand-border p-3 rounded-lg text-white font-sans text-sm focus:outline-none focus:border-brand-accent"
-                        required
-                      />
-                    </div>
+                        {editingPlanId === plan.id ? (
+                          /* FORM EDIT MODE IN CONSOLE MODULE */
+                          <div className="space-y-4 text-xs font-mono">
+                            <div className="flex gap-2.5 items-center">
+                              <span className="px-2.5 py-1 bg-brand-accent text-black uppercase font-bold text-[9px] rounded-full">
+                                EDIT FORMAT
+                              </span>
+                              <span className="text-white/80 font-bold">{plan.title}</span>
+                            </div>
 
-                    <button 
-                      type="submit"
-                      className="w-full py-3.5 bg-brand-accent text-black font-black uppercase tracking-wider rounded-xl hover:bg-brand-accent-hover transition-colors min-h-[44px] cursor-pointer"
-                    >
-                      PUSH TO SCHEDULE
-                    </button>
-                  </form>
+                            <div className="grid grid-cols-2 gap-3 pb-2 border-b border-brand-border/40">
+                              <div className="space-y-1.5">
+                                <label className="text-brand-muted uppercase tracking-wider font-bold">Plan Name</label>
+                                <input 
+                                  type="text"
+                                  value={editingPlanForm.title}
+                                  onChange={(e) => setEditingPlanForm({...editingPlanForm, title: e.target.value})}
+                                  className="w-full bg-brand-primary border border-brand-border p-2.5 rounded-lg text-white font-sans text-sm focus:outline-none focus:border-brand-accent transition-colors"
+                                />
+                              </div>
+                              <div className="space-y-1.5">
+                                <label className="text-brand-muted uppercase tracking-wider font-bold">Price Option</label>
+                                <input 
+                                  type="text"
+                                  value={editingPlanForm.price}
+                                  onChange={(e) => setEditingPlanForm({...editingPlanForm, price: e.target.value})}
+                                  className="w-full bg-brand-primary border border-brand-border p-2.5 rounded-lg text-brand-accent font-sans text-sm focus:outline-none focus:border-brand-accent transition-colors"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3 pb-2 border-b border-brand-border/40">
+                              <div className="space-y-1.5">
+                                <label className="text-brand-muted uppercase tracking-wider font-bold">Original Strikeout Price</label>
+                                <input 
+                                  type="text"
+                                  value={editingPlanForm.originalPrice}
+                                  onChange={(e) => setEditingPlanForm({...editingPlanForm, originalPrice: e.target.value})}
+                                  placeholder="e.g. 9,000/-"
+                                  className="w-full bg-brand-primary border border-brand-border p-2.5 rounded-lg text-white font-sans text-xs focus:outline-none focus:border-brand-accent transition-colors"
+                                />
+                              </div>
+                              <div className="space-y-1.5">
+                                <label className="text-brand-muted uppercase tracking-wider font-bold">Ribbon Badge Banner</label>
+                                <input 
+                                  type="text"
+                                  value={editingPlanForm.badge}
+                                  onChange={(e) => setEditingPlanForm({...editingPlanForm, badge: e.target.value})}
+                                  placeholder="e.g. Most Popular"
+                                  className="w-full bg-brand-primary border border-brand-border p-2.5 rounded-lg text-white font-sans text-xs focus:outline-none focus:border-brand-accent transition-colors"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-3 py-2.5 px-3 bg-brand-primary border border-brand-border rounded-xl">
+                              <input 
+                                type="checkbox"
+                                id={`hl-${plan.id}`}
+                                checked={editingPlanForm.highlight}
+                                onChange={(e) => setEditingPlanForm({...editingPlanForm, highlight: e.target.checked})}
+                                className="w-4 h-4 text-brand-accent accent-brand-accent shrink-0 rounded cursor-pointer"
+                              />
+                              <label htmlFor={`hl-${plan.id}`} className="font-bold text-white uppercase tracking-wider cursor-pointer font-sans text-[11px]">
+                                Highlight & Recommend
+                              </label>
+                            </div>
+
+                            <div className="space-y-1.5">
+                              <label className="text-brand-muted uppercase tracking-wider font-bold">
+                                Features (one bullet highlight per row)
+                              </label>
+                              <textarea 
+                                rows={4}
+                                value={editingPlanForm.features}
+                                onChange={(e) => setEditingPlanForm({...editingPlanForm, features: e.target.value})}
+                                placeholder="Bullet Points..."
+                                className="w-full bg-brand-primary border border-brand-border p-3 rounded-lg font-sans text-sm tracking-normal focus:outline-none focus:border-brand-accent duration-200"
+                              />
+                            </div>
+
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => saveEditedPlan(plan.id)}
+                                className="flex-1 py-3 bg-brand-accent text-black font-bold uppercase text-xs rounded-xl flex items-center justify-center gap-2 hover:bg-brand-accent-hover transition-all min-h-[44px] cursor-pointer shadow-md shadow-brand-accent/15"
+                              >
+                                <Save className="w-4 h-4" /> SAVE CONFIG
+                              </button>
+                              <button
+                                onClick={() => setEditingPlanId(null)}
+                                className="px-4 py-3 bg-brand-primary border border-brand-border text-brand-muted hover:text-white font-mono text-xs rounded-xl min-h-[44px] cursor-pointer"
+                              >
+                                CANCEL
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          /* CARD DISPLAY MODE */
+                          <div className="space-y-5">
+                            <div className="flex justify-between items-start">
+                              <div>
+                                {plan.badge && (
+                                  <span className="inline-block px-3 py-1 bg-brand-accent text-black font-bold uppercase text-[9px] tracking-widest rounded-full mb-3 shadow-sm">
+                                    {plan.badge}
+                                  </span>
+                                )}
+                                <h4 className="text-xl font-display font-black text-white uppercase tracking-tight">{plan.title}</h4>
+                              </div>
+
+                              <button 
+                                onClick={() => startEditingPlan(plan)}
+                                className="p-2.5 border border-brand-border hover:border-brand-accent hover:text-brand-accent rounded-xl text-brand-muted transition-all flex items-center justify-center gap-1.5 font-mono text-[9px] font-bold uppercase tracking-widest cursor-pointer min-h-[38px]"
+                              >
+                                <Edit3 className="w-3.5 h-3.5" /> EDIT FORMAT
+                              </button>
+                            </div>
+
+                            <div className="flex items-baseline gap-2">
+                              {plan.originalPrice && (
+                                <span className="text-sm line-through text-brand-muted/70 font-bold">{plan.originalPrice}</span>
+                              )}
+                              <span className="text-3xl font-display font-black text-brand-accent">{plan.price}</span>
+                              <span className="text-xs text-brand-muted uppercase font-bold">/ Course</span>
+                            </div>
+
+                            <ul className="space-y-3 pt-5 border-t border-brand-border/40 text-sm">
+                              {plan.features.map((feature, fIdx) => (
+                                <li key={fIdx} className="flex items-center gap-3 text-white/90">
+                                  <CheckCircle2 className="w-4.5 h-4.5 text-brand-accent shrink-0" />
+                                  <span>{feature}</span>
+                                </li>
+                              ))}
+                            </ul>
+
+                            {plan.highlight && (
+                              <div className="p-3 bg-brand-accent/5 border border-brand-accent/20 rounded-xl text-center text-brand-accent text-[10px] font-bold uppercase tracking-widest">
+                                ★ Featured Showcase package
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
+              )}
 
-                {/* Right Column: Weekly Breakdown List */}
-                <div className="lg:col-span-8 space-y-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-lg font-bold uppercase text-white">Current Active Timetable</h3>
-                      <p className="text-xs text-brand-muted font-mono mt-1">{"// Persists dynamically to homepage display components"}</p>
-                    </div>
+              {/* TAB 4: CLIENT CONTACT INBOX */}
+              {activeTab === 'inquiries' && (
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-base font-bold uppercase text-white tracking-widest">Client Contact Board Messages</h3>
                   </div>
 
                   <div className="space-y-4">
-                    {scheduleData.length === 0 ? (
-                      <p className="p-8 text-center text-xs text-brand-muted border-2 border-brand-border border-dashed font-mono uppercase">
-                        No scheduled class hours set in panel.
-                      </p>
+                    {inquiries.length === 0 ? (
+                      <div className="p-16 text-center text-sm font-sans uppercase text-brand-muted bg-brand-secondary/40 border border-brand-border border-dashed rounded-2xl">
+                        Your mailbox is currently clean. No new inquiries.
+                      </div>
                     ) : (
-                      scheduleData.map((dayGroup) => (
-                        <div key={dayGroup.day} className="p-5 bg-brand-secondary border border-brand-border rounded-2xl space-y-3">
-                          <div className="font-display font-black text-white text-base border-b border-brand-border/40 pb-2 flex justify-between items-center text-brand-accent uppercase tracking-wider">
-                            <span>{dayGroup.day}</span>
-                            <span className="text-[9px] font-mono font-bold text-brand-muted tracking-widest">{"// Weekly Hour"}</span>
+                      inquiries.map((inq) => (
+                        <div 
+                          key={inq.id}
+                          className={`p-6 bg-brand-secondary/45 border rounded-[2rem] space-y-4 transition-all duration-500 relative shadow-md ${
+                            inq.read ? 'border-brand-border/80' : 'border-brand-accent/50 shadow-brand-accent/5'
+                          }`}
+                        >
+                          {!inq.read && (
+                            <div className="absolute top-5 right-5 bg-brand-accent text-black font-mono font-black text-[9px] uppercase tracking-wider px-2.5 py-1 rounded-full shadow-md select-none">
+                              UNREAD MESSAGE
+                            </div>
+                          )}
+
+                          <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b border-brand-border/40 pb-4">
+                            <div>
+                              <div className="flex items-center gap-2.5">
+                                <span className="font-bold text-white text-base">{inq.name}</span>
+                                <span className="text-[10px] font-mono text-brand-muted uppercase font-bold">({inq.date})</span>
+                              </div>
+                              <div className="text-xs text-brand-muted font-sans mt-0.5">{inq.email}</div>
+                            </div>
+
+                            <div className="flex items-center gap-2 shrink-0">
+                              <button
+                                onClick={() => handleToggleInquiryRead(inq.id)}
+                                className={`px-4 py-2 font-mono text-[9px] font-bold uppercase tracking-wider rounded-xl border transition-colors cursor-pointer min-h-[34px] ${
+                                  inq.read 
+                                    ? 'bg-brand-primary border-brand-border text-brand-muted hover:text-white hover:border-white/20' 
+                                    : 'bg-brand-accent/10 border-brand-accent text-brand-accent hover:bg-brand-accent/20'
+                                }`}
+                              >
+                                {inq.read ? 'UNREAD' : 'MARK READ'}
+                              </button>
+                              
+                              <button
+                                onClick={() => handleDeleteInquiry(inq.id)}
+                                className="p-2 border border-brand-border text-brand-muted hover:text-red-500 hover:border-red-500 rounded-xl transition-colors min-w-[34px] min-h-[34px] flex items-center justify-center cursor-pointer"
+                                title="Delete Message"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
                           </div>
 
-                          <div className="divide-y divide-brand-border/20">
-                            {dayGroup.classes.map((cls) => (
-                              <div key={cls.id} className="flex items-center justify-between py-3 hover:bg-white/2 animate-fade">
-                                <div className="flex gap-4 items-center">
-                                  <div className="w-1.5 h-1.5 rounded-full bg-brand-accent animate-pulse" />
-                                  <div>
-                                    <div className="text-xs font-mono text-brand-muted leading-none">{cls.time}</div>
-                                    <div className="text-sm font-bold text-white mt-1">{cls.activity}</div>
-                                  </div>
-                                </div>
-                                <button
-                                  onClick={() => handleDeleteClass(dayGroup.day, cls.id)}
-                                  className="p-2 border border-brand-border text-brand-muted hover:text-red-500 hover:border-red-500 rounded-lg transition-all min-w-[36px] min-h-[36px] flex items-center justify-center cursor-pointer"
-                                  title="Remove session"
-                                >
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                </button>
+                          <p className="text-sm text-brand-muted leading-relaxed font-sans bg-brand-primary/40 border border-brand-border/20 p-5 rounded-2xl italic">
+                            &ldquo;{inq.message}&rdquo;
+                          </p>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 5: PRODUCTS / SHOP MANAGEMENT */}
+              {activeTab === 'products' && (
+                <div className="space-y-6">
+                  <div className="grid lg:grid-cols-12 gap-6 items-start">
+                    
+                    {/* Add product form */}
+                    <div className="lg:col-span-4 p-6 bg-brand-secondary/40 border border-brand-border/80 rounded-[2rem] relative shadow-lg">
+                      <h2 className="text-xs font-black uppercase tracking-[0.2em] text-white border-b border-brand-border/40 pb-4 mb-5 flex items-center gap-2 font-display">
+                        <ShoppingBag className="w-4 h-4 text-brand-accent" /> Register Store Product
+                      </h2>
+                      
+                      <form onSubmit={handleAddProduct} className="space-y-4 text-xs">
+                        <div className="space-y-1.5">
+                          <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Product Name *</label>
+                          <input 
+                            type="text" 
+                            required
+                            placeholder="e.g. Invictus Rashguard"
+                            value={newProduct.name}
+                            onChange={(e) => setNewProduct({...newProduct, name: e.target.value})}
+                            className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="space-y-1.5">
+                            <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Price (৳) *</label>
+                            <input 
+                              type="number" 
+                              required
+                              step="0.01"
+                              placeholder="e.g. 1200"
+                              value={newProduct.price}
+                              onChange={(e) => setNewProduct({...newProduct, price: e.target.value})}
+                              className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Category *</label>
+                            <select
+                              value={newProduct.category}
+                              onChange={(e) => setNewProduct({...newProduct, category: e.target.value})}
+                              className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors cursor-pointer"
+                            >
+                              <option value="Apparel">Apparel</option>
+                              <option value="Equipment">Equipment</option>
+                              <option value="Digital">Digital</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="space-y-1.5">
+                            <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Rating Code *</label>
+                            <input 
+                              type="text" 
+                              placeholder="e.g. 4.9"
+                              value={newProduct.rating}
+                              onChange={(e) => setNewProduct({...newProduct, rating: e.target.value})}
+                              className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Product Image URL</label>
+                            <input 
+                              type="text" 
+                              placeholder="e.g. https://picsum.photos/..."
+                              value={newProduct.image}
+                              onChange={(e) => setNewProduct({...newProduct, image: e.target.value})}
+                              className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Short Description</label>
+                          <textarea 
+                            rows={3}
+                            placeholder="Briefly summarize what makes this gear standard elite..."
+                            value={newProduct.description}
+                            onChange={(e) => setNewProduct({...newProduct, description: e.target.value})}
+                            className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors font-sans"
+                          />
+                        </div>
+
+                        <button 
+                          type="submit"
+                          className="w-full py-4 bg-brand-accent text-black font-black uppercase tracking-wider text-xs rounded-xl hover:bg-brand-accent-hover transition-colors min-h-[44px] cursor-pointer shadow-lg shadow-brand-accent/10"
+                        >
+                          REGISTER PRODUCT RECORD
+                        </button>
+                      </form>
+                    </div>
+
+                    {/* Pro Product Directory Grid */}
+                    <div className="lg:col-span-8 space-y-4">
+                      <div className="p-6 bg-brand-secondary/40 border border-brand-border/80 rounded-[2rem]">
+                        <h3 className="text-xs font-black uppercase tracking-widest text-white border-b border-brand-border/40 pb-4 mb-4 font-display">
+                          🏪 Store Inventory Inventory Directory ({products.length})
+                        </h3>
+                        
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-left border-collapse text-xs">
+                            <thead>
+                              <tr className="border-b border-brand-border/60 text-brand-muted uppercase font-mono tracking-wider">
+                                <th className="pb-3 font-bold">Product ID / Item Name</th>
+                                <th className="pb-3 font-bold">Category</th>
+                                <th className="pb-3 font-bold">Price</th>
+                                <th className="pb-3 font-bold">Rating</th>
+                                <th className="pb-3 font-bold text-right">Actions</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-brand-border/30">
+                              {products.length === 0 ? (
+                                <tr>
+                                  <td colSpan={5} className="py-12 text-center text-brand-muted uppercase font-mono">
+                                    No products found in stock.
+                                  </td>
+                                </tr>
+                              ) : (
+                                products.map((prod) => (
+                                  <tr key={prod.id} className="hover:bg-white/[0.01]">
+                                    <td className="py-4">
+                                      <div className="flex items-center gap-3">
+                                        <div className="relative w-10 h-10 rounded-lg overflow-hidden shrink-0 border border-brand-border bg-brand-primary">
+                                          <img src={prod.image} alt={prod.name} className="object-cover w-full h-full grayscale" />
+                                        </div>
+                                        <div>
+                                          <div className="font-bold text-white text-sm">{prod.name}</div>
+                                          <div className="text-[10px] font-mono text-brand-muted mt-0.5">ID: {prod.id}</div>
+                                        </div>
+                                      </div>
+                                    </td>
+                                    <td className="py-4">
+                                      <span className="px-2 py-0.5 bg-brand-primary border border-brand-border text-[9px] font-mono font-bold uppercase rounded text-brand-accent">
+                                        {prod.category}
+                                      </span>
+                                    </td>
+                                    <td className="py-4 font-bold text-white">৳{(prod.price || 0).toLocaleString()}</td>
+                                    <td className="py-4 font-mono text-amber-400 font-bold">★ {prod.rating || "5.0"}</td>
+                                    <td className="py-4 text-right">
+                                      <button 
+                                        onClick={() => handleDeleteProduct(prod.id, prod.name)}
+                                        className="p-2 border border-brand-border text-brand-muted hover:text-red-500 hover:border-red-500 rounded-lg transition-colors cursor-pointer pointer-events-auto"
+                                      >
+                                        <Trash2 className="w-3.5 h-3.5" />
+                                      </button>
+                                    </td>
+                                  </tr>
+                                ))
+                              )}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 6: SHOP ORDERS LIST */}
+              {activeTab === 'orders' && (
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-base font-bold uppercase text-white tracking-widest">Store Checkout Stream orders</h3>
+                  </div>
+
+                  <div className="space-y-4">
+                    {orders.length === 0 ? (
+                      <div className="p-16 text-center text-sm font-sans uppercase text-brand-muted bg-brand-secondary/40 border border-brand-border border-dashed rounded-2xl">
+                        No orders have been submitted yet. Build connections inside.
+                      </div>
+                    ) : (
+                      orders.map((ord) => (
+                        <div 
+                          key={ord.id}
+                          className={`p-6 bg-brand-secondary/45 border rounded-[2rem] space-y-4 transition-all duration-500 relative shadow-md ${
+                            ord.status === 'Pending' 
+                              ? 'border-amber-400/40 shadow-amber-400/5' 
+                              : ord.status === 'Shipped'
+                                ? 'border-sky-500/30 shadow-sky-500/5'
+                                : ord.status === 'Delivered'
+                                  ? 'border-[#52fa7c]/30'
+                                  : 'border-brand-border/80 opacity-75'
+                          }`}
+                        >
+                          <div className="absolute top-5 right-5 flex items-center gap-2">
+                            <span className={`font-mono font-black text-[9px] uppercase tracking-wider px-2.5 py-1 rounded-full shadow-md select-none ${
+                              ord.status === 'Pending' 
+                                ? 'bg-amber-400 text-black' 
+                                : ord.status === 'Shipped'
+                                  ? 'bg-sky-400 text-black'
+                                  : ord.status === 'Delivered'
+                                    ? 'bg-emerald-400 text-black'
+                                    : 'bg-zinc-800 text-zinc-400'
+                            }`}>
+                              {ord.status}
+                            </span>
+                          </div>
+
+                          <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b border-brand-border/40 pb-4">
+                            <div>
+                              <div className="flex items-center gap-2.5">
+                                <span className="font-bold text-white text-base">{ord.athleteName}</span>
+                                <span className="text-[10px] font-mono text-brand-muted uppercase font-bold">({ord.date})</span>
                               </div>
-                            ))}
+                              <div className="text-xs text-brand-muted font-sans mt-0.5">Phone: <span className="font-mono text-white">{ord.phone}</span> • Email: {ord.email}</div>
+                              <div className="text-[11px] text-brand-muted tracking-tight font-sans mt-1">Shipping: <span className="text-white">{ord.address}</span></div>
+                            </div>
+
+                            <div className="flex items-center gap-2 shrink-0 pt-2 sm:pt-0">
+                              <button
+                                onClick={() => handleToggleOrderStatus(ord.id, ord.status)}
+                                className="px-4 py-2 font-mono text-[9px] font-bold uppercase tracking-wider rounded-xl border border-brand-border hover:border-brand-accent text-brand-muted hover:text-brand-accent transition-colors cursor-pointer min-h-[34px]"
+                              >
+                                Cycle Status
+                              </button>
+                              
+                              <button
+                                onClick={() => handleDeleteOrder(ord.id)}
+                                className="p-2 border border-brand-border text-brand-muted hover:text-red-500 hover:border-red-500 rounded-xl transition-colors min-w-[34px] min-h-[34px] flex items-center justify-center cursor-pointer"
+                                title="Delete Order"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-between gap-4 bg-brand-primary/40 p-4 rounded-xl border border-brand-border/20">
+                            <div className="text-xs font-mono font-bold text-brand-muted uppercase">
+                              Purchased Items: <span className="text-white normal-case font-sans tracking-normal ml-1.5">{ord.items}</span>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-[9px] font-mono text-brand-muted uppercase">Total Paid ({ord.paymentMethod})</div>
+                              <div className="text-base font-display font-black text-brand-accent">৳{(ord.totalPrice || 0).toLocaleString()}</div>
+                            </div>
                           </div>
                         </div>
                       ))
                     )}
                   </div>
                 </div>
+              )}
+
+            </main>
+
+            {/* Custom high-end footer alignment */}
+            <footer className="py-6 border-t border-brand-border bg-brand-secondary/30 text-center text-[10px] font-mono text-brand-muted select-none">
+              <div className="container max-w-7xl mx-auto px-4">
+                INVICTUS ATHLETICS HQ DHAKA • COMPILABLE LOCAL CLIENT CONSOLE SECURE ROOT
               </div>
-            )}
-
-            {/* TAB 3: COURSE PLANS & PRICING CONFIGURATION */}
-            {activeTab === 'pricing' && (
-              <div className="space-y-8">
-                <div>
-                  <h3 className="text-lg font-bold uppercase text-white">Training Plans Structure</h3>
-                  <p className="text-xs text-brand-muted font-mono mt-1">{"// Dynamically handles pricing levels, ribbons, and lists layout."}</p>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-8 items-start">
-                  {pricingData.map((plan) => (
-                    <div 
-                      key={plan.id}
-                      className={`p-6 border-2 rounded-2xl bg-brand-secondary relative space-y-6 ${
-                        plan.highlight ? 'border-brand-accent' : 'border-brand-border'
-                      }`}
-                    >
-                      {editingPlanId === plan.id ? (
-                        /* EDITOR EXPANDED CONTROLS FORM */
-                        <div className="space-y-4 font-mono text-xs">
-                          <div className="flex gap-2">
-                            <span className="px-2 py-1 bg-brand-accent text-black font-mono uppercase font-black tracking-widest text-[8px]">
-                              EDITING FORM
-                            </span>
-                            <span className="text-white/80 font-bold">{plan.title}</span>
-                          </div>
-
-                          <div className="grid grid-cols-2 gap-3 pb-2 border-b border-brand-border/40">
-                            <div className="space-y-1.5">
-                              <label className="text-brand-muted uppercase tracking-wider font-bold">Plan Name</label>
-                              <input 
-                                type="text"
-                                value={editingPlanForm.title}
-                                onChange={(e) => setEditingPlanForm({...editingPlanForm, title: e.target.value})}
-                                className="w-full bg-brand-primary border border-brand-border p-2 rounded-lg font-sans text-sm focus:outline-none"
-                              />
-                            </div>
-                            <div className="space-y-1.5">
-                              <label className="text-brand-muted uppercase tracking-wider font-bold">Price Level</label>
-                              <input 
-                                type="text"
-                                value={editingPlanForm.price}
-                                onChange={(e) => setEditingPlanForm({...editingPlanForm, price: e.target.value})}
-                                className="w-full bg-brand-primary border border-brand-border p-2 rounded-lg font-sans text-sm focus:outline-none text-brand-accent"
-                              />
-                            </div>
-                          </div>
-
-                          <div className="grid grid-cols-2 gap-3 mb-2">
-                            <div className="space-y-1.5">
-                              <label className="text-brand-muted uppercase tracking-wider font-bold">Strikeout Price</label>
-                              <input 
-                                type="text"
-                                value={editingPlanForm.originalPrice}
-                                onChange={(e) => setEditingPlanForm({...editingPlanForm, originalPrice: e.target.value})}
-                                placeholder="Optional"
-                                className="w-full bg-brand-primary border border-brand-border p-2 rounded-lg font-sans text-sm focus:outline-none"
-                              />
-                            </div>
-                            <div className="space-y-1.5">
-                              <label className="text-brand-muted uppercase tracking-wider font-bold">Badge Ribbons</label>
-                              <input 
-                                type="text"
-                                value={editingPlanForm.badge}
-                                onChange={(e) => setEditingPlanForm({...editingPlanForm, badge: e.target.value})}
-                                placeholder="e.g. Best Value, Hot"
-                                className="w-full bg-brand-primary border border-brand-border p-2 rounded-lg font-sans text-sm focus:outline-none"
-                              />
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-3 py-2 bg-brand-primary border border-brand-border p-3 rounded-lg select-none">
-                            <input 
-                              type="checkbox"
-                              id={`hl-${plan.id}`}
-                              checked={editingPlanForm.highlight}
-                              onChange={(e) => setEditingPlanForm({...editingPlanForm, highlight: e.target.checked})}
-                              className="w-4.5 h-4.5 rounded text-brand-accent accent-brand-accent shrink-0"
-                            />
-                            <label htmlFor={`hl-${plan.id}`} className="font-bold text-white uppercase cursor-pointer">
-                              Highlight on Landing Page
-                            </label>
-                          </div>
-
-                          <div className="space-y-1.5">
-                            <label className="text-brand-muted uppercase tracking-wider font-bold">
-                              Features (One Line Per Bullet)
-                            </label>
-                            <textarea 
-                              rows={5}
-                              value={editingPlanForm.features}
-                              onChange={(e) => setEditingPlanForm({...editingPlanForm, features: e.target.value})}
-                              placeholder="Bullet Points..."
-                              className="w-full bg-brand-primary border border-brand-border p-3 rounded-lg font-sans text-sm tracking-normal focus:outline-none"
-                            />
-                          </div>
-
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => saveEditedPlan(plan.id)}
-                              className="flex-1 py-3 bg-brand-accent text-black font-black uppercase text-xs rounded-xl flex items-center justify-center gap-2 hover:bg-brand-accent-hover transition-colors min-h-[44px] cursor-pointer"
-                            >
-                              <Save className="w-4 h-4" /> SAVE CONFIG
-                            </button>
-                            <button
-                              onClick={() => setEditingPlanId(null)}
-                              className="px-4 py-3 bg-brand-primary border border-brand-border text-brand-muted hover:text-white font-mono text-xs rounded-xl min-h-[44px] cursor-pointer"
-                            >
-                              CANCEL
-                            </button>
-                          </div>
-                        </div>
-                      ) : (
-                        /* CURRENT VALUE PREVIEW VIEW CARD */
-                        <div className="space-y-6">
-                          <div className="flex justify-between items-start">
-                            <div>
-                              {plan.badge && (
-                                <span className="inline-block px-2.5 py-0.5 bg-brand-accent text-black font-mono font-black uppercase text-[8px] tracking-widest rounded-full mb-3">
-                                  {plan.badge}
-                                </span>
-                              )}
-                              <h4 className="text-xl font-display font-black text-white uppercase tracking-tight">{plan.title}</h4>
-                            </div>
-
-                            <button 
-                              onClick={() => startEditingPlan(plan)}
-                              className="p-2.5 border border-brand-border text-brand-muted hover:text-brand-accent hover:border-brand-accent rounded-lg transition-all flex items-center justify-center gap-1.5 min-w-[36px] min-h-[36px] uppercase font-mono text-[9px] font-black tracking-widest cursor-pointer"
-                            >
-                              <Edit3 className="w-3.5 h-3.5" /> EDIT_FMT
-                            </button>
-                          </div>
-
-                          <div className="flex items-baseline gap-2">
-                            {plan.originalPrice && (
-                              <span className="text-sm line-through text-brand-muted font-bold">{plan.originalPrice}</span>
-                            )}
-                            <span className="text-3xl font-display font-black text-brand-accent">{plan.price}</span>
-                            <span className="text-xs text-brand-muted uppercase font-bold">/ Course</span>
-                          </div>
-
-                          <ul className="space-y-3 pt-4 border-t border-brand-border/40 text-sm">
-                            {plan.features.map((feature, fIdx) => (
-                              <li key={fIdx} className="flex items-center gap-2.5 text-brand-muted">
-                                <CheckCircle2 className="w-4 h-4 text-brand-accent shrink-0" />
-                                <span>{feature}</span>
-                              </li>
-                            ))}
-                          </ul>
-
-                          {plan.highlight && (
-                            <div className="p-3 bg-brand-accent/5 border border-brand-accent/20 rounded-xl text-center text-brand-accent/90 text-[10px] font-mono uppercase font-black tracking-widest">
-                              ⭐ Visual Showcase Target
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* TAB 4: CLIENT CONTACT INBOX */}
-            {activeTab === 'inquiries' && (
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-bold uppercase text-white">Client Inquiry Messages</h3>
-                  <p className="text-xs text-brand-muted font-mono mt-1">{"// Submissions generated from homepage contact module input queries."}</p>
-                </div>
-
-                <div className="space-y-4">
-                  {inquiries.length === 0 ? (
-                    <div className="p-16 text-center text-sm font-mono uppercase text-brand-muted bg-brand-secondary border border-brand-border border-dashed rounded-2xl">
-                      {"// No contact inquiries logged in mailbox"}
-                    </div>
-                  ) : (
-                    inquiries.map((inq) => (
-                      <div 
-                        key={inq.id}
-                        className={`p-5 sm:p-6 bg-brand-secondary border rounded-2xl space-y-4 transition-all relative ${
-                          inq.read ? 'border-brand-border' : 'border-brand-accent shadow-lg shadow-brand-accent/5'
-                        }`}
-                      >
-                        {!inq.read && (
-                          <div className="absolute top-4 right-4 bg-brand-accent text-black font-mono font-black text-[9px] uppercase tracking-widest px-2 py-0.5 rounded">
-                            UNREAD
-                          </div>
-                        )}
-
-                        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b border-brand-border/30 pb-3">
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="font-bold text-white text-base">{inq.name}</span>
-                              <span className="text-[10px] font-mono text-brand-muted uppercase">({inq.date})</span>
-                            </div>
-                            <div className="text-xs text-brand-muted font-mono mt-0.5">{inq.email}</div>
-                          </div>
-
-                          <div className="flex items-center gap-2 shrink-0">
-                            <button
-                              onClick={() => handleToggleInquiryRead(inq.id)}
-                              className={`px-3 py-1.5 font-mono text-[9px] font-black uppercase tracking-wider rounded-lg border transition-colors cursor-pointer min-h-[32px] ${
-                                inq.read ? 'bg-brand-primary border-brand-border text-brand-muted hover:text-white' : 'bg-brand-accent/10 border-brand-accent text-brand-accent hover:bg-brand-accent/20'
-                              }`}
-                            >
-                              {inq.read ? 'MARK_UNREAD' : 'MARK_READ'}
-                            </button>
-                            
-                            <button
-                              onClick={() => handleDeleteInquiry(inq.id)}
-                              className="p-2 border border-brand-border text-brand-muted hover:text-red-500 hover:border-red-500 rounded-lg transition-colors min-w-[32px] min-h-[32px] flex items-center justify-center cursor-pointer"
-                              title="Delete Message"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </div>
-
-                        <p className="text-sm text-brand-muted leading-relaxed font-sans bg-brand-primary/40 border border-brand-border/20 p-4 rounded-xl italic">
-                          &ldquo;{inq.message}&rdquo;
-                        </p>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-            )}
-
-          </main>
-
-          {/* Footer of console */}
-          <footer className="py-6 border-t border-brand-border bg-brand-secondary text-center text-xs font-mono text-brand-muted">
-            <div className="container max-w-7xl mx-auto px-4">
-              <span>ADMIN CONSOLE ENG // COMPILABLE // FULL-STACK LOCAL SIMULATION ENG</span>
-            </div>
-          </footer>
+            </footer>
+          </div>
         </div>
       )}
     </div>

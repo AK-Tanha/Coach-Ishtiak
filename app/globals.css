@@ -5,17 +5,17 @@
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-space), ui-sans-serif, system-ui, sans-serif;
   
-  --color-brand-primary: #000000;
-  --color-brand-secondary: #09090b;
+  --color-brand-primary: #050507;
+  --color-brand-secondary: #0d0d11;
   --color-brand-surface: #FFFFFF;
-  --color-brand-accent: #FCFF00;
-  --color-brand-accent-hover: #E2E600;
-  --color-brand-muted: #71717a;
-  --color-brand-border: #27272a;
+  --color-brand-accent: #CCFF00;
+  --color-brand-accent-hover: #BFFF00;
+  --color-brand-muted: #8e8e93;
+  --color-brand-border: #1c1c1e;
 }
 
 :root {
-  --background: #000000;
+  --background: #050507;
   --foreground: #FFFFFF;
 }
 

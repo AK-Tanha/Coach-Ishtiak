@@ -220,6 +220,7 @@ export default function PortfolioPage() {
 
   const [formData, setFormData] = React.useState({ name: '', email: '', message: '' });
   const [successToast, setSuccessToast] = React.useState(false);
+  const [selectedScheduleDay, setSelectedScheduleDay] = React.useState<string>('All');
 
   React.useEffect(() => {
     const timer = setInterval(() => {
@@ -437,58 +438,55 @@ export default function PortfolioPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              {/* Brutalist Stamp badge */}
-              <div className="hidden sm:inline-flex items-center gap-3 px-4 py-2 bg-brand-secondary border-2 border-brand-accent text-[11px] font-mono font-black tracking-widest text-brand-accent mb-8 uppercase transform hover:-translate-y-0.5 transition-transform">
-                <span className="w-2.5 h-2.5 bg-brand-accent animate-[ping_1.5s_infinite] shrink-0" />
-                [ REGISTRATION OPEN // ELITE DIVISION ]
+              {/* Modern elegant glowing pill badge */}
+              <div className="hidden sm:inline-flex items-center gap-2.5 px-4.5 py-1.5 bg-brand-accent/10 border border-brand-accent/25 text-[10px] font-mono font-bold tracking-widest text-[#BFFF00] mb-8 rounded-full uppercase select-none transition-all duration-300 hover:border-brand-accent/40 hover:shadow-[0_0_15px_rgba(204,255,0,0.1)]">
+                <span className="w-2 h-2 rounded-full bg-brand-accent animate-[pulse_1.5s_infinite] shrink-0" />
+                REGISTRATION OPEN • ELITE DIVISION
               </div>
 
               <h1 className="font-display mb-6 sm:mb-8">
-                <span className="block text-xs sm:text-sm font-mono font-black tracking-[0.25em] text-brand-muted uppercase mb-2">
+                <span className="block text-xs sm:text-sm font-mono font-bold tracking-[0.25em] text-brand-muted uppercase mb-3">
                   MASTERING THE
                 </span>
-                <span className="block text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tighter uppercase leading-[0.95] mb-4">
+                <span className="block text-4xl sm:text-5xl md:text-6xl font-black text-white tracking-tighter uppercase leading-[0.95] mb-5">
                   ART OF COMBAT
                 </span>
-                <span className="block mt-5 sm:mt-7 text-[10px] sm:text-xs font-mono font-bold text-brand-muted uppercase tracking-widest leading-none mb-2">
-                  {"// WITH"}
-                </span>
-                <span className="relative inline-block text-black bg-brand-accent px-4 py-2 sm:px-6 sm:py-3.5 transform -skew-x-6 hover:-translate-x-1 hover:-translate-y-1 transition-transform duration-200 cursor-default select-none shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] sm:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] text-3xl sm:text-5xl md:text-7xl font-display font-black leading-none uppercase">
+                <span className="relative inline-block text-black bg-brand-accent px-6 py-3 rounded-2xl select-none text-3xl sm:text-5xl md:text-6xl font-display font-black leading-none uppercase tracking-tight shadow-xl shadow-brand-accent/20">
                   COACH ISHTIAK
                 </span>
               </h1>
 
-              <p className="text-sm sm:text-base md:text-lg text-brand-muted max-w-xl mb-8 sm:mb-12 leading-relaxed font-sans border-l-4 border-brand-border pl-4">
+              <p className="text-sm sm:text-base md:text-lg text-brand-muted max-w-xl mb-8 sm:mb-12 leading-relaxed font-sans border-l-2 border-brand-border pl-4">
                 A Coach, A Student & An Athlete. <br />
                 Over a decade forging champions in MMA, BJJ, and Boxing. Founder of core combat sport institutions in Bangladesh.
               </p>
               
-              <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 mb-8 sm:mb-12">
+              <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 mb-8 sm:mb-12">
                 <a 
                   href="#contact" 
-                  className="px-6 py-4 sm:px-8 sm:py-5 bg-brand-accent text-black font-black uppercase tracking-wider text-xs sm:text-sm border-2 border-black font-mono transition-all duration-150 shadow-[4px_4px_0px_0px_#FFFFFF] sm:shadow-[6px_6px_0px_0px_#FFFFFF] relative hover:-translate-x-[3px] hover:-translate-y-[3px] flex items-center justify-center gap-3 group text-center min-h-[48px]"
+                  className="px-8 py-4 sm:px-10 sm:py-4.5 bg-brand-accent hover:bg-brand-accent-hover text-black font-black uppercase tracking-widest text-xs sm:text-sm rounded-full transition-all duration-300 shadow-lg shadow-brand-accent/25 hover:shadow-brand-accent/40 hover:-translate-y-0.5 flex items-center justify-center gap-2.5 group text-center min-h-[48px]"
                 >
                   Join Training
-                  <Zap className="w-4 h-4 fill-black group-hover:scale-110 transition-transform" />
+                  <Zap className="w-4 h-4 fill-black group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                 </a>
                 <a 
                   href="#schedule" 
-                  className="px-6 py-4 sm:px-8 sm:py-5 bg-brand-primary text-white font-black uppercase tracking-wider text-xs sm:text-sm border-2 border-brand-border font-mono transition-all duration-150 shadow-[4px_4px_0px_0px_#27272a] sm:shadow-[6px_6px_0px_0px_#27272a] relative hover:-translate-x-[3px] hover:-translate-y-[3px] flex items-center justify-center gap-3 text-center min-h-[48px]"
+                  className="px-8 py-4 sm:px-10 sm:py-4.5 border border-brand-border hover:border-brand-accent/50 bg-transparent hover:bg-white/[0.02] text-white font-bold uppercase tracking-widest text-xs sm:text-sm rounded-full transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-center gap-2.5 text-center min-h-[48px]"
                 >
                   View Schedule
                 </a>
               </div>
 
-              <div className="hidden sm:grid grid-cols-2 max-w-md border-2 border-brand-border bg-brand-secondary divide-x-2 divide-brand-border">
-                <div className="p-3 sm:p-4 flex flex-col justify-between hover:bg-brand-border/20 transition-colors">
-                  <div className="text-[8px] sm:text-[9px] font-mono text-brand-muted tracking-widest font-black uppercase mb-1 sm:mb-2">[ LOCATION ]</div>
+              <div className="hidden sm:grid grid-cols-2 max-w-md border border-brand-border/60 bg-brand-secondary/40 backdrop-blur-md rounded-2xl divide-x divide-brand-border/60 overflow-hidden shadow-lg shadow-black/40">
+                <div className="p-4 flex flex-col justify-between hover:bg-brand-border/20 transition-colors">
+                  <div className="text-[8px] sm:text-[9px] font-mono text-brand-muted tracking-widest font-black uppercase mb-1.5 sm:mb-2">LOCATION</div>
                   <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-bold text-white">
                     <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-brand-accent shrink-0" />
                     <span>KALABAGAN, DHAKA</span>
                   </div>
                 </div>
-                <div className="p-3 sm:p-4 flex flex-col justify-between hover:bg-brand-border/20 transition-colors">
-                  <div className="text-[8px] sm:text-[9px] font-mono text-brand-muted tracking-widest font-black uppercase mb-1 sm:mb-2">[ HEADQUARTERS ]</div>
+                <div className="p-4 flex flex-col justify-between hover:bg-brand-border/20 transition-colors">
+                  <div className="text-[8px] sm:text-[9px] font-mono text-brand-muted tracking-widest font-black uppercase mb-1.5 sm:mb-2">HEADQUARTERS</div>
                   <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-bold text-white">
                     <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-brand-accent shrink-0" />
                     <span>INVICTUS BJJ & MMA</span>
@@ -501,66 +499,69 @@ export default function PortfolioPage() {
               initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 1, delay: 0.2 }}
-              className="relative aspect-square rounded-none bg-brand-secondary border-4 border-white group select-none shadow-[8px_8px_0px_0px_#FCFF00] md:shadow-[12px_12px_0px_0px_#FCFF00] w-full max-w-md lg:max-w-none mx-auto"
+              className="relative aspect-square rounded-[2rem] bg-brand-secondary/40 backdrop-blur-md border border-brand-border/85 overflow-hidden group select-none w-full max-w-md lg:max-w-none mx-auto shadow-2xl hover:shadow-[0_0_30px_rgba(204,255,0,0.03)] transition-all duration-500"
             >
-              {/* Mechanical / Tactical Frame Overlays */}
-              <div className="absolute top-4 left-4 z-40 bg-black/80 px-3 py-1 text-[8px] font-mono text-brand-accent tracking-widest uppercase border border-brand-accent select-none">
-                [ CAMERA FEED // {`0${currentSlide + 1}_REF`} ]
+              {/* Modern Badge Overlays */}
+              <div className="absolute top-5 left-5 z-40 bg-black/75 backdrop-blur-md px-3 py-1.5 text-[9px] font-mono text-brand-accent tracking-widest uppercase rounded-full border border-brand-accent/20 select-none">
+                SLIDE {currentSlide + 1} &bull; OVERVIEW
               </div>
               
-              <div className="absolute top-4 right-4 z-40 bg-black/80 px-3 py-1 text-[8px] font-mono text-brand-accent tracking-widest uppercase border border-brand-accent select-none flex items-center gap-1">
-                <span className="w-1.5 h-1.5 bg-red-600 rounded-full animate-pulse" />
-                REC_LIVE
+              <div className="absolute top-5 right-5 z-40 bg-black/75 backdrop-blur-md px-3 py-1.5 text-[9px] font-mono text-white/95 tracking-widest uppercase rounded-full border border-white/10 select-none flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 bg-brand-accent rounded-full animate-pulse" />
+                ACTIVE_PORTFOLIO
               </div>
 
               <AnimatePresence mode="wait">
                 <motion.div
                   key={currentSlide}
-                  initial={{ opacity: 0, filter: "brightness(0%) contrast(150%)" }}
-                  animate={{ opacity: 1, filter: "brightness(65%) contrast(110%)" }}
-                  exit={{ opacity: 0, filter: "brightness(0%) contrast(150%)" }}
+                  initial={{ opacity: 0, scale: 1.02 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.98 }}
                   transition={{ duration: 0.4 }}
                   className="absolute inset-0"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent z-10" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent z-10" />
                   <Image 
                     src={heroImages[currentSlide].url} 
                     alt={heroImages[currentSlide].caption} 
                     fill
-                    className="w-full h-full object-cover grayscale transition-transform duration-700"
+                    className="w-full h-full object-cover grayscale brightness-90 contrast-[1.05] group-hover:scale-105 transition-transform duration-700"
                     priority
+                    referrerPolicy="no-referrer"
                   />
                   <div className="absolute bottom-8 left-8 z-20">
-                    <div className="text-[10px] font-mono font-black uppercase tracking-widest text-[#FCFF00] mb-2">[ {heroImages[currentSlide].caption} ]</div>
-                    <div className="text-4xl font-display font-black tracking-tighter text-white uppercase">{heroImages[currentSlide].title}</div>
+                    <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#BFFF00] mb-2">{heroImages[currentSlide].caption}</div>
+                    <div className="text-3xl sm:text-4xl font-display font-black tracking-tighter text-white uppercase">{heroImages[currentSlide].title}</div>
                   </div>
                 </motion.div>
               </AnimatePresence>
  
-              {/* Navigation Controls */}
-              <div className="absolute bottom-6 right-6 z-30 flex">
+              {/* Navigation Controls with modern rounded buttons */}
+              <div className="absolute bottom-6 right-6 z-30 flex gap-2">
                 <button 
                   onClick={prevSlide}
-                  className="p-4 bg-brand-primary border-2 border-brand-border text-white hover:bg-[#FCFF00] hover:text-black transition-all hover:-translate-y-1 cursor-pointer"
+                  className="p-3 bg-black/60 backdrop-blur-md border border-white/10 text-white rounded-full hover:bg-brand-accent hover:text-black hover:border-brand-accent transition-all cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center shadow-lg"
                   aria-label="Previous slide"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
                 <button 
                   onClick={nextSlide}
-                  className="p-4 bg-brand-primary border-y-2 border-r-2 border-brand-border text-white hover:bg-[#FCFF00] hover:text-black transition-all hover:-translate-y-1 cursor-pointer"
+                  className="p-3 bg-black/60 backdrop-blur-md border border-white/10 text-white rounded-full hover:bg-brand-accent hover:text-black hover:border-brand-accent transition-all cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center shadow-lg"
                   aria-label="Next slide"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
  
-              {/* Progress Indicators */}
-              <div className="absolute bottom-6 left-6 z-30 flex gap-1.5">
+              {/* Progress Indicators (Pills) */}
+              <div className="absolute bottom-8 left-8 z-30 flex gap-1.5">
                 {heroImages.map((_, idx) => (
-                  <div 
+                  <button 
                     key={idx}
-                    className={`h-1.5 transition-all duration-500 rounded-none ${idx === currentSlide ? 'w-8 bg-brand-accent' : 'w-2 bg-white/20'}`}
+                    onClick={() => setCurrentSlide(idx)}
+                    className={`h-1.5 transition-all duration-500 rounded-full cursor-pointer ${idx === currentSlide ? 'w-6 bg-brand-accent' : 'w-1.5 bg-white/30 hover:bg-white/50'}`}
+                    aria-label={`Go to slide ${idx + 1}`}
                   />
                 ))}
               </div>
@@ -570,65 +571,44 @@ export default function PortfolioPage() {
       </section>
 
       {/* Stats/Highlight Section */}
-      <section className="py-8 sm:py-16 border-y border-brand-border bg-black/40 relative overflow-hidden">
+      <section className="py-12 sm:py-20 border-y border-brand-border/40 bg-brand-primary/50 backdrop-blur-md relative overflow-hidden">
         {/* Decorative background grid effect */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none opacity-20" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none opacity-15" />
         
         <div className="container max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            <div className="group relative p-5 sm:p-8 bg-brand-secondary/40 border border-brand-border/60 hover:border-brand-accent/50 transition-all duration-300 flex flex-col justify-center items-center text-center overflow-hidden shadow-[4px_4px_0px_0px_#111111] hover:shadow-[4px_4px_0px_0px_rgba(252,255,0,0.15)] hover:-translate-y-0.5 min-h-[120px] sm:min-h-[160px]">
-              {/* Tactical Corner brackets */}
-              <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-brand-border/40 group-hover:border-brand-accent/60 transition-colors" />
-              <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-brand-border/40 group-hover:border-brand-accent/60 transition-colors" />
-              <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-brand-border/40 group-hover:border-brand-accent/60 transition-colors" />
-              <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-brand-border/40 group-hover:border-brand-accent/60 transition-colors" />
-              
+            <div className="group relative p-6 sm:p-8 bg-brand-secondary/40 border border-brand-border hover:border-brand-accent/40 rounded-3xl transition-all duration-300 flex flex-col justify-center items-center text-center overflow-hidden hover:-translate-y-1 hover:shadow-xl hover:shadow-black/40 min-h-[120px] sm:min-h-[160px]">
               <div className="text-3xl sm:text-4xl md:text-5xl font-display font-black text-brand-accent tracking-tighter mb-2 leading-none">10+</div>
-              <div className="text-[10px] sm:text-xs uppercase font-extrabold text-brand-muted tracking-widest leading-tight">Years Experience</div>
+              <div className="text-[10px] sm:text-xs uppercase font-bold text-brand-muted tracking-widest leading-tight">Years Experience</div>
             </div>
 
-            <div className="group relative p-5 sm:p-8 bg-brand-secondary/40 border border-brand-border/60 hover:border-brand-accent/50 transition-all duration-300 flex flex-col justify-center items-center text-center overflow-hidden shadow-[4px_4px_0px_0px_#111111] hover:shadow-[4px_4px_0px_0px_rgba(252,255,0,0.15)] hover:-translate-y-0.5 min-h-[120px] sm:min-h-[160px]">
-              <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-brand-border/40 group-hover:border-brand-accent/60 transition-colors" />
-              <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-brand-border/40 group-hover:border-brand-accent/60 transition-colors" />
-              <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-brand-border/40 group-hover:border-brand-accent/60 transition-colors" />
-              <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-brand-border/40 group-hover:border-brand-accent/60 transition-colors" />
-              
+            <div className="group relative p-6 sm:p-8 bg-brand-secondary/40 border border-brand-border hover:border-brand-accent/40 rounded-3xl transition-all duration-300 flex flex-col justify-center items-center text-center overflow-hidden hover:-translate-y-1 hover:shadow-xl hover:shadow-black/40 min-h-[120px] sm:min-h-[160px]">
               <div className="text-3xl sm:text-4xl md:text-5xl font-display font-black text-brand-accent tracking-tighter mb-2 leading-none">500+</div>
-              <div className="text-[10px] sm:text-xs uppercase font-extrabold text-brand-muted tracking-widest leading-tight">Total Students</div>
+              <div className="text-[10px] sm:text-xs uppercase font-bold text-brand-muted tracking-widest leading-tight">Total Students</div>
             </div>
 
-            <div className="group relative p-5 sm:p-8 bg-brand-secondary/40 border border-brand-border/60 hover:border-brand-accent/50 transition-all duration-300 flex flex-col justify-center items-center text-center overflow-hidden shadow-[4px_4px_0px_0px_#111111] hover:shadow-[4px_4px_0px_0px_rgba(252,255,0,0.15)] hover:-translate-y-0.5 min-h-[120px] sm:min-h-[160px]">
-              <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-brand-border/40 group-hover:border-brand-accent/60 transition-colors" />
-              <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-brand-border/40 group-hover:border-brand-accent/60 transition-colors" />
-              <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-brand-border/40 group-hover:border-brand-accent/60 transition-colors" />
-              <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-brand-border/40 group-hover:border-brand-accent/60 transition-colors" />
-              
+            <div className="group relative p-6 sm:p-8 bg-brand-secondary/40 border border-brand-border hover:border-brand-accent/40 rounded-3xl transition-all duration-300 flex flex-col justify-center items-center text-center overflow-hidden hover:-translate-y-1 hover:shadow-xl hover:shadow-black/40 min-h-[120px] sm:min-h-[160px]">
               <div className="text-3xl sm:text-4xl md:text-5xl font-display font-black text-brand-accent tracking-tighter mb-2 leading-none">1st</div>
-              <div className="text-[10px] sm:text-xs uppercase font-extrabold text-brand-muted tracking-widest leading-tight">WBC Referee BD</div>
+              <div className="text-[10px] sm:text-xs uppercase font-bold text-brand-muted tracking-widest leading-tight">WBC Referee BD</div>
             </div>
 
-            <div className="group relative p-5 sm:p-8 bg-brand-secondary/40 border border-brand-border/60 hover:border-brand-accent/50 transition-all duration-300 flex flex-col justify-center items-center text-center overflow-hidden shadow-[4px_4px_0px_0px_#111111] hover:shadow-[4px_4px_0px_0px_rgba(252,255,0,0.15)] hover:-translate-y-0.5 min-h-[120px] sm:min-h-[160px]">
-              <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-brand-border/40 group-hover:border-brand-accent/60 transition-colors" />
-              <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-brand-border/40 group-hover:border-brand-accent/60 transition-colors" />
-              <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-brand-border/40 group-hover:border-brand-accent/60 transition-colors" />
-              <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-brand-border/40 group-hover:border-brand-accent/60 transition-colors" />
-              
+            <div className="group relative p-6 sm:p-8 bg-brand-secondary/40 border border-brand-border hover:border-brand-accent/40 rounded-3xl transition-all duration-300 flex flex-col justify-center items-center text-center overflow-hidden hover:-translate-y-1 hover:shadow-xl hover:shadow-black/40 min-h-[120px] sm:min-h-[160px]">
               <div className="text-2xl sm:text-3xl md:text-4xl font-display font-black text-brand-accent tracking-tighter mb-2 leading-none uppercase">Founder</div>
-              <div className="text-[10px] sm:text-xs uppercase font-extrabold text-brand-muted tracking-widest leading-tight">BMMAA Bangladesh</div>
+              <div className="text-[10px] sm:text-xs uppercase font-bold text-brand-muted tracking-widest leading-tight">BMMAA Bangladesh</div>
             </div>
           </div>
         </div>
       </section>
 
       {/* About Section */}
-      <section id="about" className="py-12 sm:py-24 px-4 sm:px-6 overflow-hidden bg-brand-primary relative">
+      <section id="about" className="py-16 sm:py-28 px-4 sm:px-6 overflow-hidden bg-brand-primary relative">
         {/* Subtle Background Glow Spot */}
         <div className="absolute top-1/2 right-0 -translate-y-1/2 w-[350px] h-[350px] bg-brand-accent/5 rounded-full blur-[80px] pointer-events-none -z-10" />
         
         {/* MMA Cage Wireframe Background Decal */}
-        <MmaCageDecal className="absolute -right-28 -top-28 w-[500px] h-[500px] text-brand-accent/25 rotate-12 pointer-events-none select-none" />
-        <MmaCageDecal className="absolute -left-36 -bottom-36 w-[600px] h-[600px] text-brand-muted/20 -rotate-12 pointer-events-none select-none" />
-
+        <MmaCageDecal className="absolute -right-28 -top-28 w-[500px] h-[500px] text-brand-accent/20 rotate-12 pointer-events-none select-none animate-pulse duration-[10s]" />
+        <MmaCageDecal className="absolute -left-36 -bottom-36 w-[600px] h-[600px] text-brand-muted/10 -rotate-12 pointer-events-none select-none" />
+ 
         <div className="container max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
             {/* Left Column: Premium Coach Action Image */}
@@ -639,27 +619,21 @@ export default function PortfolioPage() {
               transition={{ duration: 0.8 }}
               className="lg:col-span-5 relative group"
             >
-              {/* Brutalist design corner details */}
-              <div className="absolute -top-2 -left-2 w-4 h-4 border-t-2 border-l-2 border-brand-accent z-20" />
-              <div className="absolute -top-2 -right-2 w-4 h-4 border-t-2 border-r-2 border-brand-accent z-20" />
-              <div className="absolute -bottom-2 -left-2 w-4 h-4 border-b-2 border-l-2 border-brand-accent z-20" />
-              <div className="absolute -bottom-2 -right-2 w-4 h-4 border-b-2 border-r-2 border-brand-accent z-20" />
-
-              <div className="relative h-[320px] sm:h-[480px] lg:h-[560px] w-full rounded-2xl sm:rounded-3xl overflow-hidden border-2 border-brand-border/80 group-hover:border-brand-accent/60 transition-all duration-350 shadow-[8px_8px_0px_0px_#111111] lg:shadow-[12px_12px_0px_0px_rgba(252,255,0,0.15)]">
+              <div className="relative h-[320px] sm:h-[480px] lg:h-[560px] w-full rounded-[2.5rem] overflow-hidden border border-brand-border/80 group-hover:border-brand-accent/40 transition-all duration-500 shadow-2xl shadow-black/60">
                 <Image 
                   src="https://picsum.photos/seed/coach-ishtiaq/800/1000" 
                   alt="Coach Ishtiak Philosophy"
                   fill
-                  className="object-cover object-top transition-transform duration-700 group-hover:scale-105"
+                  className="object-cover object-top transition-transform duration-700 group-hover:scale-103 brightness-95"
                   referrerPolicy="no-referrer"
                 />
                 {/* Visual design badge detailing */}
-                <div className="absolute top-4 left-4 bg-black/90 px-3 py-1.5 border border-brand-border text-[9px] font-mono uppercase tracking-widest text-brand-accent">
-                  [ PROFILE // LEAD COACH ]
+                <div className="absolute top-5 left-5 bg-black/80 backdrop-blur-md px-3.5 py-1.5 border border-white/10 rounded-full text-[9px] font-mono uppercase tracking-widest text-[#BFFF00]">
+                  PROFILE • LEAD COACH
                 </div>
               </div>
             </motion.div>
-
+ 
             {/* Right Column: Title, Headline, and Descriptions */}
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
@@ -668,12 +642,12 @@ export default function PortfolioPage() {
               transition={{ duration: 0.8, delay: 0.15 }}
               className="lg:col-span-7 flex flex-col justify-center"
             >
-              <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-brand-accent mb-4 sm:mb-6 font-display">{"// Philosophy"}</h2>
+              <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-brand-accent mb-4 sm:mb-6 font-display">Philosophy</h2>
               
               <h3 className="text-2xl sm:text-4xl md:text-5xl font-display font-black leading-tight tracking-tighter mb-6 sm:mb-8 text-white uppercase">
                 Building champions inside and outside the cage.
               </h3>
-
+ 
               <div className="space-y-6 sm:space-y-8 text-brand-muted text-sm sm:text-base md:text-lg leading-relaxed font-sans">
                 <p>
                   Recognized as Bangladesh&apos;s first WBC-certified boxing referee, my journey has been defined by a relentless 
@@ -691,17 +665,17 @@ export default function PortfolioPage() {
           </div>
         </div>
       </section>
-
+ 
       {/* Achievements Grid */}
-      <section id="achievements" className="py-12 sm:py-24 px-4 sm:px-6 bg-brand-secondary/50 relative overflow-hidden border-t border-b border-brand-border/30">
+      <section id="achievements" className="py-16 sm:py-28 px-4 sm:px-6 bg-brand-secondary/30 relative overflow-hidden border-t border-b border-brand-border/40">
         {/* Deep Yellow Glow Background Gradient */}
         <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] bg-brand-accent/5 rounded-full blur-[100px] pointer-events-none -z-10" />
-
+ 
         {/* Technical Glove Decals to anchor the layout */}
-        <BoxingGloveGraphic className="absolute -left-16 -bottom-16 w-80 h-80 text-brand-accent/25 rotate-12 pointer-events-none select-none" />
-        <MmaGloveGraphic className="absolute -right-20 -top-20 w-80 h-80 text-brand-muted/20 -rotate-12 pointer-events-none select-none" />
-
-        <div className="container max-w-7xl mx-auto text-center mb-10 sm:mb-16 relative z-10">
+        <BoxingGloveGraphic className="absolute -left-16 -bottom-16 w-80 h-80 text-brand-accent/15 rotate-12 pointer-events-none select-none" />
+        <MmaGloveGraphic className="absolute -right-20 -top-20 w-80 h-80 text-brand-muted/10 -rotate-12 pointer-events-none select-none" />
+ 
+        <div className="container max-w-7xl mx-auto text-center mb-12 sm:mb-20 relative z-10">
           <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-brand-accent mb-4 sm:mb-6 font-display">Recognition</h2>
           <h3 className="text-3xl sm:text-5xl font-display font-black tracking-tighter uppercase text-white">Key Achievements</h3>
         </div>
@@ -711,15 +685,15 @@ export default function PortfolioPage() {
             return (
               <motion.div 
                 key={idx}
-                whileHover={{ y: -10, scale: 1.02 }}
-                className="p-8 rounded-[1.5rem] bg-brand-secondary border-2 border-brand-border hover:border-brand-accent transition-all duration-300 group shadow-[4px_4px_0px_0px_rgba(0,0,0,0.5)] hover:shadow-[6px_6px_0px_0px_#FCFF00] cursor-default"
+                whileHover={{ y: -6, scale: 1.01 }}
+                className="p-8 rounded-[2rem] bg-brand-secondary/45 border border-brand-border/60 hover:border-brand-accent/40 transition-all duration-500 group shadow-lg shadow-black/40 cursor-default"
               >
-                <div className="mb-6 inline-block p-3 rounded-xl bg-brand-primary border border-brand-border text-brand-accent group-hover:scale-110 group-hover:bg-brand-accent group-hover:text-black transition-all duration-300">
-                  <IconComponent className="w-6 h-6 transition-colors duration-300" />
+                <div className="mb-6 inline-block p-3.5 rounded-2xl bg-brand-primary border border-brand-border/60 text-brand-accent group-hover:bg-brand-accent group-hover:text-black transition-all duration-500 shadow-sm">
+                  <IconComponent className="w-5 h-5 transition-colors duration-500" />
                 </div>
-                <div className="text-2xl font-display font-bold mb-2 leading-tight text-white group-hover:text-brand-accent transition-colors duration-300">{item.title}</div>
-                <p className="text-brand-muted text-sm mb-4 leading-relaxed">{item.description}</p>
-                <div className="text-xs font-black tracking-widest text-brand-accent/80 uppercase italic">Year: {item.year}</div>
+                <div className="text-xl font-display font-bold mb-3.5 leading-tight text-white group-hover:text-brand-accent transition-colors duration-300">{item.title}</div>
+                <p className="text-brand-muted text-sm mb-5 leading-relaxed font-sans">{item.description}</p>
+                <div className="text-[11px] font-mono font-bold tracking-widest text-brand-accent/85 uppercase">Year: {item.year}</div>
               </motion.div>
             );
           })}
@@ -751,38 +725,67 @@ export default function PortfolioPage() {
             </div>
           </div>
  
+          {/* High-End Styled Day Switcher */}
+          <div className="flex flex-wrap items-center gap-2 mb-10 border-b border-brand-border/40 pb-6">
+            {['All', 'Saturday', 'Sunday', 'Tuesday', 'Wednesday', 'Thursday'].map((day) => {
+              const isActive = selectedScheduleDay === day;
+              return (
+                <button
+                  key={day}
+                  onClick={() => setSelectedScheduleDay(day)}
+                  className={`relative px-5 py-2.5 text-xs font-black uppercase tracking-widest transition-all rounded-full min-h-[40px] cursor-pointer flex items-center justify-center border leading-none ${
+                    isActive
+                      ? 'bg-brand-accent text-black border-brand-accent shadow-md shadow-brand-accent/25'
+                      : 'bg-brand-secondary/80 text-brand-muted border-brand-border/80 hover:text-white hover:border-brand-accent/40'
+                  }`}
+                >
+                  {day}
+                </button>
+              );
+            })}
+          </div>
+ 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {currentSchedule.map((item: any, idx: number) => (
-              <motion.div 
-                key={idx}
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.1 }}
-                className="p-8 rounded-3xl bg-brand-secondary/95 backdrop-blur-sm border border-brand-border hover:border-brand-accent transition-colors"
-              >
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center">
-                    <Calendar className="w-4 h-4 text-brand-accent" />
-                  </div>
-                  <h4 className="text-xl font-display font-black tracking-tight text-white">{item.day}</h4>
-                </div>
-                <div className="space-y-4">
-                  {item.classes.map((cls: any, cIdx: number) => (
-                    <div key={cIdx} className="group cursor-default">
-                      <div className="text-xs font-mono text-brand-muted mb-1">{cls.time}</div>
-                      <div className="text-lg font-bold text-white group-hover:text-brand-accent transition-colors">{cls.activity}</div>
+            <AnimatePresence mode="popLayout">
+              {currentSchedule
+                .filter((item: any) => selectedScheduleDay === 'All' || item.day === selectedScheduleDay)
+                .map((item: any, idx: number) => (
+                  <motion.div 
+                    layout
+                    key={item.day}
+                    initial={{ opacity: 0, scale: 0.95, y: 15 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                    transition={{ duration: 0.3, delay: idx * 0.05 }}
+                    className="p-8 rounded-3xl bg-brand-secondary/95 backdrop-blur-sm border border-brand-border hover:border-brand-accent hover:shadow-[0_0_20px_rgba(252,255,0,0.03)] transition-all duration-300 group"
+                  >
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-brand-accent/10 group-hover:border-brand-accent/20 transition-colors">
+                        <Calendar className="w-4 h-4 text-brand-accent" />
+                      </div>
+                      <h4 className="text-xl font-display font-black tracking-tight text-white group-hover:text-brand-accent transition-colors">{item.day}</h4>
                     </div>
-                  ))}
-                </div>
-              </motion.div>
-            ))}
-            {/* Sunday has more classes, maybe highlight it */}
-            <div className="hidden lg:block p-8 rounded-3xl border border-dashed border-brand-border flex items-center justify-center text-center">
-               <div className="space-y-4">
+                    <div className="space-y-4">
+                      {item.classes.map((cls: any, cIdx: number) => (
+                        <div key={cIdx} className="group cursor-default relative pl-3 border-l border-brand-border/60 hover:border-brand-accent transition-colors">
+                          <div className="text-xs font-mono text-brand-muted mb-1">{cls.time}</div>
+                          <div className="text-lg font-bold text-white group-hover:text-brand-accent transition-colors">{cls.activity}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                ))}
+            </AnimatePresence>
+            
+            {/* Opening slots placeholder card rendered only when 'All' is selected to maintain grid balance */}
+            {selectedScheduleDay === 'All' && (
+              <div className="hidden lg:flex p-8 rounded-3xl border border-dashed border-brand-border flex-col items-center justify-center text-center">
+                <div className="space-y-4">
                   <Zap className="w-8 h-8 text-brand-accent/40 mx-auto" />
                   <p className="text-xs font-bold text-brand-muted tracking-widest uppercase">New slots opening soon</p>
-               </div>
-            </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -885,37 +888,45 @@ export default function PortfolioPage() {
             {currentPricing.map((plan: any, idx: number) => (
               <motion.div 
                 key={idx}
-                whileHover={{ scale: 1.01 }}
-                className={`p-5 sm:p-8 lg:p-10 rounded-[1.5rem] lg:rounded-[2.5rem] border ${plan.highlight ? 'bg-brand-accent text-black border-brand-accent shadow-2xl shadow-brand-accent/10' : 'bg-brand-secondary border-brand-border text-white'} relative flex flex-col justify-between`}
+                whileHover={{ y: -6, scale: 1.01 }}
+                className={`p-6 sm:p-8 lg:p-10 rounded-[2rem] border transition-all duration-500 relative flex flex-col justify-between bg-brand-secondary/45 ${
+                  plan.highlight 
+                    ? 'border-brand-accent/50 shadow-[0_0_35px_rgba(204,255,0,0.06)]' 
+                    : 'border-brand-border/60'
+                }`}
               >
                 <div>
                   {plan.badge && (
-                    <div className="absolute top-5 right-5 sm:top-8 sm:right-8 px-2.5 py-0.5 sm:px-3 sm:py-1 bg-black text-brand-accent text-[9px] sm:text-[10px] font-black uppercase tracking-widest rounded-full">
+                    <div className="absolute top-5 right-5 sm:top-8 sm:right-8 px-3 py-1 bg-brand-accent text-black text-[9px] font-black uppercase tracking-wider rounded-full shadow-lg shadow-brand-accent/15 select-none">
                       {plan.badge}
                     </div>
                   )}
-                  <div className={`text-[10px] sm:text-xs font-black uppercase tracking-widest mb-4 sm:mb-6 ${plan.highlight ? 'text-black/70' : 'text-brand-muted'}`}>
+                  <div className="text-[10px] sm:text-xs font-bold tracking-widest text-brand-muted uppercase mb-5">
                     {plan.title}
                   </div>
-                  <div className="flex items-baseline gap-1.5 sm:gap-2 mb-6 sm:mb-8 flex-wrap">
+                  <div className="flex items-baseline gap-2 mb-6 sm:mb-8 flex-wrap">
                     {plan.originalPrice && (
-                      <span className={`text-base sm:text-lg line-through font-bold ${plan.highlight ? 'text-black/60' : 'text-brand-muted'}`}>{plan.originalPrice}</span>
+                      <span className="text-base sm:text-lg line-through font-bold text-brand-muted/70">{plan.originalPrice}</span>
                     )}
-                    <span className="text-4xl sm:text-5xl lg:text-6xl font-display font-black tracking-tighter leading-none">{plan.price}</span>
-                    <span className={`text-xs sm:text-sm font-bold ${plan.highlight ? 'text-black/70' : 'text-brand-muted'}`}>/ COURSE</span>
+                    <span className="text-4xl sm:text-5xl lg:text-5xl font-display font-black tracking-tighter leading-none text-white">{plan.price}</span>
+                    <span className="text-xs sm:text-sm font-bold text-brand-muted">/ COURSE</span>
                   </div>
-                  <ul className="space-y-4 sm:space-y-5 mb-8 sm:mb-10 lg:mb-12">
+                  <ul className="space-y-4 sm:space-y-4.5 mb-8 sm:mb-10 lg:mb-12">
                     {plan.features.map((feature: string, fIdx: number) => (
-                      <li key={fIdx} className="flex items-start gap-3 sm:gap-4">
-                        <CheckCircle2 className={`w-4 h-4 sm:w-5 sm:h-5 mt-0.5 shrink-0 ${plan.highlight ? 'text-black' : 'text-brand-accent'}`} />
-                        <span className="text-sm sm:text-base font-medium leading-tight">{feature}</span>
+                      <li key={fIdx} className="flex items-start gap-3 sm:gap-4.5">
+                        <CheckCircle2 className="w-4.5 h-4.5 sm:w-5 sm:h-5 mt-0.5 shrink-0 text-brand-accent" />
+                        <span className="text-sm sm:text-base font-medium leading-tight text-white/90">{feature}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
                 <a 
                   href="mailto:coachishtiak@gmail.com"
-                  className={`w-full py-3.5 sm:py-5 rounded-xl sm:rounded-2xl font-black uppercase tracking-widest text-xs sm:text-sm flex items-center justify-center transition-all min-h-[44px] ${plan.highlight ? 'bg-brand-primary text-brand-accent hover:bg-black' : 'bg-brand-accent text-black hover:bg-brand-accent-hover'}`}
+                  className={`w-full py-4 rounded-xl font-bold uppercase tracking-widest text-xs flex items-center justify-center transition-all min-h-[48px] ${
+                    plan.highlight 
+                      ? 'bg-brand-accent text-black hover:bg-brand-accent-hover shadow-lg shadow-brand-accent/25' 
+                      : 'bg-transparent border border-brand-border hover:border-brand-accent/40 text-white hover:bg-white/[0.01]'
+                  }`}
                 >
                   Join Now
                 </a>
