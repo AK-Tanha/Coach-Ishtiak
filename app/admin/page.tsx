@@ -259,6 +259,8 @@ export default function AdminPage() {
   
   // Dashboard states
   const [activeTab, setActiveTab ] = React.useState<'students' | 'schedule' | 'pricing' | 'inquiries' | 'products' | 'orders' | 'content'>('students');
+  const [athleteSubTab, setAthleteSubTab] = React.useState<'list' | 'form'>('list');
+  const [productSubTab, setProductSubTab] = React.useState<'list' | 'form'>('list');
   const [students, setStudents] = React.useState<typeof defaultStudents>(() => {
     if (typeof window !== 'undefined') {
       const stored = localStorage.getItem('invictus_students');
@@ -457,6 +459,7 @@ export default function AdminPage() {
     setStudents(updated);
     syncToStorage('invictus_students', updated);
     setNewStudent({ name: '', email: '', phone: '', course: '3 Months Course', status: 'Pending', image: '' });
+    setAthleteSubTab('list');
     triggerNotification(`Athlete ${newlyCreated.name} successfully registered!`);
   };
 
@@ -470,6 +473,7 @@ export default function AdminPage() {
       status: student.status,
       image: student.image || ''
     });
+    setAthleteSubTab('form');
     triggerNotification(`Editing record of: ${student.name}`);
   };
 
@@ -495,6 +499,7 @@ export default function AdminPage() {
     setStudents(updated);
     syncToStorage('invictus_students', updated);
     setEditingStudentId(null);
+    setAthleteSubTab('list');
     triggerNotification(`Athlete ${editingStudentForm.name} updated successfully.`);
   };
 
@@ -671,6 +676,7 @@ export default function AdminPage() {
     setProducts(updated);
     syncToStorage('invictus_products', updated);
     setNewProduct({ name: '', price: '', category: 'Equipment', description: '', image: '', rating: '5.0' });
+    setProductSubTab('list');
     triggerNotification(`Successfully registered product: ${newlyCreated.name}`);
   };
 
@@ -684,6 +690,7 @@ export default function AdminPage() {
       image: product.image,
       rating: product.rating.toString()
     });
+    setProductSubTab('form');
     triggerNotification(`Editing product: ${product.name}`);
   };
 
@@ -709,6 +716,7 @@ export default function AdminPage() {
     setProducts(updated);
     syncToStorage('invictus_products', updated);
     setEditingProductId(null);
+    setProductSubTab('list');
     triggerNotification(`Successfully updated product: ${editingProductForm.name}`);
   };
 
@@ -1083,67 +1091,115 @@ export default function AdminPage() {
               {/* TAB 1: STUDENTS / LEADS MANAGEMENT */}
               {activeTab === 'students' && (
                 <div className="space-y-6">
-                  <div className="grid lg:grid-cols-12 gap-6 items-start">
-                    
-                    {/* Athlete registration / edit form */}
-                    <div className="lg:col-span-4 p-6 bg-brand-secondary/40 border border-brand-border/80 rounded-[2rem] relative shadow-lg">
+                  {/* Separate Page sub-navigation header for athlete list and form */}
+                  <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-brand-border/40 pb-5 mb-6">
+                    <div>
+                      <h3 className="text-xl font-display font-black uppercase text-white tracking-tight">
+                        {athleteSubTab === 'list' ? 'Athlete Directory & Leads' : editingStudentId ? 'Edit Athlete Record' : 'Enroll New Athlete'}
+                      </h3>
+                      <p className="text-xs text-brand-muted font-mono tracking-wider mt-0.5 animate-pulse text-brand-accent">
+                        {athleteSubTab === 'list' ? 'PROFILES AND ACTIVE REGISTRATION TIMINGS' : 'CRM DATABASE RECORD GENERATOR'}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => {
+                          setAthleteSubTab('list');
+                          setEditingStudentId(null);
+                        }}
+                        className={`px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-xl transition-all border min-h-[40px] cursor-pointer ${
+                          athleteSubTab === 'list'
+                            ? 'bg-brand-accent text-black font-black border-brand-accent shadow-sm shadow-brand-accent/20'
+                            : 'bg-brand-secondary/80 border-brand-border text-brand-muted hover:text-white'
+                        }`}
+                      >
+                        Athlete List
+                      </button>
+                      <button
+                        onClick={() => {
+                          setAthleteSubTab('form');
+                          setEditingStudentId(null);
+                          setNewStudent({ name: '', email: '', phone: '', course: '3 Months Course', status: 'Pending', image: '' });
+                        }}
+                        className={`px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-xl transition-all border min-h-[40px] cursor-pointer ${
+                          athleteSubTab === 'form' && !editingStudentId
+                            ? 'bg-brand-accent text-black font-black border-brand-accent shadow-sm shadow-brand-accent/20'
+                            : 'bg-brand-secondary/80 border-brand-border text-brand-muted hover:text-white'
+                        }`}
+                      >
+                        + Register New
+                      </button>
+                    </div>
+                  </div>
+
+                  {athleteSubTab === 'form' ? (
+                    /* Focused Athlete registration / edit form view */
+                    <div className="max-w-2xl mx-auto w-full p-8 bg-brand-secondary/40 border border-brand-border/85 rounded-[2.5rem] relative shadow-2xl">
                       {editingStudentId ? (
                         <>
-                          <h2 className="text-xs font-black uppercase tracking-[0.2em] text-white border-b border-brand-border/40 pb-4 mb-5 flex items-center gap-2 font-display">
-                            <Edit3 className="w-4 h-4 text-brand-accent animate-pulse" /> Edit Athlete Record
-                          </h2>
+                          <div className="flex items-center justify-between border-b border-brand-border/40 pb-4 mb-6">
+                            <h2 className="text-sm font-black uppercase tracking-[0.2em] text-white flex items-center gap-2.5 font-display">
+                              <Edit3 className="w-5 h-5 text-brand-accent animate-pulse" /> Edit Athlete Record
+                            </h2>
+                            <button
+                              onClick={() => { setAthleteSubTab('list'); setEditingStudentId(null); }}
+                              className="text-xs text-brand-muted hover:text-white font-mono uppercase tracking-widest flex items-center gap-1 cursor-pointer"
+                            >
+                              ← Back to List
+                            </button>
+                          </div>
                           
-                          <form onSubmit={(e) => { e.preventDefault(); saveEditedStudent(editingStudentId); }} className="space-y-4 text-xs">
-                            <div className="space-y-1.5">
+                          <form onSubmit={(e) => { e.preventDefault(); saveEditedStudent(editingStudentId); }} className="space-y-6 text-xs">
+                            <div className="space-y-2">
                               <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Full Name *</label>
                               <input 
                                 type="text" 
                                 value={editingStudentForm.name}
                                 onChange={(e) => setEditingStudentForm({...editingStudentForm, name: e.target.value})}
                                 placeholder="e.g. Tanvir Rahman"
-                                className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                                className="w-full bg-brand-primary border border-brand-border p-3.5 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
                                 required
                               />
                             </div>
-                            <div className="space-y-1.5">
+                            <div className="space-y-2">
                               <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Contact Phone *</label>
                               <input 
                                 type="text" 
                                 value={editingStudentForm.phone}
                                 onChange={(e) => setEditingStudentForm({...editingStudentForm, phone: e.target.value})}
                                 placeholder="e.g. 017-XXXX-XXXX"
-                                className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm font-mono focus:border-brand-accent focus:outline-none transition-colors"
+                                className="w-full bg-brand-primary border border-brand-border p-3.5 rounded-xl text-white text-sm font-mono focus:border-brand-accent focus:outline-none transition-colors"
                                 required
                               />
                             </div>
-                            <div className="space-y-1.5">
+                            <div className="space-y-2">
                               <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Email Address</label>
                               <input 
                                 type="email" 
                                 value={editingStudentForm.email}
                                 onChange={(e) => setEditingStudentForm({...editingStudentForm, email: e.target.value})}
                                 placeholder="e.g. fighter@gmail.com"
-                                className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                                className="w-full bg-brand-primary border border-brand-border p-3.5 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
                               />
                             </div>
-                            <div className="grid grid-cols-2 gap-3">
-                              <div className="space-y-1.5">
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="space-y-2">
                                 <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Target Course</label>
                                 <select 
                                   value={editingStudentForm.course}
                                   onChange={(e) => setEditingStudentForm({...editingStudentForm, course: e.target.value})}
-                                  className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white focus:border-brand-accent focus:outline-none h-[44px] text-xs"
+                                  className="w-full bg-brand-primary border border-brand-border p-3.5 rounded-xl text-white focus:border-brand-accent focus:outline-none h-[48px] text-xs cursor-pointer"
                                 >
                                   <option value="3 Months Course">3 Months Core</option>
                                   <option value="Monthly Plan">Monthly Plan</option>
                                 </select>
                               </div>
-                              <div className="space-y-1.5">
+                              <div className="space-y-2">
                                 <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Status</label>
                                 <select 
                                   value={editingStudentForm.status}
                                   onChange={(e) => setEditingStudentForm({...editingStudentForm, status: e.target.value})}
-                                  className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white focus:border-brand-accent focus:outline-none h-[44px] text-xs"
+                                  className="w-full bg-brand-primary border border-brand-border p-3.5 rounded-xl text-white focus:border-brand-accent focus:outline-none h-[48px] text-xs cursor-pointer"
                                 >
                                   <option value="Pending">Pending</option>
                                   <option value="Active">Active</option>
@@ -1158,17 +1214,17 @@ export default function AdminPage() {
                               onChange={(val) => setEditingStudentForm({...editingStudentForm, image: val})}
                             />
                             
-                            <div className="flex gap-2 pt-2">
+                            <div className="flex gap-3 pt-4">
                               <button 
                                 type="submit"
-                                className="flex-1 py-4 bg-brand-accent text-black font-extrabold uppercase tracking-widest rounded-xl hover:bg-brand-accent-hover transition-colors min-h-[44px] cursor-pointer shadow-md shadow-brand-accent/15 text-xs"
+                                className="flex-1 py-4 bg-brand-accent text-black font-extrabold uppercase tracking-widest rounded-xl hover:bg-brand-accent-hover transition-colors min-h-[48px] cursor-pointer shadow-md shadow-brand-accent/15 text-xs"
                               >
                                 SAVE CHANGES
                               </button>
                               <button 
                                 type="button"
-                                onClick={() => setEditingStudentId(null)}
-                                className="px-4 py-4 bg-brand-primary border border-brand-border text-brand-muted hover:text-white font-mono text-xs rounded-xl min-h-[44px] cursor-pointer"
+                                onClick={() => { setAthleteSubTab('list'); setEditingStudentId(null); }}
+                                className="px-6 py-4 bg-brand-primary border border-brand-border text-brand-muted hover:text-white font-mono text-xs rounded-xl min-h-[48px] cursor-pointer"
                               >
                                 CANCEL
                               </button>
@@ -1177,61 +1233,69 @@ export default function AdminPage() {
                         </>
                       ) : (
                         <>
-                          <h2 className="text-xs font-black uppercase tracking-[0.2em] text-white border-b border-brand-border/40 pb-4 mb-5 flex items-center gap-2 font-display">
-                            <UserPlus className="w-4 h-4 text-brand-accent" /> Register Athlete
-                          </h2>
+                          <div className="flex items-center justify-between border-b border-brand-border/40 pb-4 mb-6">
+                            <h2 className="text-sm font-black uppercase tracking-[0.2em] text-white flex items-center gap-2.5 font-display">
+                              <UserPlus className="w-5 h-5 text-brand-accent" /> Register Athlete
+                            </h2>
+                            <button
+                              onClick={() => setAthleteSubTab('list')}
+                              className="text-xs text-brand-muted hover:text-white font-mono uppercase tracking-widest flex items-center gap-1 cursor-pointer"
+                            >
+                              ← Back to List
+                            </button>
+                          </div>
                           
-                          <form onSubmit={handleAddStudent} className="space-y-4 text-xs">
-                            <div className="space-y-1.5">
+                          <form onSubmit={handleAddStudent} className="space-y-6 text-xs">
+                            <div className="space-y-2">
                               <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Full Name *</label>
                               <input 
                                 type="text" 
                                 value={newStudent.name}
                                 onChange={(e) => setNewStudent({...newStudent, name: e.target.value})}
                                 placeholder="e.g. Shakib Al Hasan"
-                                className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                                className="w-full bg-brand-primary border border-brand-border p-3.5 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
                                 required
                               />
                             </div>
-                            <div className="space-y-1.5">
+                            <div className="space-y-2">
                               <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Contact Phone *</label>
                               <input 
                                 type="text" 
                                 value={newStudent.phone}
                                 onChange={(e) => setNewStudent({...newStudent, phone: e.target.value})}
                                 placeholder="e.g. 017-XXXX-XXXX"
-                                className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm font-mono focus:border-brand-accent focus:outline-none transition-colors"
+                                className="w-full bg-brand-primary border border-brand-border p-3.5 rounded-xl text-white text-sm font-mono focus:border-brand-accent focus:outline-none transition-colors"
                                 required
                               />
                             </div>
-                            <div className="space-y-1.5">
+                            <div className="space-y-2">
                               <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Email Address</label>
                               <input 
                                 type="email" 
                                 value={newStudent.email}
                                 onChange={(e) => setNewStudent({...newStudent, email: e.target.value})}
                                 placeholder="e.g. fighter@gmail.com"
-                                className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                                className="w-full bg-brand-primary border border-brand-border p-3.5 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
                               />
                             </div>
-                            <div className="grid grid-cols-2 gap-3">
-                              <div className="space-y-1.5">
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="space-y-2">
                                 <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Target Course</label>
                                 <select 
                                   value={newStudent.course}
                                   onChange={(e) => setNewStudent({...newStudent, course: e.target.value})}
-                                  className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white focus:border-brand-accent focus:outline-none h-[44px] text-xs"
+                                  className="w-full bg-brand-primary border border-brand-border p-3.5 rounded-xl text-white focus:border-brand-accent focus:outline-none h-[48px] text-xs cursor-pointer"
                                 >
                                   <option value="3 Months Course">3 Months Core</option>
                                   <option value="Monthly Plan">Monthly Plan</option>
                                 </select>
                               </div>
-                              <div className="space-y-1.5">
+                              <div className="space-y-2">
                                 <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Initial Status</label>
                                 <select 
                                   value={newStudent.status}
                                   onChange={(e) => setNewStudent({...newStudent, status: e.target.value})}
-                                  className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white focus:border-brand-accent focus:outline-none h-[44px] text-xs"
+                                  className="w-full bg-brand-primary border border-brand-border p-3.5 rounded-xl text-white focus:border-brand-accent focus:outline-none h-[48px] text-xs cursor-pointer"
                                 >
                                   <option value="Pending">Pending</option>
                                   <option value="Active">Active</option>
@@ -1248,7 +1312,7 @@ export default function AdminPage() {
                             
                             <button 
                               type="submit"
-                              className="w-full py-4 mt-2 bg-brand-accent text-black font-bold uppercase tracking-widest rounded-xl hover:bg-brand-accent-hover transition-colors min-h-[44px] cursor-pointer shadow-md shadow-brand-accent/15 text-xs"
+                              className="w-full py-4 mt-2 bg-brand-accent text-black font-extrabold uppercase tracking-widest rounded-xl hover:bg-brand-accent-hover transition-colors min-h-[48px] cursor-pointer shadow-md shadow-brand-accent/15 text-xs"
                             >
                               CONFIRM ENROLLMENT
                             </button>
@@ -1256,11 +1320,11 @@ export default function AdminPage() {
                         </>
                       )}
                     </div>
-
-                    {/* Athlete Leads Deck list */}
-                    <div className="lg:col-span-8 space-y-4">
+                  ) : (
+                    /* Full-width Athlete Leads Deck list */
+                    <div className="w-full space-y-4">
                       {/* Search Bar & Status Filter Pill Swapper */}
-                      <div className="p-4 bg-brand-secondary/40 border border-brand-border rounded-2xl flex flex-col sm:flex-row gap-3 justify-between items-center shadow-md">
+                      <div className="p-4 bg-brand-secondary/40 border border-brand-border rounded-xl flex flex-col sm:flex-row gap-3 justify-between items-center shadow-md animate-in fade-in duration-300">
                         <div className="relative w-full sm:max-w-xs">
                           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-muted" />
                           <input 
@@ -1290,7 +1354,7 @@ export default function AdminPage() {
                       </div>
 
                       {/* Desktop Table View */}
-                      <div className="hidden md:block overflow-hidden bg-brand-secondary/40 border border-brand-border rounded-2xl shadow-xl">
+                      <div className="hidden md:block overflow-hidden bg-brand-secondary/40 border border-brand-border rounded-2xl shadow-xl animate-in fade-in duration-300">
                         <table className="w-full text-left border-collapse">
                           <thead>
                             <tr className="bg-brand-secondary/90 border-b border-brand-border text-brand-muted text-[10px] font-bold uppercase tracking-wider">
@@ -1353,7 +1417,7 @@ export default function AdminPage() {
                                     <div className="flex justify-end gap-2">
                                       <button 
                                         onClick={() => startEditingStudent(athlete)}
-                                        className="p-2.5 rounded-xl border border-brand-border hover:border-brand-accent hover:text-brand-accent transition-colors text-brand-muted cursor-pointer min-h-[38px] min-w-[38px] flex items-center justify-center"
+                                        className="p-2.5 rounded-xl border border-brand-border hover:border-brand-accent hover:text-brand-accent transition-colors text-brand-muted cursor-pointer min-h-[38px] min-w-[38px] flex items-center justify-center animate-in zoom-in-75 duration-300"
                                         title="Edit Athlete Record"
                                       >
                                         <Edit3 className="w-4 h-4" />
@@ -1375,7 +1439,7 @@ export default function AdminPage() {
                       </div>
 
                       {/* Mobile Card Deck View */}
-                      <div className="md:hidden space-y-4">
+                      <div className="md:hidden space-y-4 animate-in fade-in duration-305">
                         {filteredStudents.length === 0 ? (
                           <div className="p-10 text-center text-brand-muted bg-brand-secondary border border-brand-border rounded-xl font-mono text-xs">
                             No records matching filter settings.
@@ -1453,7 +1517,7 @@ export default function AdminPage() {
                         )}
                       </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               )}
 
@@ -1795,18 +1859,66 @@ export default function AdminPage() {
               {/* TAB 5: PRODUCTS / SHOP MANAGEMENT */}
               {activeTab === 'products' && (
                 <div className="space-y-6">
-                  <div className="grid lg:grid-cols-12 gap-6 items-start">
-                    
-                    {/* Register or Edit Product form */}
-                    <div className="lg:col-span-4 p-6 bg-brand-secondary/40 border border-brand-border/80 rounded-[2rem] relative shadow-lg">
+                  {/* Separate Page sub-navigation header for products list and form */}
+                  <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-brand-border/40 pb-5 mb-6">
+                    <div>
+                      <h3 className="text-xl font-display font-black uppercase text-white tracking-tight">
+                        {productSubTab === 'list' ? 'Store Catalog & Inventory' : editingProductId ? 'Edit Product Details' : 'Register New Gear'}
+                      </h3>
+                      <p className="text-xs text-brand-muted font-mono tracking-wider mt-0.5 animate-pulse text-brand-accent">
+                        {productSubTab === 'list' ? 'STOREFRONT GEAR INVENTORY STOCKLIST' : 'CREATE HIGH-END PRODUCT DISPLAY'}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => {
+                          setProductSubTab('list');
+                          setEditingProductId(null);
+                        }}
+                        className={`px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-xl transition-all border min-h-[40px] cursor-pointer ${
+                          productSubTab === 'list'
+                            ? 'bg-brand-accent text-black font-black border-brand-accent shadow-sm shadow-brand-accent/20'
+                            : 'bg-brand-secondary/80 border-brand-border text-brand-muted hover:text-white'
+                        }`}
+                      >
+                        Product Catalog
+                      </button>
+                      <button
+                        onClick={() => {
+                          setProductSubTab('form');
+                          setEditingProductId(null);
+                          setNewProduct({ name: '', price: '', category: 'Equipment', description: '', image: '', rating: '5.0' });
+                        }}
+                        className={`px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-xl transition-all border min-h-[40px] cursor-pointer ${
+                          productSubTab === 'form' && !editingProductId
+                            ? 'bg-brand-accent text-black font-black border-brand-accent shadow-sm shadow-brand-accent/20'
+                            : 'bg-brand-secondary/80 border-brand-border text-brand-muted hover:text-white'
+                        }`}
+                      >
+                        + Add Gear
+                      </button>
+                    </div>
+                  </div>
+
+                  {productSubTab === 'form' ? (
+                    /* Focused Product Input Details Form */
+                    <div className="max-w-2xl mx-auto w-full p-8 bg-brand-secondary/40 border border-brand-border/85 rounded-[2.5rem] relative shadow-2xl">
                       {editingProductId ? (
                         <>
-                          <h2 className="text-xs font-black uppercase tracking-[0.2em] text-white border-b border-brand-border/40 pb-4 mb-5 flex items-center gap-2 font-display">
-                            <Edit3 className="w-4 h-4 text-brand-accent animate-pulse" /> Edit Shop Product
-                          </h2>
+                          <div className="flex items-center justify-between border-b border-brand-border/40 pb-4 mb-6">
+                            <h2 className="text-sm font-black uppercase tracking-[0.2em] text-white flex items-center gap-2.5 font-display2">
+                              <Edit3 className="w-5 h-5 text-brand-accent animate-pulse" /> Edit Shop Product
+                            </h2>
+                            <button
+                              onClick={() => { setProductSubTab('list'); setEditingProductId(null); }}
+                              className="text-xs text-brand-muted hover:text-white font-mono uppercase tracking-widest flex items-center gap-1 cursor-pointer"
+                            >
+                              ← Back to Catalog
+                            </button>
+                          </div>
                           
-                          <form onSubmit={(e) => { e.preventDefault(); saveEditedProduct(editingProductId); }} className="space-y-4 text-xs">
-                            <div className="space-y-1.5">
+                          <form onSubmit={(e) => { e.preventDefault(); saveEditedProduct(editingProductId); }} className="space-y-6 text-xs">
+                            <div className="space-y-2">
                               <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Product Name *</label>
                               <input 
                                 type="text" 
@@ -1814,12 +1926,12 @@ export default function AdminPage() {
                                 placeholder="e.g. Invictus Rashguard"
                                 value={editingProductForm.name}
                                 onChange={(e) => setEditingProductForm({...editingProductForm, name: e.target.value})}
-                                className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                                className="w-full bg-brand-primary border border-brand-border p-3.5 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
                               />
                             </div>
 
-                            <div className="grid grid-cols-2 gap-3">
-                              <div className="space-y-1.5">
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="space-y-2">
                                 <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Price (৳) *</label>
                                 <input 
                                   type="number" 
@@ -1828,15 +1940,15 @@ export default function AdminPage() {
                                   placeholder="e.g. 1200"
                                   value={editingProductForm.price}
                                   onChange={(e) => setEditingProductForm({...editingProductForm, price: e.target.value})}
-                                  className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                                  className="w-full bg-brand-primary border border-brand-border p-3.5 rounded-xl text-white text-sm font-mono focus:border-brand-accent focus:outline-none transition-colors"
                                 />
                               </div>
-                              <div className="space-y-1.5">
+                              <div className="space-y-2">
                                 <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Category *</label>
                                 <select
                                   value={editingProductForm.category}
                                   onChange={(e) => setEditingProductForm({...editingProductForm, category: e.target.value})}
-                                  className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors cursor-pointer"
+                                  className="w-full bg-brand-primary border border-brand-border p-3.5 rounded-xl text-white text-xs focus:border-brand-accent focus:outline-none transition-colors cursor-pointer h-[48px]"
                                 >
                                   <option value="Apparel">Apparel</option>
                                   <option value="Equipment">Equipment</option>
@@ -1845,25 +1957,25 @@ export default function AdminPage() {
                               </div>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-3">
-                              <div className="space-y-1.5">
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="space-y-2">
                                 <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Rating Code *</label>
                                 <input 
                                   type="text" 
                                   placeholder="e.g. 4.9"
                                   value={editingProductForm.rating}
                                   onChange={(e) => setEditingProductForm({...editingProductForm, rating: e.target.value})}
-                                  className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                                  className="w-full bg-brand-primary border border-brand-border p-3.5 rounded-xl text-white text-sm font-mono focus:border-brand-accent focus:outline-none transition-colors"
                                 />
                               </div>
-                              <div className="space-y-1.5">
+                              <div className="space-y-2">
                                 <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Product Image URL</label>
                                 <input 
                                   type="text" 
                                   placeholder="e.g. https://picsum.photos/..."
                                   value={editingProductForm.image}
                                   onChange={(e) => setEditingProductForm({...editingProductForm, image: e.target.value})}
-                                  className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                                  className="w-full bg-brand-primary border border-brand-border p-3.5 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
                                 />
                               </div>
                             </div>
@@ -1874,28 +1986,28 @@ export default function AdminPage() {
                               onChange={(val) => setEditingProductForm({...editingProductForm, image: val})}
                             />
 
-                            <div className="space-y-1.5">
+                            <div className="space-y-2">
                               <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Short Description</label>
                               <textarea 
                                 rows={3}
                                 placeholder="Briefly summarize what makes this gear standard elite..."
                                 value={editingProductForm.description}
                                 onChange={(e) => setEditingProductForm({...editingProductForm, description: e.target.value})}
-                                className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors font-sans"
+                                className="w-full bg-brand-primary border border-brand-border p-3.5 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors font-sans"
                               />
                             </div>
 
-                            <div className="flex gap-2">
+                            <div className="flex gap-3 pt-4">
                               <button 
                                 type="submit"
-                                className="flex-1 py-4 bg-brand-accent text-black font-extrabold uppercase tracking-widest rounded-xl hover:bg-brand-accent-hover transition-colors min-h-[44px] cursor-pointer shadow-md shadow-brand-accent/15 text-xs"
+                                className="flex-1 py-4 bg-brand-accent text-black font-extrabold uppercase tracking-widest rounded-xl hover:bg-brand-accent-hover transition-colors min-h-[48px] cursor-pointer shadow-md shadow-brand-accent/15 text-xs"
                               >
                                 SAVE CHANGES
                               </button>
                               <button 
                                 type="button"
-                                onClick={() => setEditingProductId(null)}
-                                className="px-4 py-4 bg-brand-primary border border-brand-border text-brand-muted hover:text-white font-mono text-xs rounded-xl min-h-[44px] cursor-pointer"
+                                onClick={() => { setProductSubTab('list'); setEditingProductId(null); }}
+                                className="px-6 py-4 bg-brand-primary border border-brand-border text-brand-muted hover:text-white font-mono text-xs rounded-xl min-h-[48px] cursor-pointer"
                               >
                                 CANCEL
                               </button>
@@ -1904,12 +2016,20 @@ export default function AdminPage() {
                         </>
                       ) : (
                         <>
-                          <h2 className="text-xs font-black uppercase tracking-[0.2em] text-white border-b border-brand-border/40 pb-4 mb-5 flex items-center gap-2 font-display">
-                            <ShoppingBag className="w-4 h-4 text-brand-accent" /> Register Store Product
-                          </h2>
+                          <div className="flex items-center justify-between border-b border-brand-border/40 pb-4 mb-6">
+                            <h2 className="text-sm font-black uppercase tracking-[0.2em] text-white flex items-center gap-2.5 font-display2">
+                              <ShoppingBag className="w-5 h-5 text-brand-accent" /> Register Store Product
+                            </h2>
+                            <button
+                              onClick={() => setProductSubTab('list')}
+                              className="text-xs text-brand-muted hover:text-white font-mono uppercase tracking-widest flex items-center gap-1 cursor-pointer"
+                            >
+                              ← Back to Catalog
+                            </button>
+                          </div>
                           
-                          <form onSubmit={handleAddProduct} className="space-y-4 text-xs">
-                            <div className="space-y-1.5">
+                          <form onSubmit={handleAddProduct} className="space-y-6 text-xs">
+                            <div className="space-y-2">
                               <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Product Name *</label>
                               <input 
                                 type="text" 
@@ -1917,12 +2037,12 @@ export default function AdminPage() {
                                 placeholder="e.g. Invictus Rashguard"
                                 value={newProduct.name}
                                 onChange={(e) => setNewProduct({...newProduct, name: e.target.value})}
-                                className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                                className="w-full bg-brand-primary border border-brand-border p-3.5 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
                               />
                             </div>
 
-                            <div className="grid grid-cols-2 gap-3">
-                              <div className="space-y-1.5">
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="space-y-2">
                                 <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Price (৳) *</label>
                                 <input 
                                   type="number" 
@@ -1931,15 +2051,15 @@ export default function AdminPage() {
                                   placeholder="e.g. 1200"
                                   value={newProduct.price}
                                   onChange={(e) => setNewProduct({...newProduct, price: e.target.value})}
-                                  className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                                  className="w-full bg-brand-primary border border-brand-border p-3.5 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
                                 />
                               </div>
-                              <div className="space-y-1.5">
+                              <div className="space-y-2">
                                 <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Category *</label>
                                 <select
                                   value={newProduct.category}
                                   onChange={(e) => setNewProduct({...newProduct, category: e.target.value})}
-                                  className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors cursor-pointer"
+                                  className="w-full bg-brand-primary border border-brand-border p-3.5 rounded-xl text-white text-xs focus:border-brand-accent focus:outline-none transition-colors cursor-pointer h-[48px]"
                                 >
                                   <option value="Apparel">Apparel</option>
                                   <option value="Equipment">Equipment</option>
@@ -1948,25 +2068,25 @@ export default function AdminPage() {
                               </div>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-3">
-                              <div className="space-y-1.5">
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="space-y-2">
                                 <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Rating Code *</label>
                                 <input 
                                   type="text" 
                                   placeholder="e.g. 4.9"
                                   value={newProduct.rating}
                                   onChange={(e) => setNewProduct({...newProduct, rating: e.target.value})}
-                                  className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                                  className="w-full bg-brand-primary border border-brand-border p-3.5 rounded-xl text-white text-sm font-mono focus:border-brand-accent focus:outline-none transition-colors"
                                 />
                               </div>
-                              <div className="space-y-1.5">
+                              <div className="space-y-2">
                                 <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Product Image URL</label>
                                 <input 
                                   type="text" 
                                   placeholder="e.g. https://picsum.photos/..."
                                   value={newProduct.image}
                                   onChange={(e) => setNewProduct({...newProduct, image: e.target.value})}
-                                  className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                                  className="w-full bg-brand-primary border border-brand-border p-3.5 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
                                 />
                               </div>
                             </div>
@@ -1977,20 +2097,20 @@ export default function AdminPage() {
                               onChange={(val) => setNewProduct({...newProduct, image: val})}
                             />
 
-                            <div className="space-y-1.5">
+                            <div className="space-y-2">
                               <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Short Description</label>
                               <textarea 
                                 rows={3}
                                 placeholder="Briefly summarize what makes this gear standard elite..."
                                 value={newProduct.description}
                                 onChange={(e) => setNewProduct({...newProduct, description: e.target.value})}
-                                className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors font-sans"
+                                className="w-full bg-brand-primary border border-brand-border p-3.5 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors font-sans"
                               />
                             </div>
 
                             <button 
                               type="submit"
-                              className="w-full py-4 bg-brand-accent text-black font-black uppercase tracking-wider text-xs rounded-xl hover:bg-brand-accent-hover transition-colors min-h-[44px] cursor-pointer shadow-lg shadow-brand-accent/10"
+                              className="w-full py-4 bg-brand-accent text-black font-extrabold uppercase tracking-widest text-xs rounded-xl hover:bg-brand-accent-hover transition-colors min-h-[48px] cursor-pointer shadow-lg shadow-brand-accent/10"
                             >
                               REGISTER PRODUCT RECORD
                             </button>
@@ -1998,10 +2118,10 @@ export default function AdminPage() {
                         </>
                       )}
                     </div>
-
-                    {/* Pro Product Directory Grid */}
-                    <div className="lg:col-span-8 space-y-4">
-                      <div className="p-6 bg-brand-secondary/40 border border-brand-border/80 rounded-[2rem]">
+                  ) : (
+                    /* Full-width Product Directory Table */
+                    <div className="w-full space-y-4">
+                      <div className="p-6 bg-brand-secondary/40 border border-brand-border/80 rounded-[2rem] shadow-xl animate-in fade-in duration-300">
                         <h3 className="text-xs font-black uppercase tracking-widest text-white border-b border-brand-border/40 pb-4 mb-4 font-display">
                           🏪 Store Inventory Inventory Directory ({products.length})
                         </h3>
@@ -2010,11 +2130,11 @@ export default function AdminPage() {
                           <table className="w-full text-left border-collapse text-xs">
                             <thead>
                               <tr className="border-b border-brand-border/60 text-brand-muted uppercase font-mono tracking-wider">
-                                <th className="pb-3 font-bold">Product ID / Item Name</th>
-                                <th className="pb-3 font-bold">Category</th>
-                                <th className="pb-3 font-bold">Price</th>
-                                <th className="pb-3 font-bold">Rating</th>
-                                <th className="pb-3 font-bold text-right">Actions</th>
+                                <th className="pb-3 p-2 font-bold">Product ID / Item Name</th>
+                                <th className="pb-3 p-2 font-bold">Category</th>
+                                <th className="pb-3 p-2 font-bold">Price</th>
+                                <th className="pb-3 p-2 font-bold">Rating</th>
+                                <th className="pb-3 p-2 font-bold text-right">Actions</th>
                               </tr>
                             </thead>
                             <tbody className="divide-y divide-brand-border/30">
@@ -2027,7 +2147,7 @@ export default function AdminPage() {
                               ) : (
                                 products.map((prod) => (
                                   <tr key={prod.id} className="hover:bg-white/[0.01]">
-                                    <td className="py-4">
+                                    <td className="py-4 p-2">
                                       <div className="flex items-center gap-3">
                                         <div className="relative w-10 h-10 rounded-lg overflow-hidden shrink-0 border border-brand-border bg-brand-primary">
                                           <img src={prod.image} alt={prod.name} className="object-cover w-full h-full grayscale" />
@@ -2038,14 +2158,14 @@ export default function AdminPage() {
                                         </div>
                                       </div>
                                     </td>
-                                    <td className="py-4">
+                                    <td className="py-4 p-2">
                                       <span className="px-2 py-0.5 bg-brand-primary border border-brand-border text-[9px] font-mono font-bold uppercase rounded text-brand-accent">
                                         {prod.category}
                                       </span>
                                     </td>
-                                    <td className="py-4 font-bold text-white">৳{(prod.price || 0).toLocaleString()}</td>
-                                    <td className="py-4 font-mono text-amber-400 font-bold">★ {prod.rating || "5.0"}</td>
-                                    <td className="py-4 text-right">
+                                    <td className="py-4 p-2 font-bold text-white">৳{(prod.price || 0).toLocaleString()}</td>
+                                    <td className="py-4 p-2 font-mono text-amber-400 font-bold">★ {prod.rating || "5.0"}</td>
+                                    <td className="py-4 p-2 text-right">
                                       <div className="flex justify-end gap-2">
                                         <button 
                                           onClick={() => startEditingProduct(prod)}
@@ -2071,8 +2191,7 @@ export default function AdminPage() {
                         </div>
                       </div>
                     </div>
-
-                  </div>
+                  )}
                 </div>
               )}
 
