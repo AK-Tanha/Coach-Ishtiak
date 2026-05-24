@@ -96,11 +96,11 @@ const defaultPricing = [
 ];
 
 const defaultStudents = [
-  { id: "st-1", name: "Tanvir Rahman", email: "tanvir@gmail.com", phone: "01711223344", course: "3 Months Course", status: "Active", enrolledDate: "2026-05-10" },
-  { id: "st-2", name: "Fahim Ahmed", email: "fahim.ah@gmail.com", phone: "01822445566", course: "Monthly Plan", status: "Pending", enrolledDate: "2026-05-18" },
-  { id: "st-3", name: "Imtiaz Hassan", email: "imtiaz@hassan.info", phone: "01677338899", course: "3 Months Course", status: "Active", enrolledDate: "2026-04-12" },
-  { id: "st-4", name: "Anika Bushra", email: "anika.bushra@outlook.com", phone: "01944112233", course: "3 Months Course", status: "Active", enrolledDate: "2026-05-02" },
-  { id: "st-5", name: "Raihan Kabir", email: "raihan@kabir.net", phone: "01588667744", course: "Monthly Plan", status: "Canceled", enrolledDate: "2026-05-15" }
+  { id: "st-1", name: "Tanvir Rahman", email: "tanvir@gmail.com", phone: "01711223344", course: "3 Months Course", status: "Active", enrolledDate: "2026-05-10", image: "https://picsum.photos/seed/tanvir/800/800" },
+  { id: "st-2", name: "Fahim Ahmed", email: "fahim.ah@gmail.com", phone: "01822445566", course: "Monthly Plan", status: "Pending", enrolledDate: "2026-05-18", image: "https://picsum.photos/seed/fahim/800/800" },
+  { id: "st-3", name: "Imtiaz Hassan", email: "imtiaz@hassan.info", phone: "01677338899", course: "3 Months Course", status: "Active", enrolledDate: "2026-04-12", image: "" },
+  { id: "st-4", name: "Anika Bushra", email: "anika.bushra@outlook.com", phone: "01944112233", course: "3 Months Course", status: "Active", enrolledDate: "2026-05-02", image: "" },
+  { id: "st-5", name: "Raihan Kabir", email: "raihan@kabir.net", phone: "01588667744", course: "Monthly Plan", status: "Canceled", enrolledDate: "2026-05-15", image: "" }
 ];
 
 const defaultInquiries = [
@@ -149,6 +149,104 @@ const defaultProducts = [
   }
 ];
 
+const defaultHeroSettings = {
+  badge: "REGISTRATION OPEN • ELITE DIVISION",
+  subheading: "MASTERING THE",
+  title: "ART OF COMBAT",
+  name: "COACH ISHTIAK",
+  description: "A Coach, A Student & An Athlete. Over a decade forging champions in MMA, BJJ, and Boxing. Founder of core combat sport institutions in Bangladesh.",
+  images: [
+    {
+      url: "https://picsum.photos/seed/coach-ishtiaq/1000/1000",
+      caption: "First WBC Referee BD",
+      title: "BANGLADESH"
+    },
+    {
+      url: "https://picsum.photos/seed/mma-training-1/1000/1000",
+      caption: "Head Coach",
+      title: "INVICTUS"
+    },
+    {
+      url: "https://picsum.photos/seed/boxing-match-1/1000/1000",
+      caption: "Founder",
+      title: "BMMAA"
+    }
+  ]
+};
+
+const defaultAboutSettings = {
+  badge: "PROFILE • LEAD COACH",
+  heading: "Philosophy",
+  subheading: "Building champions inside and outside the cage.",
+  para1: "Recognized as Bangladesh's first WBC-certified boxing referee, my journey has been defined by a relentless pursuit of excellence and the development of combat sports on a national level. As the Founder and General Secretary of the Bangladesh Mixed Martial Arts Association (BMMAA), I have pioneered the first organized MMA events in our nation.",
+  para2: "My coaching methodology combines technical precision with mental fortitude. From tactical boxing instructions for the Bangladesh Army to leading high-performance training at Invictus BJJ, I focus on the holistic development of my athletes.",
+  image: "https://picsum.photos/seed/coach-ishtiaq/800/1000"
+};
+
+const ImageUploader = ({ 
+  value, 
+  onChange, 
+  id 
+}: { 
+  value: string; 
+  onChange: (base64: string) => void; 
+  id: string;
+}) => {
+  const fileInputRef = React.useRef<HTMLInputElement | null>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        onChange(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  return (
+    <div className="space-y-1.5">
+      <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Upload Image File</label>
+      <div 
+        onClick={() => fileInputRef.current?.click()}
+        className="border border-dashed border-brand-border hover:border-brand-accent/55 bg-brand-primary p-3 rounded-xl flex flex-col items-center justify-center cursor-pointer min-h-[70px] transition-all group"
+      >
+        <input 
+          type="file" 
+          ref={fileInputRef} 
+          id={id}
+          accept="image/*" 
+          className="hidden" 
+          onChange={handleFileChange} 
+        />
+        {value ? (
+          <div className="flex items-center gap-3 w-full">
+            <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 border border-brand-border bg-brand-primary">
+              <img src={value} alt="Preview" className="object-cover w-full h-full" />
+            </div>
+            <div className="text-left text-[11px] text-brand-muted truncate flex-1 leading-normal">
+              Image loaded successfully. Click to replace.
+            </div>
+            <button 
+              type="button" 
+              onClick={(e) => { e.stopPropagation(); onChange(''); }}
+              className="text-red-400 hover:text-red-500 font-mono text-[9px] uppercase tracking-wider font-bold cursor-pointer"
+            >
+              Clear
+            </button>
+          </div>
+        ) : (
+          <div className="text-center group-hover:text-brand-accent transition-colors">
+            <Plus className="w-4 h-4 text-brand-muted group-hover:text-brand-accent mx-auto mb-1 animate-pulse" />
+            <span className="text-[10px] uppercase font-mono tracking-widest text-[#cbcbcb]">Select file or Drag here</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = React.useState(() => {
     if (typeof window !== 'undefined') {
@@ -160,7 +258,7 @@ export default function AdminPage() {
   const [loginError, setLoginError] = React.useState('');
   
   // Dashboard states
-  const [activeTab, setActiveTab] = React.useState<'students' | 'schedule' | 'pricing' | 'inquiries' | 'products' | 'orders'>('students');
+  const [activeTab, setActiveTab ] = React.useState<'students' | 'schedule' | 'pricing' | 'inquiries' | 'products' | 'orders' | 'content'>('students');
   const [students, setStudents] = React.useState<typeof defaultStudents>(() => {
     if (typeof window !== 'undefined') {
       const stored = localStorage.getItem('invictus_students');
@@ -198,6 +296,38 @@ export default function AdminPage() {
     return defaultProducts;
   });
 
+  const [heroSettings, setHeroSettings] = React.useState<typeof defaultHeroSettings>(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('invictus_hero_settings');
+      return stored ? JSON.parse(stored) : defaultHeroSettings;
+    }
+    return defaultHeroSettings;
+  });
+
+  const [aboutSettings, setAboutSettings] = React.useState<typeof defaultAboutSettings>(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('invictus_about_settings');
+      return stored ? JSON.parse(stored) : defaultAboutSettings;
+    }
+    return defaultAboutSettings;
+  });
+
+  const [heroForm, setHeroForm] = React.useState<typeof defaultHeroSettings>(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('invictus_hero_settings');
+      return stored ? JSON.parse(stored) : defaultHeroSettings;
+    }
+    return defaultHeroSettings;
+  });
+
+  const [aboutForm, setAboutForm] = React.useState<typeof defaultAboutSettings>(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('invictus_about_settings');
+      return stored ? JSON.parse(stored) : defaultAboutSettings;
+    }
+    return defaultAboutSettings;
+  });
+
   const [orders, setOrders] = React.useState<any[]>(() => {
     if (typeof window !== 'undefined') {
       const stored = localStorage.getItem('invictus_orders');
@@ -217,11 +347,16 @@ export default function AdminPage() {
   const [studentFilter, setStudentFilter] = React.useState('All');
   
   // Forms states
-  const [newStudent, setNewStudent] = React.useState({ name: '', email: '', phone: '', course: '3 Months Course', status: 'Pending' });
+  const [newStudent, setNewStudent] = React.useState({ name: '', email: '', phone: '', course: '3 Months Course', status: 'Pending', image: '' });
+  const [editingStudentId, setEditingStudentId] = React.useState<string | null>(null);
+  const [editingStudentForm, setEditingStudentForm] = React.useState({ name: '', email: '', phone: '', course: '3 Months Course', status: 'Pending', image: '' });
+
   const [editingPlanId, setEditingPlanId] = React.useState<string | null>(null);
   const [editingPlanForm, setEditingPlanForm] = React.useState({ title: '', price: '', originalPrice: '', highlight: false, badge: '', features: '' });
   
   const [newProduct, setNewProduct] = React.useState({ name: '', price: '', category: 'Equipment', description: '', image: '', rating: '5.0' });
+  const [editingProductId, setEditingProductId] = React.useState<number | null>(null);
+  const [editingProductForm, setEditingProductForm] = React.useState({ name: '', price: '', category: 'Equipment', description: '', image: '', rating: '5.0' });
 
   // Schedule quick add
   const [selectedDay, setSelectedDay] = React.useState('Sunday');
@@ -249,6 +384,12 @@ export default function AdminPage() {
       }
       if (!localStorage.getItem('invictus_products')) {
         localStorage.setItem('invictus_products', JSON.stringify(defaultProducts));
+      }
+      if (!localStorage.getItem('invictus_hero_settings')) {
+        localStorage.setItem('invictus_hero_settings', JSON.stringify(defaultHeroSettings));
+      }
+      if (!localStorage.getItem('invictus_about_settings')) {
+        localStorage.setItem('invictus_about_settings', JSON.stringify(defaultAboutSettings));
       }
       if (!localStorage.getItem('invictus_orders')) {
         const defaultOrders = [
@@ -309,13 +450,52 @@ export default function AdminPage() {
       phone: newStudent.phone,
       course: newStudent.course,
       status: newStudent.status,
-      enrolledDate: new Date().toISOString().split('T')[0]
+      enrolledDate: new Date().toISOString().split('T')[0],
+      image: newStudent.image || ""
     };
     const updated = [newlyCreated, ...students];
     setStudents(updated);
     syncToStorage('invictus_students', updated);
-    setNewStudent({ name: '', email: '', phone: '', course: '3 Months Course', status: 'Pending' });
+    setNewStudent({ name: '', email: '', phone: '', course: '3 Months Course', status: 'Pending', image: '' });
     triggerNotification(`Athlete ${newlyCreated.name} successfully registered!`);
+  };
+
+  const startEditingStudent = (student: any) => {
+    setEditingStudentId(student.id);
+    setEditingStudentForm({
+      name: student.name,
+      email: student.email === 'N/A' || !student.email ? '' : student.email,
+      phone: student.phone,
+      course: student.course,
+      status: student.status,
+      image: student.image || ''
+    });
+    triggerNotification(`Editing record of: ${student.name}`);
+  };
+
+  const saveEditedStudent = (id: string) => {
+    if (!editingStudentForm.name || !editingStudentForm.phone) {
+      triggerNotification('Name and Phone are required.', 'error');
+      return;
+    }
+    const updated = students.map(s => {
+      if (s.id === id) {
+        return {
+          ...s,
+          name: editingStudentForm.name,
+          email: editingStudentForm.email || 'N/A',
+          phone: editingStudentForm.phone,
+          course: editingStudentForm.course,
+          status: editingStudentForm.status,
+          image: editingStudentForm.image
+        };
+      }
+      return s;
+    });
+    setStudents(updated);
+    syncToStorage('invictus_students', updated);
+    setEditingStudentId(null);
+    triggerNotification(`Athlete ${editingStudentForm.name} updated successfully.`);
   };
 
   const handleDeleteStudent = (id: string, name: string) => {
@@ -494,6 +674,44 @@ export default function AdminPage() {
     triggerNotification(`Successfully registered product: ${newlyCreated.name}`);
   };
 
+  const startEditingProduct = (product: any) => {
+    setEditingProductId(product.id);
+    setEditingProductForm({
+      name: product.name,
+      price: product.price.toString(),
+      category: product.category,
+      description: product.description,
+      image: product.image,
+      rating: product.rating.toString()
+    });
+    triggerNotification(`Editing product: ${product.name}`);
+  };
+
+  const saveEditedProduct = (id: number) => {
+    if (!editingProductForm.name || !editingProductForm.price) {
+      triggerNotification('Product Name and Price are required.', 'error');
+      return;
+    }
+    const updated = products.map(p => {
+      if (p.id === id) {
+        return {
+          ...p,
+          name: editingProductForm.name,
+          price: parseFloat(editingProductForm.price) || 0,
+          category: editingProductForm.category,
+          description: editingProductForm.description || "Elite training product.",
+          image: editingProductForm.image || "https://picsum.photos/seed/invictus-gear/800/800",
+          rating: parseFloat(editingProductForm.rating) || 5.0
+        };
+      }
+      return p;
+    });
+    setProducts(updated);
+    syncToStorage('invictus_products', updated);
+    setEditingProductId(null);
+    triggerNotification(`Successfully updated product: ${editingProductForm.name}`);
+  };
+
   // Order Actions
   const handleToggleOrderStatus = (id: string, currentStatus: string) => {
     const nextStatus = currentStatus === 'Pending' ? 'Shipped' : currentStatus === 'Shipped' ? 'Delivered' : currentStatus === 'Delivered' ? 'Canceled' : 'Pending';
@@ -637,6 +855,7 @@ export default function AdminPage() {
                   { id: 'inquiries', label: 'Client Inbox', icon: Mail, count: inquiries.filter(i => !i.read).length, isInbox: true },
                   { id: 'products', label: 'Manage Shop', icon: ShoppingBag, count: products.length },
                   { id: 'orders', label: 'Shop Orders', icon: Package, count: orders.filter(o => o.status === 'Pending').length, isInbox: true },
+                  { id: 'content', label: 'Hero & About CMS', icon: Compass },
                 ].map((item) => {
                   const TabIcon = item.icon;
                   const isActive = activeTab === item.id;
@@ -734,6 +953,7 @@ export default function AdminPage() {
                     { id: 'inquiries', label: 'Client Inbox', icon: Mail, count: inquiries.filter(i => !i.read).length, isInbox: true },
                     { id: 'products', label: 'Manage Shop', icon: ShoppingBag, count: products.length },
                     { id: 'orders', label: 'Shop Orders', icon: Package, count: orders.filter(o => o.status === 'Pending').length, isInbox: true },
+                    { id: 'content', label: 'Hero & About CMS', icon: Compass },
                   ].map((item) => {
                     const TabIcon = item.icon;
                     const isActive = activeTab === item.id;
@@ -798,6 +1018,7 @@ export default function AdminPage() {
                   {activeTab === 'inquiries' && '📬 Dynamic Mail Inbox'}
                   {activeTab === 'products' && '📦 Shop Inventory Manager'}
                   {activeTab === 'orders' && '🛒 Store Orders Stream'}
+                  {activeTab === 'content' && '🌐 Hero & About CMS'}
                 </h1>
                 <p className="text-xs text-brand-muted mt-0.5 font-sans">
                   Active directory synchronized directly to client modules.
@@ -864,78 +1085,176 @@ export default function AdminPage() {
                 <div className="space-y-6">
                   <div className="grid lg:grid-cols-12 gap-6 items-start">
                     
-                    {/* Athlete registration form */}
+                    {/* Athlete registration / edit form */}
                     <div className="lg:col-span-4 p-6 bg-brand-secondary/40 border border-brand-border/80 rounded-[2rem] relative shadow-lg">
-                      <h2 className="text-xs font-black uppercase tracking-[0.2em] text-white border-b border-brand-border/40 pb-4 mb-5 flex items-center gap-2 font-display">
-                        <UserPlus className="w-4 h-4 text-brand-accent" /> Register Athlete
-                      </h2>
-                      
-                      <form onSubmit={handleAddStudent} className="space-y-4 text-xs">
-                        <div className="space-y-1.5">
-                          <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Full Name *</label>
-                          <input 
-                            type="text" 
-                            value={newStudent.name}
-                            onChange={(e) => setNewStudent({...newStudent, name: e.target.value})}
-                            placeholder="e.g. Shakib Al Hasan"
-                            className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
-                            required
-                          />
-                        </div>
-                        <div className="space-y-1.5">
-                          <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Contact Phone *</label>
-                          <input 
-                            type="text" 
-                            value={newStudent.phone}
-                            onChange={(e) => setNewStudent({...newStudent, phone: e.target.value})}
-                            placeholder="e.g. 017-XXXX-XXXX"
-                            className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm font-mono focus:border-brand-accent focus:outline-none transition-colors"
-                            required
-                          />
-                        </div>
-                        <div className="space-y-1.5">
-                          <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Email Address</label>
-                          <input 
-                            type="email" 
-                            value={newStudent.email}
-                            onChange={(e) => setNewStudent({...newStudent, email: e.target.value})}
-                            placeholder="e.g. fighter@gmail.com"
-                            className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
-                          />
-                        </div>
-                        <div className="grid grid-cols-2 gap-3">
-                          <div className="space-y-1.5">
-                            <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Target Course</label>
-                            <select 
-                              value={newStudent.course}
-                              onChange={(e) => setNewStudent({...newStudent, course: e.target.value})}
-                              className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white focus:border-brand-accent focus:outline-none h-[44px] text-xs"
+                      {editingStudentId ? (
+                        <>
+                          <h2 className="text-xs font-black uppercase tracking-[0.2em] text-white border-b border-brand-border/40 pb-4 mb-5 flex items-center gap-2 font-display">
+                            <Edit3 className="w-4 h-4 text-brand-accent animate-pulse" /> Edit Athlete Record
+                          </h2>
+                          
+                          <form onSubmit={(e) => { e.preventDefault(); saveEditedStudent(editingStudentId); }} className="space-y-4 text-xs">
+                            <div className="space-y-1.5">
+                              <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Full Name *</label>
+                              <input 
+                                type="text" 
+                                value={editingStudentForm.name}
+                                onChange={(e) => setEditingStudentForm({...editingStudentForm, name: e.target.value})}
+                                placeholder="e.g. Tanvir Rahman"
+                                className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                                required
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Contact Phone *</label>
+                              <input 
+                                type="text" 
+                                value={editingStudentForm.phone}
+                                onChange={(e) => setEditingStudentForm({...editingStudentForm, phone: e.target.value})}
+                                placeholder="e.g. 017-XXXX-XXXX"
+                                className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm font-mono focus:border-brand-accent focus:outline-none transition-colors"
+                                required
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Email Address</label>
+                              <input 
+                                type="email" 
+                                value={editingStudentForm.email}
+                                onChange={(e) => setEditingStudentForm({...editingStudentForm, email: e.target.value})}
+                                placeholder="e.g. fighter@gmail.com"
+                                className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                              />
+                            </div>
+                            <div className="grid grid-cols-2 gap-3">
+                              <div className="space-y-1.5">
+                                <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Target Course</label>
+                                <select 
+                                  value={editingStudentForm.course}
+                                  onChange={(e) => setEditingStudentForm({...editingStudentForm, course: e.target.value})}
+                                  className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white focus:border-brand-accent focus:outline-none h-[44px] text-xs"
+                                >
+                                  <option value="3 Months Course">3 Months Core</option>
+                                  <option value="Monthly Plan">Monthly Plan</option>
+                                </select>
+                              </div>
+                              <div className="space-y-1.5">
+                                <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Status</label>
+                                <select 
+                                  value={editingStudentForm.status}
+                                  onChange={(e) => setEditingStudentForm({...editingStudentForm, status: e.target.value})}
+                                  className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white focus:border-brand-accent focus:outline-none h-[44px] text-xs"
+                                >
+                                  <option value="Pending">Pending</option>
+                                  <option value="Active">Active</option>
+                                  <option value="Canceled">Canceled</option>
+                                </select>
+                              </div>
+                            </div>
+
+                            <ImageUploader 
+                              id="edit-athlete-img"
+                              value={editingStudentForm.image}
+                              onChange={(val) => setEditingStudentForm({...editingStudentForm, image: val})}
+                            />
+                            
+                            <div className="flex gap-2 pt-2">
+                              <button 
+                                type="submit"
+                                className="flex-1 py-4 bg-brand-accent text-black font-extrabold uppercase tracking-widest rounded-xl hover:bg-brand-accent-hover transition-colors min-h-[44px] cursor-pointer shadow-md shadow-brand-accent/15 text-xs"
+                              >
+                                SAVE CHANGES
+                              </button>
+                              <button 
+                                type="button"
+                                onClick={() => setEditingStudentId(null)}
+                                className="px-4 py-4 bg-brand-primary border border-brand-border text-brand-muted hover:text-white font-mono text-xs rounded-xl min-h-[44px] cursor-pointer"
+                              >
+                                CANCEL
+                              </button>
+                            </div>
+                          </form>
+                        </>
+                      ) : (
+                        <>
+                          <h2 className="text-xs font-black uppercase tracking-[0.2em] text-white border-b border-brand-border/40 pb-4 mb-5 flex items-center gap-2 font-display">
+                            <UserPlus className="w-4 h-4 text-brand-accent" /> Register Athlete
+                          </h2>
+                          
+                          <form onSubmit={handleAddStudent} className="space-y-4 text-xs">
+                            <div className="space-y-1.5">
+                              <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Full Name *</label>
+                              <input 
+                                type="text" 
+                                value={newStudent.name}
+                                onChange={(e) => setNewStudent({...newStudent, name: e.target.value})}
+                                placeholder="e.g. Shakib Al Hasan"
+                                className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                                required
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Contact Phone *</label>
+                              <input 
+                                type="text" 
+                                value={newStudent.phone}
+                                onChange={(e) => setNewStudent({...newStudent, phone: e.target.value})}
+                                placeholder="e.g. 017-XXXX-XXXX"
+                                className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm font-mono focus:border-brand-accent focus:outline-none transition-colors"
+                                required
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Email Address</label>
+                              <input 
+                                type="email" 
+                                value={newStudent.email}
+                                onChange={(e) => setNewStudent({...newStudent, email: e.target.value})}
+                                placeholder="e.g. fighter@gmail.com"
+                                className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                              />
+                            </div>
+                            <div className="grid grid-cols-2 gap-3">
+                              <div className="space-y-1.5">
+                                <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Target Course</label>
+                                <select 
+                                  value={newStudent.course}
+                                  onChange={(e) => setNewStudent({...newStudent, course: e.target.value})}
+                                  className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white focus:border-brand-accent focus:outline-none h-[44px] text-xs"
+                                >
+                                  <option value="3 Months Course">3 Months Core</option>
+                                  <option value="Monthly Plan">Monthly Plan</option>
+                                </select>
+                              </div>
+                              <div className="space-y-1.5">
+                                <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Initial Status</label>
+                                <select 
+                                  value={newStudent.status}
+                                  onChange={(e) => setNewStudent({...newStudent, status: e.target.value})}
+                                  className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white focus:border-brand-accent focus:outline-none h-[44px] text-xs"
+                                >
+                                  <option value="Pending">Pending</option>
+                                  <option value="Active">Active</option>
+                                  <option value="Canceled">Canceled</option>
+                                </select>
+                              </div>
+                            </div>
+
+                            <ImageUploader 
+                              id="new-athlete-img"
+                              value={newStudent.image}
+                              onChange={(val) => setNewStudent({...newStudent, image: val})}
+                            />
+                            
+                            <button 
+                              type="submit"
+                              className="w-full py-4 mt-2 bg-brand-accent text-black font-bold uppercase tracking-widest rounded-xl hover:bg-brand-accent-hover transition-colors min-h-[44px] cursor-pointer shadow-md shadow-brand-accent/15 text-xs"
                             >
-                              <option value="3 Months Course">3 Months Core</option>
-                              <option value="Monthly Plan">Monthly Plan</option>
-                            </select>
-                          </div>
-                          <div className="space-y-1.5">
-                            <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Initial Status</label>
-                            <select 
-                              value={newStudent.status}
-                              onChange={(e) => setNewStudent({...newStudent, status: e.target.value})}
-                              className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white focus:border-brand-accent focus:outline-none h-[44px] text-xs"
-                            >
-                              <option value="Pending">Pending</option>
-                              <option value="Active">Active</option>
-                              <option value="Canceled">Canceled</option>
-                            </select>
-                          </div>
-                        </div>
-                        
-                        <button 
-                          type="submit"
-                          className="w-full py-4 mt-2 bg-brand-accent text-black font-bold uppercase tracking-widest rounded-xl hover:bg-brand-accent-hover transition-colors min-h-[44px] cursor-pointer shadow-md shadow-brand-accent/15 text-xs"
-                        >
-                          CONFIRM ENROLLMENT
-                        </button>
-                      </form>
+                              CONFIRM ENROLLMENT
+                            </button>
+                          </form>
+                        </>
+                      )}
                     </div>
 
                     {/* Athlete Leads Deck list */}
@@ -979,7 +1298,7 @@ export default function AdminPage() {
                               <th className="p-4">Contact Info</th>
                               <th className="p-4">Enrolled Course</th>
                               <th className="p-4">Approved Status</th>
-                              <th className="p-4 text-right">Delete</th>
+                              <th className="p-4 text-right">Actions</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-brand-border/40 text-sm">
@@ -993,8 +1312,21 @@ export default function AdminPage() {
                               filteredStudents.map((athlete) => (
                                 <tr key={athlete.id} className="hover:bg-brand-secondary/20 transition-colors">
                                   <td className="p-4">
-                                    <div className="font-bold text-white text-sm">{athlete.name}</div>
-                                    <div className="text-[10px] text-brand-muted font-mono mt-0.5">REGISTERED: {athlete.enrolledDate}</div>
+                                    <div className="flex items-center gap-3">
+                                      <div className="relative w-9 h-9 rounded-full overflow-hidden shrink-0 border border-brand-border bg-brand-primary flex items-center justify-center">
+                                        {athlete.image ? (
+                                          <img src={athlete.image} alt={athlete.name} className="object-cover w-full h-full" />
+                                        ) : (
+                                          <span className="text-[10px] font-mono tracking-wider font-extrabold text-brand-accent uppercase">
+                                            {athlete.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
+                                          </span>
+                                        )}
+                                      </div>
+                                      <div>
+                                        <div className="font-bold text-white text-sm">{athlete.name}</div>
+                                        <div className="text-[10px] text-brand-muted font-mono mt-0.5">REGISTERED: {athlete.enrolledDate}</div>
+                                      </div>
+                                    </div>
                                   </td>
                                   <td className="p-4">
                                     <div className="font-mono text-xs text-brand-muted">{athlete.phone}</div>
@@ -1018,12 +1350,22 @@ export default function AdminPage() {
                                     </button>
                                   </td>
                                   <td className="p-4 text-right">
-                                    <button 
-                                      onClick={() => handleDeleteStudent(athlete.id, athlete.name)}
-                                      className="p-2.5 rounded-xl border border-brand-border hover:bg-red-500/10 hover:border-red-500 hover:text-red-500 transition-colors text-brand-muted group cursor-pointer min-h-[38px] min-w-[38px] flex items-center justify-center inline-block"
-                                    >
-                                      <Trash2 className="w-4 h-4" />
-                                    </button>
+                                    <div className="flex justify-end gap-2">
+                                      <button 
+                                        onClick={() => startEditingStudent(athlete)}
+                                        className="p-2.5 rounded-xl border border-brand-border hover:border-brand-accent hover:text-brand-accent transition-colors text-brand-muted cursor-pointer min-h-[38px] min-w-[38px] flex items-center justify-center"
+                                        title="Edit Athlete Record"
+                                      >
+                                        <Edit3 className="w-4 h-4" />
+                                      </button>
+                                      <button 
+                                        onClick={() => handleDeleteStudent(athlete.id, athlete.name)}
+                                        className="p-2.5 rounded-xl border border-brand-border hover:bg-red-500/10 hover:border-red-500 hover:text-red-500 transition-colors text-brand-muted group cursor-pointer min-h-[38px] min-w-[38px] flex items-center justify-center"
+                                        title="Delete Record"
+                                      >
+                                        <Trash2 className="w-4 h-4" />
+                                      </button>
+                                    </div>
                                   </td>
                                 </tr>
                               ))
@@ -1042,9 +1384,20 @@ export default function AdminPage() {
                           filteredStudents.map((athlete) => (
                             <div key={athlete.id} className="p-5 bg-brand-secondary/40 border border-brand-border rounded-[1.5rem] space-y-4 shadow-sm">
                               <div className="flex justify-between items-start gap-3">
-                                <div>
-                                  <h3 className="font-bold text-white leading-tight">{athlete.name}</h3>
-                                  <div className="text-[9px] text-brand-muted font-mono mt-0.5">ENROLLED: {athlete.enrolledDate}</div>
+                                <div className="flex items-center gap-2.5">
+                                  <div className="relative w-8 h-8 rounded-full overflow-hidden shrink-0 border border-brand-border bg-brand-primary flex items-center justify-center">
+                                    {athlete.image ? (
+                                      <img src={athlete.image} alt={athlete.name} className="object-cover w-full h-full" />
+                                    ) : (
+                                      <span className="text-[9px] font-mono tracking-wider font-extrabold text-brand-accent uppercase">
+                                        {athlete.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div>
+                                    <h3 className="font-bold text-white leading-tight">{athlete.name}</h3>
+                                    <div className="text-[9px] text-brand-muted font-mono mt-0.5">ENROLLED: {athlete.enrolledDate}</div>
+                                  </div>
                                 </div>
                                 <button
                                   onClick={() => handleToggleStudentStatus(athlete.id, athlete.status)}
@@ -1073,7 +1426,7 @@ export default function AdminPage() {
                                 </div>
                               </div>
 
-                              <div className="flex gap-2.5">
+                              <div className="flex gap-2">
                                 <button 
                                   onClick={() => handleToggleStudentStatus(athlete.id, athlete.status)}
                                   className="flex-1 py-2.5 bg-brand-primary border border-brand-border text-[9px] font-bold tracking-widest text-white rounded-xl uppercase hover:bg-neutral-900 focus:outline-none min-h-[40px] cursor-pointer"
@@ -1081,8 +1434,15 @@ export default function AdminPage() {
                                   CHANGE STATUS
                                 </button>
                                 <button 
+                                  onClick={() => startEditingStudent(athlete)}
+                                  className="w-10 h-10 bg-brand-primary border border-brand-border flex items-center justify-center text-brand-muted hover:text-brand-accent hover:border-brand-accent rounded-xl transition-colors min-h-[40px] min-w-[40px] cursor-pointer"
+                                  aria-label="Edit Record"
+                                >
+                                  <Edit3 className="w-4 h-4" />
+                                </button>
+                                <button 
                                   onClick={() => handleDeleteStudent(athlete.id, athlete.name)}
-                                  className="w-10 h-10 bg-brand-primary border border-brand-border flex items-center justify-center text-brand-muted hover:text-red-500 hover:border-red-500 rounded-xl transition-colors min-h-[40px] min-w-[40px] cursor-pointer"
+                                  className="w-10 h-10 bg-brand-primary border border-brand-border flex items-center justify-center text-[#ff4c4c] hover:bg-red-500/10 hover:border-red-500 rounded-xl transition-colors min-h-[40px] min-w-[40px] cursor-pointer"
                                   aria-label="Delete Student"
                                 >
                                   <Trash2 className="w-4 h-4" />
@@ -1437,93 +1797,206 @@ export default function AdminPage() {
                 <div className="space-y-6">
                   <div className="grid lg:grid-cols-12 gap-6 items-start">
                     
-                    {/* Add product form */}
+                    {/* Register or Edit Product form */}
                     <div className="lg:col-span-4 p-6 bg-brand-secondary/40 border border-brand-border/80 rounded-[2rem] relative shadow-lg">
-                      <h2 className="text-xs font-black uppercase tracking-[0.2em] text-white border-b border-brand-border/40 pb-4 mb-5 flex items-center gap-2 font-display">
-                        <ShoppingBag className="w-4 h-4 text-brand-accent" /> Register Store Product
-                      </h2>
-                      
-                      <form onSubmit={handleAddProduct} className="space-y-4 text-xs">
-                        <div className="space-y-1.5">
-                          <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Product Name *</label>
-                          <input 
-                            type="text" 
-                            required
-                            placeholder="e.g. Invictus Rashguard"
-                            value={newProduct.name}
-                            onChange={(e) => setNewProduct({...newProduct, name: e.target.value})}
-                            className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
-                          />
-                        </div>
+                      {editingProductId ? (
+                        <>
+                          <h2 className="text-xs font-black uppercase tracking-[0.2em] text-white border-b border-brand-border/40 pb-4 mb-5 flex items-center gap-2 font-display">
+                            <Edit3 className="w-4 h-4 text-brand-accent animate-pulse" /> Edit Shop Product
+                          </h2>
+                          
+                          <form onSubmit={(e) => { e.preventDefault(); saveEditedProduct(editingProductId); }} className="space-y-4 text-xs">
+                            <div className="space-y-1.5">
+                              <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Product Name *</label>
+                              <input 
+                                type="text" 
+                                required
+                                placeholder="e.g. Invictus Rashguard"
+                                value={editingProductForm.name}
+                                onChange={(e) => setEditingProductForm({...editingProductForm, name: e.target.value})}
+                                className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                              />
+                            </div>
 
-                        <div className="grid grid-cols-2 gap-3">
-                          <div className="space-y-1.5">
-                            <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Price (৳) *</label>
-                            <input 
-                              type="number" 
-                              required
-                              step="0.01"
-                              placeholder="e.g. 1200"
-                              value={newProduct.price}
-                              onChange={(e) => setNewProduct({...newProduct, price: e.target.value})}
-                              className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
-                            />
-                          </div>
-                          <div className="space-y-1.5">
-                            <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Category *</label>
-                            <select
-                              value={newProduct.category}
-                              onChange={(e) => setNewProduct({...newProduct, category: e.target.value})}
-                              className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors cursor-pointer"
-                            >
-                              <option value="Apparel">Apparel</option>
-                              <option value="Equipment">Equipment</option>
-                              <option value="Digital">Digital</option>
-                            </select>
-                          </div>
-                        </div>
+                            <div className="grid grid-cols-2 gap-3">
+                              <div className="space-y-1.5">
+                                <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Price (৳) *</label>
+                                <input 
+                                  type="number" 
+                                  required
+                                  step="0.01"
+                                  placeholder="e.g. 1200"
+                                  value={editingProductForm.price}
+                                  onChange={(e) => setEditingProductForm({...editingProductForm, price: e.target.value})}
+                                  className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                                />
+                              </div>
+                              <div className="space-y-1.5">
+                                <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Category *</label>
+                                <select
+                                  value={editingProductForm.category}
+                                  onChange={(e) => setEditingProductForm({...editingProductForm, category: e.target.value})}
+                                  className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors cursor-pointer"
+                                >
+                                  <option value="Apparel">Apparel</option>
+                                  <option value="Equipment">Equipment</option>
+                                  <option value="Digital">Digital</option>
+                                </select>
+                              </div>
+                            </div>
 
-                        <div className="grid grid-cols-2 gap-3">
-                          <div className="space-y-1.5">
-                            <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Rating Code *</label>
-                            <input 
-                              type="text" 
-                              placeholder="e.g. 4.9"
-                              value={newProduct.rating}
-                              onChange={(e) => setNewProduct({...newProduct, rating: e.target.value})}
-                              className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                            <div className="grid grid-cols-2 gap-3">
+                              <div className="space-y-1.5">
+                                <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Rating Code *</label>
+                                <input 
+                                  type="text" 
+                                  placeholder="e.g. 4.9"
+                                  value={editingProductForm.rating}
+                                  onChange={(e) => setEditingProductForm({...editingProductForm, rating: e.target.value})}
+                                  className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                                />
+                              </div>
+                              <div className="space-y-1.5">
+                                <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Product Image URL</label>
+                                <input 
+                                  type="text" 
+                                  placeholder="e.g. https://picsum.photos/..."
+                                  value={editingProductForm.image}
+                                  onChange={(e) => setEditingProductForm({...editingProductForm, image: e.target.value})}
+                                  className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                                />
+                              </div>
+                            </div>
+
+                            <ImageUploader 
+                              id="edit-product-img"
+                              value={editingProductForm.image}
+                              onChange={(val) => setEditingProductForm({...editingProductForm, image: val})}
                             />
-                          </div>
-                          <div className="space-y-1.5">
-                            <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Product Image URL</label>
-                            <input 
-                              type="text" 
-                              placeholder="e.g. https://picsum.photos/..."
+
+                            <div className="space-y-1.5">
+                              <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Short Description</label>
+                              <textarea 
+                                rows={3}
+                                placeholder="Briefly summarize what makes this gear standard elite..."
+                                value={editingProductForm.description}
+                                onChange={(e) => setEditingProductForm({...editingProductForm, description: e.target.value})}
+                                className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors font-sans"
+                              />
+                            </div>
+
+                            <div className="flex gap-2">
+                              <button 
+                                type="submit"
+                                className="flex-1 py-4 bg-brand-accent text-black font-extrabold uppercase tracking-widest rounded-xl hover:bg-brand-accent-hover transition-colors min-h-[44px] cursor-pointer shadow-md shadow-brand-accent/15 text-xs"
+                              >
+                                SAVE CHANGES
+                              </button>
+                              <button 
+                                type="button"
+                                onClick={() => setEditingProductId(null)}
+                                className="px-4 py-4 bg-brand-primary border border-brand-border text-brand-muted hover:text-white font-mono text-xs rounded-xl min-h-[44px] cursor-pointer"
+                              >
+                                CANCEL
+                              </button>
+                            </div>
+                          </form>
+                        </>
+                      ) : (
+                        <>
+                          <h2 className="text-xs font-black uppercase tracking-[0.2em] text-white border-b border-brand-border/40 pb-4 mb-5 flex items-center gap-2 font-display">
+                            <ShoppingBag className="w-4 h-4 text-brand-accent" /> Register Store Product
+                          </h2>
+                          
+                          <form onSubmit={handleAddProduct} className="space-y-4 text-xs">
+                            <div className="space-y-1.5">
+                              <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Product Name *</label>
+                              <input 
+                                type="text" 
+                                required
+                                placeholder="e.g. Invictus Rashguard"
+                                value={newProduct.name}
+                                onChange={(e) => setNewProduct({...newProduct, name: e.target.value})}
+                                className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                              />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3">
+                              <div className="space-y-1.5">
+                                <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Price (৳) *</label>
+                                <input 
+                                  type="number" 
+                                  required
+                                  step="0.01"
+                                  placeholder="e.g. 1200"
+                                  value={newProduct.price}
+                                  onChange={(e) => setNewProduct({...newProduct, price: e.target.value})}
+                                  className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                                />
+                              </div>
+                              <div className="space-y-1.5">
+                                <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Category *</label>
+                                <select
+                                  value={newProduct.category}
+                                  onChange={(e) => setNewProduct({...newProduct, category: e.target.value})}
+                                  className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors cursor-pointer"
+                                >
+                                  <option value="Apparel">Apparel</option>
+                                  <option value="Equipment">Equipment</option>
+                                  <option value="Digital">Digital</option>
+                                </select>
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3">
+                              <div className="space-y-1.5">
+                                <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Rating Code *</label>
+                                <input 
+                                  type="text" 
+                                  placeholder="e.g. 4.9"
+                                  value={newProduct.rating}
+                                  onChange={(e) => setNewProduct({...newProduct, rating: e.target.value})}
+                                  className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                                />
+                              </div>
+                              <div className="space-y-1.5">
+                                <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Product Image URL</label>
+                                <input 
+                                  type="text" 
+                                  placeholder="e.g. https://picsum.photos/..."
+                                  value={newProduct.image}
+                                  onChange={(e) => setNewProduct({...newProduct, image: e.target.value})}
+                                  className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                                />
+                              </div>
+                            </div>
+
+                            <ImageUploader 
+                              id="new-product-img"
                               value={newProduct.image}
-                              onChange={(e) => setNewProduct({...newProduct, image: e.target.value})}
-                              className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                              onChange={(val) => setNewProduct({...newProduct, image: val})}
                             />
-                          </div>
-                        </div>
 
-                        <div className="space-y-1.5">
-                          <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Short Description</label>
-                          <textarea 
-                            rows={3}
-                            placeholder="Briefly summarize what makes this gear standard elite..."
-                            value={newProduct.description}
-                            onChange={(e) => setNewProduct({...newProduct, description: e.target.value})}
-                            className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors font-sans"
-                          />
-                        </div>
+                            <div className="space-y-1.5">
+                              <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Short Description</label>
+                              <textarea 
+                                rows={3}
+                                placeholder="Briefly summarize what makes this gear standard elite..."
+                                value={newProduct.description}
+                                onChange={(e) => setNewProduct({...newProduct, description: e.target.value})}
+                                className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors font-sans"
+                              />
+                            </div>
 
-                        <button 
-                          type="submit"
-                          className="w-full py-4 bg-brand-accent text-black font-black uppercase tracking-wider text-xs rounded-xl hover:bg-brand-accent-hover transition-colors min-h-[44px] cursor-pointer shadow-lg shadow-brand-accent/10"
-                        >
-                          REGISTER PRODUCT RECORD
-                        </button>
-                      </form>
+                            <button 
+                              type="submit"
+                              className="w-full py-4 bg-brand-accent text-black font-black uppercase tracking-wider text-xs rounded-xl hover:bg-brand-accent-hover transition-colors min-h-[44px] cursor-pointer shadow-lg shadow-brand-accent/10"
+                            >
+                              REGISTER PRODUCT RECORD
+                            </button>
+                          </form>
+                        </>
+                      )}
                     </div>
 
                     {/* Pro Product Directory Grid */}
@@ -1573,12 +2046,22 @@ export default function AdminPage() {
                                     <td className="py-4 font-bold text-white">৳{(prod.price || 0).toLocaleString()}</td>
                                     <td className="py-4 font-mono text-amber-400 font-bold">★ {prod.rating || "5.0"}</td>
                                     <td className="py-4 text-right">
-                                      <button 
-                                        onClick={() => handleDeleteProduct(prod.id, prod.name)}
-                                        className="p-2 border border-brand-border text-brand-muted hover:text-red-500 hover:border-red-500 rounded-lg transition-colors cursor-pointer pointer-events-auto"
-                                      >
-                                        <Trash2 className="w-3.5 h-3.5" />
-                                      </button>
+                                      <div className="flex justify-end gap-2">
+                                        <button 
+                                          onClick={() => startEditingProduct(prod)}
+                                          className="p-2 border border-brand-border text-brand-muted hover:border-brand-accent hover:text-brand-accent rounded-lg transition-colors cursor-pointer"
+                                          title="Edit Product Details"
+                                        >
+                                          <Edit3 className="w-3.5 h-3.5" />
+                                        </button>
+                                        <button 
+                                          onClick={() => handleDeleteProduct(prod.id, prod.name)}
+                                          className="p-2 border border-brand-border text-brand-muted hover:text-red-500 hover:border-red-500 rounded-lg transition-colors cursor-pointer shrink-0"
+                                          title="Delete Product"
+                                        >
+                                          <Trash2 className="w-3.5 h-3.5" />
+                                        </button>
+                                      </div>
                                     </td>
                                   </tr>
                                 ))
@@ -1673,6 +2156,244 @@ export default function AdminPage() {
                         </div>
                       ))
                     )}
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 7: HERO & ABOUT CMS MANAGEMENT */}
+              {activeTab === 'content' && (
+                <div className="space-y-8 animate-in fade-in duration-300">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-brand-border/40 pb-5">
+                    <div>
+                      <h3 className="text-base font-bold uppercase text-white tracking-widest">Homepage Brand Section Content Manager</h3>
+                      <p className="text-xs text-brand-muted mt-1 font-sans">Make immediate changes to your hero slides and biography philosophy sections.</p>
+                    </div>
+                  </div>
+
+                  <div className="grid lg:grid-cols-12 gap-8 items-start">
+                    {/* Hero Section Edit Form */}
+                    <div className="lg:col-span-6 p-6 bg-brand-secondary/40 border border-brand-border/80 rounded-[2rem] space-y-6 shadow-lg">
+                      <h4 className="text-xs font-black uppercase tracking-[0.2em] text-white border-b border-brand-border/40 pb-4 mb-2 flex items-center gap-2 font-display">
+                        <Compass className="w-4 h-4 text-brand-accent h-fit shrink-0" /> Edit Hero Section Content
+                      </h4>
+
+                      <div className="space-y-4 text-xs">
+                        <div className="space-y-1.5">
+                          <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Pill Badge Title</label>
+                          <input 
+                            type="text" 
+                            value={heroForm.badge}
+                            onChange={(e) => setHeroForm({...heroForm, badge: e.target.value})}
+                            className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                          />
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Subheading</label>
+                          <input 
+                            type="text" 
+                            value={heroForm.subheading}
+                            onChange={(e) => setHeroForm({...heroForm, subheading: e.target.value})}
+                            className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-1.5">
+                            <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Main Bold Title</label>
+                            <input 
+                              type="text" 
+                              value={heroForm.title}
+                              onChange={(e) => setHeroForm({...heroForm, title: e.target.value})}
+                              className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Coach Name Accent Button</label>
+                            <input 
+                              type="text" 
+                              value={heroForm.name}
+                              onChange={(e) => setHeroForm({...heroForm, name: e.target.value})}
+                              className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Brief Core Description</label>
+                          <textarea 
+                            rows={4}
+                            value={heroForm.description}
+                            onChange={(e) => setHeroForm({...heroForm, description: e.target.value})}
+                            className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors font-sans"
+                          />
+                        </div>
+
+                        <div className="border-t border-brand-border/40 pt-4 space-y-4">
+                          <h5 className="text-[10px] font-bold tracking-widest text-[#BFFF00] uppercase">Slide Show Carousel Images</h5>
+                          
+                          {heroForm.images.map((img: any, idx: number) => (
+                            <div key={idx} className="p-4 bg-brand-primary/50 border border-brand-border/60 rounded-2xl space-y-3">
+                              <div className="text-[9px] font-mono font-bold text-brand-muted uppercase">Slide #{idx + 1} Settings</div>
+                              
+                              <div className="grid grid-cols-2 gap-3">
+                                <div className="space-y-1">
+                                  <label className="text-brand-muted uppercase text-[9px]">Title</label>
+                                  <input 
+                                    type="text"
+                                    value={img.title}
+                                    onChange={(e) => {
+                                      const updatedImages = [...heroForm.images];
+                                      updatedImages[idx] = { ...updatedImages[idx], title: e.target.value };
+                                      setHeroForm({ ...heroForm, images: updatedImages });
+                                    }}
+                                    className="w-full bg-brand-primary border border-brand-border p-2 rounded-lg text-white text-xs focus:border-brand-accent focus:outline-none"
+                                  />
+                                </div>
+                                <div className="space-y-1">
+                                  <label className="text-brand-muted uppercase text-[9px]">Caption</label>
+                                  <input 
+                                    type="text"
+                                    value={img.caption}
+                                    onChange={(e) => {
+                                      const updatedImages = [...heroForm.images];
+                                      updatedImages[idx] = { ...updatedImages[idx], caption: e.target.value };
+                                      setHeroForm({ ...heroForm, images: updatedImages });
+                                    }}
+                                    className="w-full bg-brand-primary border border-brand-border p-2 rounded-lg text-white text-xs focus:border-brand-accent focus:outline-none"
+                                  />
+                                </div>
+                              </div>
+
+                              <div className="space-y-1.5">
+                                <label className="text-brand-muted uppercase text-[9px]">Image URL</label>
+                                <input 
+                                  type="text"
+                                  value={img.url}
+                                  onChange={(e) => {
+                                    const updatedImages = [...heroForm.images];
+                                    updatedImages[idx] = { ...updatedImages[idx], url: e.target.value };
+                                    setHeroForm({ ...heroForm, images: updatedImages });
+                                  }}
+                                  className="w-full bg-brand-primary border border-brand-border p-2 rounded-lg text-white text-xs focus:border-brand-accent focus:outline-none"
+                                />
+                              </div>
+
+                              <ImageUploader 
+                                id={`hero-slide-uploader-${idx}`}
+                                value={img.url}
+                                onChange={(val) => {
+                                  const updatedImages = [...heroForm.images];
+                                  updatedImages[idx] = { ...updatedImages[idx], url: val };
+                                  setHeroForm({ ...heroForm, images: updatedImages });
+                                }}
+                              />
+                            </div>
+                          ))}
+                        </div>
+
+                        <button 
+                          type="button"
+                          onClick={() => {
+                            setHeroSettings(heroForm);
+                            syncToStorage('invictus_hero_settings', heroForm);
+                            triggerNotification('Hero content segment has been pushed to live production portal!');
+                          }}
+                          className="w-full py-4 bg-brand-accent text-black font-black uppercase tracking-wider text-xs rounded-xl hover:bg-brand-accent-hover transition-colors min-h-[44px] cursor-pointer shadow-lg shadow-brand-accent/15 flex items-center justify-center gap-2"
+                        >
+                          <Save className="w-4 h-4 text-black" /> Save Hero Section
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* About Section Edit Form */}
+                    <div className="lg:col-span-6 p-6 bg-brand-secondary/40 border border-brand-border/80 rounded-[2rem] space-y-6 shadow-lg">
+                      <h4 className="text-xs font-black uppercase tracking-[0.2em] text-white border-b border-brand-border/40 pb-4 mb-2 flex items-center gap-2 font-display">
+                        <Users className="w-4 h-4 text-brand-accent h-fit shrink-0" /> Edit About Ishtiak Section Content
+                      </h4>
+
+                      <div className="space-y-4 text-xs">
+                        <div className="space-y-1.5">
+                          <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Small Prefix Badge Title</label>
+                          <input 
+                            type="text" 
+                            value={aboutForm.badge}
+                            onChange={(e) => setAboutForm({...aboutForm, badge: e.target.value})}
+                            className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-1.5">
+                            <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Section Category Heading</label>
+                            <input 
+                              type="text" 
+                              value={aboutForm.heading}
+                              onChange={(e) => setAboutForm({...aboutForm, heading: e.target.value})}
+                              className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Main Biography Headline</label>
+                            <input 
+                              type="text" 
+                              value={aboutForm.subheading}
+                              onChange={(e) => setAboutForm({...aboutForm, subheading: e.target.value})}
+                              className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Primary Biography Paragraph (Para 1)</label>
+                          <textarea 
+                            rows={4}
+                            value={aboutForm.para1}
+                            onChange={(e) => setAboutForm({...aboutForm, para1: e.target.value})}
+                            className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors font-sans"
+                          />
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Secondary Philosophy Paragraph (Para 2)</label>
+                          <textarea 
+                            rows={4}
+                            value={aboutForm.para2}
+                            onChange={(e) => setAboutForm({...aboutForm, para2: e.target.value})}
+                            className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors font-sans"
+                          />
+                        </div>
+
+                        <div className="space-y-1.5 pt-2">
+                          <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Coach Action Image (Paste URL or Upload)</label>
+                          <input 
+                            type="text" 
+                            value={aboutForm.image}
+                            onChange={(e) => setAboutForm({...aboutForm, image: e.target.value})}
+                            className="w-full bg-brand-primary border border-brand-border p-3 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors mb-2"
+                            placeholder="https://..."
+                          />
+
+                          <ImageUploader 
+                            id="about-bio-uploader"
+                            value={aboutForm.image}
+                            onChange={(val) => setAboutForm({...aboutForm, image: val})}
+                          />
+                        </div>
+
+                        <button 
+                          type="button"
+                          onClick={() => {
+                            setAboutSettings(aboutForm);
+                            syncToStorage('invictus_about_settings', aboutForm);
+                            triggerNotification('About Coach biography segment successfully updated!');
+                          }}
+                          className="w-full py-4 bg-brand-accent text-black font-black uppercase tracking-wider text-xs rounded-xl hover:bg-brand-accent-hover transition-colors min-h-[44px] cursor-pointer shadow-lg shadow-brand-accent/15 flex items-center justify-center gap-2"
+                        >
+                          <Save className="w-4 h-4 text-black" /> Save Biography Settings
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}

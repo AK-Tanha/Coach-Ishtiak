@@ -56,6 +56,24 @@ const heroImages = [
   }
 ];
 
+const defaultHeroSettings = {
+  badge: "REGISTRATION OPEN • ELITE DIVISION",
+  subheading: "MASTERING THE",
+  title: "ART OF COMBAT",
+  name: "COACH ISHTIAK",
+  description: "A Coach, A Student & An Athlete. Over a decade forging champions in MMA, BJJ, and Boxing. Founder of core combat sport institutions in Bangladesh.",
+  images: heroImages
+};
+
+const defaultAboutSettings = {
+  badge: "PROFILE • LEAD COACH",
+  heading: "Philosophy",
+  subheading: "Building champions inside and outside the cage.",
+  para1: "Recognized as Bangladesh's first WBC-certified boxing referee, my journey has been defined by a relentless pursuit of excellence and the development of combat sports on a national level. As the Founder and General Secretary of the Bangladesh Mixed Martial Arts Association (BMMAA), I have pioneered the first organized MMA events in our nation.",
+  para2: "My coaching methodology combines technical precision with mental fortitude. From tactical boxing instructions for the Bangladesh Army to leading high-performance training at Invictus BJJ, I focus on the holistic development of my athletes.",
+  image: "https://picsum.photos/seed/coach-ishtiaq/800/1000"
+};
+
 const schedule = [
   { 
     day: "Saturday", 
@@ -218,17 +236,33 @@ export default function PortfolioPage() {
     return pricing;
   });
 
+  const [heroSettings, setHeroSettings] = React.useState(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('invictus_hero_settings');
+      return stored ? JSON.parse(stored) : defaultHeroSettings;
+    }
+    return defaultHeroSettings;
+  });
+
+  const [aboutSettings, setAboutSettings] = React.useState(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('invictus_about_settings');
+      return stored ? JSON.parse(stored) : defaultAboutSettings;
+    }
+    return defaultAboutSettings;
+  });
+
   const [formData, setFormData] = React.useState({ name: '', email: '', message: '' });
   const [successToast, setSuccessToast] = React.useState(false);
   const [selectedScheduleDay, setSelectedScheduleDay] = React.useState<string>('All');
 
   React.useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % heroImages.length);
+      setCurrentSlide((prev) => (prev + 1) % (heroSettings.images?.length || 3));
     }, 5000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [heroSettings]);
 
   const handleContactSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -269,8 +303,8 @@ export default function PortfolioPage() {
     setTimeout(() => setSuccessToast(false), 5000);
   };
 
-  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % heroImages.length);
-  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + heroImages.length) % heroImages.length);
+  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % (heroSettings.images?.length || 3));
+  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + (heroSettings.images?.length || 3)) % (heroSettings.images?.length || 3));
 
   return (
     <main className="min-h-screen bg-brand-primary text-white overflow-x-hidden">
@@ -441,24 +475,23 @@ export default function PortfolioPage() {
               {/* Modern elegant glowing pill badge */}
               <div className="hidden sm:inline-flex items-center gap-2.5 px-4.5 py-1.5 bg-brand-accent/10 border border-brand-accent/25 text-[10px] font-mono font-bold tracking-widest text-[#BFFF00] mb-8 rounded-full uppercase select-none transition-all duration-300 hover:border-brand-accent/40 hover:shadow-[0_0_15px_rgba(204,255,0,0.1)]">
                 <span className="w-2 h-2 rounded-full bg-brand-accent animate-[pulse_1.5s_infinite] shrink-0" />
-                REGISTRATION OPEN • ELITE DIVISION
+                {heroSettings.badge}
               </div>
 
               <h1 className="font-display mb-6 sm:mb-8">
                 <span className="block text-xs sm:text-sm font-mono font-bold tracking-[0.25em] text-brand-muted uppercase mb-3">
-                  MASTERING THE
+                  {heroSettings.subheading}
                 </span>
                 <span className="block text-4xl sm:text-5xl md:text-6xl font-black text-white tracking-tighter uppercase leading-[0.95] mb-5">
-                  ART OF COMBAT
+                  {heroSettings.title}
                 </span>
                 <span className="relative inline-block text-black bg-brand-accent px-6 py-3 rounded-2xl select-none text-3xl sm:text-5xl md:text-6xl font-display font-black leading-none uppercase tracking-tight shadow-xl shadow-brand-accent/20">
-                  COACH ISHTIAK
+                  {heroSettings.name}
                 </span>
               </h1>
 
-              <p className="text-sm sm:text-base md:text-lg text-brand-muted max-w-xl mb-8 sm:mb-12 leading-relaxed font-sans border-l-2 border-brand-border pl-4">
-                A Coach, A Student & An Athlete. <br />
-                Over a decade forging champions in MMA, BJJ, and Boxing. Founder of core combat sport institutions in Bangladesh.
+              <p className="text-sm sm:text-base md:text-lg text-brand-muted max-w-xl mb-8 sm:mb-12 leading-relaxed font-sans border-l-2 border-brand-border pl-4 whitespace-pre-line">
+                {heroSettings.description}
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 mb-8 sm:mb-12">
@@ -522,16 +555,16 @@ export default function PortfolioPage() {
                 >
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent z-10" />
                   <Image 
-                    src={heroImages[currentSlide].url} 
-                    alt={heroImages[currentSlide].caption} 
+                    src={heroSettings.images[currentSlide]?.url || "https://picsum.photos/seed/coach-ishtiaq/1000/1000"} 
+                    alt={heroSettings.images[currentSlide]?.caption || "Slide Image"} 
                     fill
                     className="w-full h-full object-cover grayscale brightness-90 contrast-[1.05] group-hover:scale-105 transition-transform duration-700"
                     priority
                     referrerPolicy="no-referrer"
                   />
                   <div className="absolute bottom-8 left-8 z-20">
-                    <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#BFFF00] mb-2">{heroImages[currentSlide].caption}</div>
-                    <div className="text-3xl sm:text-4xl font-display font-black tracking-tighter text-white uppercase">{heroImages[currentSlide].title}</div>
+                    <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#BFFF00] mb-2">{heroSettings.images[currentSlide]?.caption}</div>
+                    <div className="text-3xl sm:text-4xl font-display font-black tracking-tighter text-white uppercase">{heroSettings.images[currentSlide]?.title}</div>
                   </div>
                 </motion.div>
               </AnimatePresence>
@@ -556,7 +589,7 @@ export default function PortfolioPage() {
  
               {/* Progress Indicators (Pills) */}
               <div className="absolute bottom-8 left-8 z-30 flex gap-1.5">
-                {heroImages.map((_, idx) => (
+                {(heroSettings.images || []).map((_: any, idx: number) => (
                   <button 
                     key={idx}
                     onClick={() => setCurrentSlide(idx)}
@@ -621,7 +654,7 @@ export default function PortfolioPage() {
             >
               <div className="relative h-[320px] sm:h-[480px] lg:h-[560px] w-full rounded-[2.5rem] overflow-hidden border border-brand-border/80 group-hover:border-brand-accent/40 transition-all duration-500 shadow-2xl shadow-black/60">
                 <Image 
-                  src="https://picsum.photos/seed/coach-ishtiaq/800/1000" 
+                  src={aboutSettings.image || "https://picsum.photos/seed/coach-ishtiaq/800/1000"} 
                   alt="Coach Ishtiak Philosophy"
                   fill
                   className="object-cover object-top transition-transform duration-700 group-hover:scale-103 brightness-95"
@@ -629,7 +662,7 @@ export default function PortfolioPage() {
                 />
                 {/* Visual design badge detailing */}
                 <div className="absolute top-5 left-5 bg-black/80 backdrop-blur-md px-3.5 py-1.5 border border-white/10 rounded-full text-[9px] font-mono uppercase tracking-widest text-[#BFFF00]">
-                  PROFILE • LEAD COACH
+                  {aboutSettings.badge}
                 </div>
               </div>
             </motion.div>
@@ -642,23 +675,18 @@ export default function PortfolioPage() {
               transition={{ duration: 0.8, delay: 0.15 }}
               className="lg:col-span-7 flex flex-col justify-center"
             >
-              <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-brand-accent mb-4 sm:mb-6 font-display">Philosophy</h2>
+              <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-brand-accent mb-4 sm:mb-6 font-display">{aboutSettings.heading}</h2>
               
               <h3 className="text-2xl sm:text-4xl md:text-5xl font-display font-black leading-tight tracking-tighter mb-6 sm:mb-8 text-white uppercase">
-                Building champions inside and outside the cage.
+                {aboutSettings.subheading}
               </h3>
  
               <div className="space-y-6 sm:space-y-8 text-brand-muted text-sm sm:text-base md:text-lg leading-relaxed font-sans">
-                <p>
-                  Recognized as Bangladesh&apos;s first WBC-certified boxing referee, my journey has been defined by a relentless 
-                  pursuit of excellence and the development of combat sports on a national level. 
-                  As the Founder and General Secretary of the <span className="text-brand-accent font-semibold">Bangladesh Mixed Martial Arts Association (BMMAA)</span>, 
-                  I have pioneered the first organized MMA events in our nation.
+                <p className="whitespace-pre-line">
+                  {aboutSettings.para1}
                 </p>
-                <p>
-                  My coaching methodology combines technical precision with mental fortitude. From tactical boxing instructions 
-                  for the Bangladesh Army to leading high-performance training at Invictus BJJ, I focus on the holistic 
-                  development of my athletes.
+                <p className="whitespace-pre-line">
+                  {aboutSettings.para2}
                 </p>
               </div>
             </motion.div>
