@@ -252,6 +252,14 @@ export default function PortfolioPage() {
     return defaultAboutSettings;
   });
 
+  const [currentExperience, setCurrentExperience] = React.useState(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('invictus_experience');
+      return stored ? JSON.parse(stored) : experience;
+    }
+    return experience;
+  });
+
   const [formData, setFormData] = React.useState({ name: '', email: '', message: '' });
   const [successToast, setSuccessToast] = React.useState(false);
   const [selectedScheduleDay, setSelectedScheduleDay] = React.useState<string>('All');
@@ -849,7 +857,7 @@ export default function PortfolioPage() {
             </div>
             
             <div className="lg:col-span-8 space-y-12">
-              {experience.map((exp, idx) => (
+              {currentExperience.map((exp: any, idx: number) => (
                 <div key={idx} className="relative pl-8 border-l border-brand-border pb-12 last:pb-0">
                   <div className="absolute left-[-5px] top-0 w-2 h-2 rounded-full bg-brand-accent" />
                   <div className="text-xs font-bold text-brand-muted uppercase tracking-widest mb-2">{exp.period}</div>

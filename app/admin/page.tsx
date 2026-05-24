@@ -183,6 +183,65 @@ const defaultAboutSettings = {
   image: "https://picsum.photos/seed/coach-ishtiaq/800/1000"
 };
 
+const defaultExperience = [
+  {
+    id: "exp-1",
+    role: "Owner / Head Coach",
+    company: "Xtreme MMA",
+    period: "2014 - Present",
+    description: "Driving elite combat sports training and organizational growth since inception."
+  },
+  {
+    id: "exp-2",
+    role: "Owner / Head Coach",
+    company: "Invictus BJJ & MMA",
+    period: "2018 - Present",
+    description: "Leading a premier academy for Brazilian Jiu-Jitsu and Mixed Martial Arts in Bangladesh."
+  },
+  {
+    id: "exp-3",
+    role: "Boxing Coach",
+    company: "Bangladesh Army",
+    period: "February 1, 2021 - Present",
+    description: "Providing tactical boxing instructions and training for military personnel."
+  },
+  {
+    id: "exp-4",
+    role: "Professional Boxing Referee",
+    company: "World Boxing Council (WBC)",
+    period: "September 8, 2022 - Present",
+    description: "WBC Ring Official Panel registered and certified as an Official Referee Level 1."
+  },
+  {
+    id: "exp-5",
+    role: "Official / Assistant Coach",
+    company: "Bangladesh Amateur Boxing Federation",
+    period: "2018 - 2025",
+    description: "Former Assistant Coach (March 2018) and continues contributing to national boxing development."
+  },
+  {
+    id: "exp-6",
+    role: "Fighter Manager",
+    company: "One Warrior Series",
+    period: "2018",
+    description: "Managed professional fighters in Singapore for the One Warrior Series."
+  },
+  {
+    id: "exp-7",
+    role: "Fighter Manager",
+    company: "ONE Championship",
+    period: "2017",
+    description: "Managed professional athletes for ONE Championship in Bangkok, Thailand."
+  },
+  {
+    id: "exp-8",
+    role: "Second (Cornerman)",
+    company: "ONE Championship",
+    period: "2016",
+    description: "Served as a professional seconds/cornerman in Myanmar events."
+  }
+];
+
 const ImageUploader = ({ 
   value, 
   onChange, 
@@ -258,9 +317,10 @@ export default function AdminPage() {
   const [loginError, setLoginError] = React.useState('');
   
   // Dashboard states
-  const [activeTab, setActiveTab ] = React.useState<'students' | 'schedule' | 'pricing' | 'inquiries' | 'products' | 'orders' | 'content'>('students');
+  const [activeTab, setActiveTab ] = React.useState<'students' | 'schedule' | 'pricing' | 'inquiries' | 'products' | 'orders' | 'content' | 'experience'>('students');
   const [athleteSubTab, setAthleteSubTab] = React.useState<'list' | 'form'>('list');
   const [productSubTab, setProductSubTab] = React.useState<'list' | 'form'>('list');
+  const [experienceSubTab, setExperienceSubTab] = React.useState<'list' | 'form'>('list');
   const [students, setStudents] = React.useState<typeof defaultStudents>(() => {
     if (typeof window !== 'undefined') {
       const stored = localStorage.getItem('invictus_students');
@@ -296,6 +356,14 @@ export default function AdminPage() {
       return stored ? JSON.parse(stored) : defaultProducts;
     }
     return defaultProducts;
+  });
+
+  const [experienceData, setExperienceData] = React.useState<any[]>(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('invictus_experience');
+      return stored ? JSON.parse(stored) : defaultExperience;
+    }
+    return defaultExperience;
   });
 
   const [heroSettings, setHeroSettings] = React.useState<typeof defaultHeroSettings>(() => {
@@ -360,6 +428,10 @@ export default function AdminPage() {
   const [editingProductId, setEditingProductId] = React.useState<number | null>(null);
   const [editingProductForm, setEditingProductForm] = React.useState({ name: '', price: '', category: 'Equipment', description: '', image: '', rating: '5.0' });
 
+  const [newExperience, setNewExperience] = React.useState({ role: '', company: '', period: '', description: '' });
+  const [editingExperienceId, setEditingExperienceId] = React.useState<string | null>(null);
+  const [editingExperienceForm, setEditingExperienceForm] = React.useState({ role: '', company: '', period: '', description: '' });
+
   // Schedule quick add
   const [selectedDay, setSelectedDay] = React.useState('Sunday');
   const [newClassTime, setNewClassTime] = React.useState('');
@@ -392,6 +464,9 @@ export default function AdminPage() {
       }
       if (!localStorage.getItem('invictus_about_settings')) {
         localStorage.setItem('invictus_about_settings', JSON.stringify(defaultAboutSettings));
+      }
+      if (!localStorage.getItem('invictus_experience')) {
+        localStorage.setItem('invictus_experience', JSON.stringify(defaultExperience));
       }
       if (!localStorage.getItem('invictus_orders')) {
         const defaultOrders = [
@@ -720,6 +795,72 @@ export default function AdminPage() {
     triggerNotification(`Successfully updated product: ${editingProductForm.name}`);
   };
 
+  // Experience Handlers
+  const handleAddExperience = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newExperience.role || !newExperience.company || !newExperience.period) {
+      triggerNotification('Please fill in Role, Company, and Period.', 'error');
+      return;
+    }
+    const newRecord = {
+      id: 'exp-' + Date.now(),
+      role: newExperience.role,
+      company: newExperience.company,
+      period: newExperience.period,
+      description: newExperience.description || ''
+    };
+    const updated = [newRecord, ...experienceData];
+    setExperienceData(updated);
+    syncToStorage('invictus_experience', updated);
+    setNewExperience({ role: '', company: '', period: '', description: '' });
+    setExperienceSubTab('list');
+    triggerNotification('New Professional Experience record registered successfully!');
+  };
+
+  const startEditingExperience = (exp: any) => {
+    setEditingExperienceId(exp.id);
+    setEditingExperienceForm({
+      role: exp.role || '',
+      company: exp.company || '',
+      period: exp.period || '',
+      description: exp.description || ''
+    });
+    setExperienceSubTab('form');
+  };
+
+  const saveEditedExperience = (id: string) => {
+    if (!editingExperienceForm.role || !editingExperienceForm.company || !editingExperienceForm.period) {
+      triggerNotification('Please fill in Role, Company, and Period.', 'error');
+      return;
+    }
+    const updated = experienceData.map(exp => {
+      if (exp.id === id) {
+        return {
+          ...exp,
+          role: editingExperienceForm.role,
+          company: editingExperienceForm.company,
+          period: editingExperienceForm.period,
+          description: editingExperienceForm.description
+        };
+      }
+      return exp;
+    });
+    setExperienceData(updated);
+    syncToStorage('invictus_experience', updated);
+    setEditingExperienceId(null);
+    setExperienceSubTab('list');
+    triggerNotification('Professional Experience details updated successfully!');
+  };
+
+  const handleDeleteExperience = (id: string) => {
+    if (confirm('Are you sure you want to delete this experience record?')) {
+      const updated = experienceData.filter(exp => exp.id !== id);
+      setExperienceData(updated);
+      syncToStorage('invictus_experience', updated);
+      triggerNotification('Professional Experience record deleted successfully!');
+    }
+  };
+
   // Order Actions
   const handleToggleOrderStatus = (id: string, currentStatus: string) => {
     const nextStatus = currentStatus === 'Pending' ? 'Shipped' : currentStatus === 'Shipped' ? 'Delivered' : currentStatus === 'Delivered' ? 'Canceled' : 'Pending';
@@ -863,6 +1004,7 @@ export default function AdminPage() {
                   { id: 'inquiries', label: 'Client Inbox', icon: Mail, count: inquiries.filter(i => !i.read).length, isInbox: true },
                   { id: 'products', label: 'Manage Shop', icon: ShoppingBag, count: products.length },
                   { id: 'orders', label: 'Shop Orders', icon: Package, count: orders.filter(o => o.status === 'Pending').length, isInbox: true },
+                  { id: 'experience', label: 'Experience Timeline', icon: Briefcase },
                   { id: 'content', label: 'Hero & About CMS', icon: Compass },
                 ].map((item) => {
                   const TabIcon = item.icon;
@@ -961,6 +1103,7 @@ export default function AdminPage() {
                     { id: 'inquiries', label: 'Client Inbox', icon: Mail, count: inquiries.filter(i => !i.read).length, isInbox: true },
                     { id: 'products', label: 'Manage Shop', icon: ShoppingBag, count: products.length },
                     { id: 'orders', label: 'Shop Orders', icon: Package, count: orders.filter(o => o.status === 'Pending').length, isInbox: true },
+                    { id: 'experience', label: 'Experience Timeline', icon: Briefcase },
                     { id: 'content', label: 'Hero & About CMS', icon: Compass },
                   ].map((item) => {
                     const TabIcon = item.icon;
@@ -1026,6 +1169,7 @@ export default function AdminPage() {
                   {activeTab === 'inquiries' && '📬 Dynamic Mail Inbox'}
                   {activeTab === 'products' && '📦 Shop Inventory Manager'}
                   {activeTab === 'orders' && '🛒 Store Orders Stream'}
+                  {activeTab === 'experience' && '💼 Professional Experience Manager'}
                   {activeTab === 'content' && '🌐 Hero & About CMS'}
                 </h1>
                 <p className="text-xs text-brand-muted mt-0.5 font-sans">
@@ -2514,6 +2658,274 @@ export default function AdminPage() {
                       </div>
                     </div>
                   </div>
+                </div>
+              )}
+
+              {/* TAB 8: EXPERIENCE TIMELINE MANAGEMENT */}
+              {activeTab === 'experience' && (
+                <div className="space-y-6 animate-in fade-in duration-300">
+                  {/* Separate Page sub-navigation header for experience list and form */}
+                  <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-brand-border/40 pb-5 mb-6">
+                    <div>
+                      <h3 className="text-xl font-display font-black uppercase text-white tracking-tight">
+                        {experienceSubTab === 'list' ? 'Professional Experience Timeline' : editingExperienceId ? 'Edit Experience Record' : 'Register New Experience'}
+                      </h3>
+                      <p className="text-xs text-[#cbcbcb] font-mono tracking-wider mt-0.5 animate-pulse text-brand-accent">
+                        {experienceSubTab === 'list' ? 'DYNAMIC HOMEPAGE EXPERIENCES TIMELINE' : 'CREATE HIGH-END WORK RECORD'}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => {
+                          setExperienceSubTab('list');
+                          setEditingExperienceId(null);
+                        }}
+                        className={`px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-xl transition-all border min-h-[40px] cursor-pointer ${
+                          experienceSubTab === 'list'
+                            ? 'bg-brand-accent text-black font-black border-brand-accent shadow-sm shadow-brand-accent/20'
+                            : 'bg-brand-secondary/80 border-brand-border text-brand-muted hover:text-white'
+                        }`}
+                      >
+                        Experience Records
+                      </button>
+                      <button
+                        onClick={() => {
+                          setExperienceSubTab('form');
+                          setEditingExperienceId(null);
+                          setNewExperience({ role: '', company: '', period: '', description: '' });
+                        }}
+                        className={`px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-xl transition-all border min-h-[40px] cursor-pointer ${
+                          experienceSubTab === 'form' && !editingExperienceId
+                            ? 'bg-brand-accent text-black font-black border-brand-accent shadow-sm shadow-brand-accent/20'
+                            : 'bg-brand-secondary/80 border-brand-border text-brand-muted hover:text-white'
+                        }`}
+                      >
+                        + Add Experience
+                      </button>
+                    </div>
+                  </div>
+
+                  {experienceSubTab === 'form' ? (
+                    /* Focused Experience Input Details Form */
+                    <div className="max-w-2xl mx-auto w-full p-8 bg-brand-secondary/40 border border-brand-border/85 rounded-[2.5rem] relative shadow-2xl">
+                      {editingExperienceId ? (
+                        <>
+                          <div className="flex items-center justify-between border-b border-brand-border/40 pb-4 mb-6">
+                            <h2 className="text-sm font-black uppercase tracking-[0.2em] text-white flex items-center gap-2.5 font-display2">
+                              <Edit3 className="w-5 h-5 text-brand-accent animate-pulse" /> Edit Experience Profile
+                            </h2>
+                            <button
+                              onClick={() => { setExperienceSubTab('list'); setEditingExperienceId(null); }}
+                              className="text-xs text-brand-muted hover:text-white font-mono uppercase tracking-widest flex items-center gap-1 cursor-pointer"
+                            >
+                              ← Back to Timeline
+                            </button>
+                          </div>
+                          
+                          <form onSubmit={(e) => { e.preventDefault(); saveEditedExperience(editingExperienceId); }} className="space-y-6 text-xs">
+                            <div className="space-y-2">
+                              <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Role / Designation *</label>
+                              <input 
+                                type="text" 
+                                required
+                                placeholder="e.g. Professional Boxing Referee"
+                                value={editingExperienceForm.role}
+                                onChange={(e) => setEditingExperienceForm({...editingExperienceForm, role: e.target.value})}
+                                className="w-full bg-brand-primary border border-brand-border p-3.5 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                              />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="space-y-2">
+                                <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Company / Organization *</label>
+                                <input 
+                                  type="text" 
+                                  required
+                                  placeholder="e.g. World Boxing Council (WBC)"
+                                  value={editingExperienceForm.company}
+                                  onChange={(e) => setEditingExperienceForm({...editingExperienceForm, company: e.target.value})}
+                                  className="w-full bg-brand-primary border border-brand-border p-3.5 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                                />
+                              </div>
+                              <div className="space-y-2">
+                                <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Time Period *</label>
+                                <input 
+                                  type="text" 
+                                  required
+                                  placeholder="e.g. 2018 - Present"
+                                  value={editingExperienceForm.period}
+                                  onChange={(e) => setEditingExperienceForm({...editingExperienceForm, period: e.target.value})}
+                                  className="w-full bg-brand-primary border border-brand-border p-3.5 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="space-y-2">
+                              <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Short Description / Highlights</label>
+                              <textarea 
+                                rows={4}
+                                placeholder="Details about coaching, achievements, reference events, etc."
+                                value={editingExperienceForm.description}
+                                onChange={(e) => setEditingExperienceForm({...editingExperienceForm, description: e.target.value})}
+                                className="w-full bg-brand-primary border border-brand-border p-3.5 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors font-sans"
+                              />
+                            </div>
+
+                            <div className="flex gap-3 pt-4">
+                              <button 
+                                type="submit"
+                                className="flex-1 py-4 bg-brand-accent text-black font-extrabold uppercase tracking-widest rounded-xl hover:bg-brand-accent-hover transition-colors min-h-[48px] cursor-pointer shadow-md shadow-brand-accent/15 text-xs"
+                              >
+                                SAVE CHANGES
+                              </button>
+                              <button 
+                                type="button"
+                                onClick={() => { setExperienceSubTab('list'); setEditingExperienceId(null); }}
+                                className="px-6 py-4 bg-brand-primary border border-brand-border text-brand-muted hover:text-white font-mono text-xs rounded-xl min-h-[48px] cursor-pointer"
+                              >
+                                CANCEL
+                              </button>
+                            </div>
+                          </form>
+                        </>
+                      ) : (
+                        <>
+                          <div className="flex items-center justify-between border-b border-brand-border/40 pb-4 mb-6">
+                            <h2 className="text-sm font-black uppercase tracking-[0.2em] text-white flex items-center gap-2.5 font-display2">
+                              <Briefcase className="w-5 h-5 text-brand-accent" /> Register Experience Record
+                            </h2>
+                            <button
+                              onClick={() => setExperienceSubTab('list')}
+                              className="text-xs text-brand-muted hover:text-white font-mono uppercase tracking-widest flex items-center gap-1 cursor-pointer"
+                            >
+                              ← Back to Timeline
+                            </button>
+                          </div>
+                          
+                          <form onSubmit={handleAddExperience} className="space-y-6 text-xs">
+                            <div className="space-y-2">
+                              <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Role / Designation *</label>
+                              <input 
+                                type="text" 
+                                required
+                                placeholder="e.g. Owner / Head Coach"
+                                value={newExperience.role}
+                                onChange={(e) => setNewExperience({...newExperience, role: e.target.value})}
+                                className="w-full bg-brand-primary border border-brand-border p-3.5 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                              />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="space-y-2">
+                                <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Company / Organization *</label>
+                                <input 
+                                  type="text" 
+                                  required
+                                  placeholder="e.g. Invictus BJJ & MMA"
+                                  value={newExperience.company}
+                                  onChange={(e) => setNewExperience({...newExperience, company: e.target.value})}
+                                  className="w-full bg-brand-primary border border-brand-border p-3.5 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                                />
+                              </div>
+                              <div className="space-y-2">
+                                <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Time Period *</label>
+                                <input 
+                                  type="text" 
+                                  required
+                                  placeholder="e.g. 2018 - Present"
+                                  value={newExperience.period}
+                                  onChange={(e) => setNewExperience({...newExperience, period: e.target.value})}
+                                  className="w-full bg-brand-primary border border-brand-border p-3.5 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="space-y-2">
+                              <label className="text-brand-muted font-bold tracking-wider uppercase text-[10px]">Short Description / Highlights</label>
+                              <textarea 
+                                rows={4}
+                                placeholder="Details about coaching, achievements, reference events, etc."
+                                value={newExperience.description}
+                                onChange={(e) => setNewExperience({...newExperience, description: e.target.value})}
+                                className="w-full bg-brand-primary border border-brand-border p-3.5 rounded-xl text-white text-sm focus:border-brand-accent focus:outline-none transition-colors font-sans"
+                              />
+                            </div>
+
+                            <button 
+                              type="submit"
+                              className="w-full py-4 bg-brand-accent text-black font-extrabold uppercase tracking-widest text-xs rounded-xl hover:bg-brand-accent-hover transition-colors min-h-[48px] cursor-pointer shadow-lg shadow-brand-accent/10"
+                            >
+                              REGISTER RECORD
+                            </button>
+                          </form>
+                        </>
+                      )}
+                    </div>
+                  ) : (
+                    /* Full-width Experience Directory Table */
+                    <div className="w-full space-y-4">
+                      <div className="p-6 bg-brand-secondary/40 border border-brand-border/80 rounded-[2rem] shadow-xl animate-in fade-in duration-300">
+                        <h3 className="text-xs font-black uppercase tracking-widest text-white border-b border-brand-border/40 pb-4 mb-4 font-display flex items-center gap-2">
+                          📋 Experience Timeline Stocklist ({experienceData.length})
+                        </h3>
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-left border-collapse text-xs">
+                            <thead>
+                              <tr className="border-b border-brand-border/60 text-brand-muted uppercase font-mono tracking-wider font-bold">
+                                <th className="pb-3 p-2 font-bold">Role / Job Title</th>
+                                <th className="pb-3 p-2 font-bold">Company / Organization</th>
+                                <th className="pb-3 p-2 font-bold">Period</th>
+                                <th className="pb-3 p-2 font-bold">Highlights Summary</th>
+                                <th className="pb-3 p-2 font-bold text-right">Actions</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-brand-border/30">
+                              {experienceData.length === 0 ? (
+                                <tr>
+                                  <td colSpan={5} className="py-8 text-center text-brand-muted font-mono uppercase tracking-wider">
+                                    No experiences indexed. Register a record today!
+                                  </td>
+                                </tr>
+                              ) : (
+                                experienceData.map((exp) => (
+                                  <tr key={exp.id} className="hover:bg-white/[0.01]">
+                                    <td className="py-4 p-2 font-bold text-white text-sm leading-tight">
+                                      {exp.role}
+                                    </td>
+                                    <td className="py-4 p-2">
+                                      <span className="px-2.5 py-1 bg-brand-primary border border-brand-border text-[9px] font-mono font-bold uppercase rounded text-brand-accent">
+                                        {exp.company}
+                                      </span>
+                                    </td>
+                                    <td className="py-4 p-2 font-mono text-brand-muted">{exp.period}</td>
+                                    <td className="py-4 p-2 text-brand-muted max-w-xs truncate">{exp.description || "(No description)"}</td>
+                                    <td className="py-4 p-2 text-right">
+                                      <div className="flex justify-end gap-2">
+                                        <button 
+                                          onClick={() => startEditingExperience(exp)}
+                                          className="p-2 border border-brand-border hover:border-brand-accent text-brand-muted hover:text-brand-accent rounded-xl transition-colors min-h-[36px] min-w-[36px] flex items-center justify-center cursor-pointer"
+                                          title="Edit Entry"
+                                        >
+                                          <Edit3 className="w-4 h-4" />
+                                        </button>
+                                        <button 
+                                          onClick={() => handleDeleteExperience(exp.id)}
+                                          className="p-2 border border-brand-border hover:border-red-500 text-brand-muted hover:text-red-500 rounded-xl transition-colors min-h-[36px] min-w-[36px] flex items-center justify-center cursor-pointer"
+                                          title="Delete Entry"
+                                        >
+                                          <Trash2 className="w-4 h-4" />
+                                        </button>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                ))
+                              )}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
