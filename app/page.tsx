@@ -215,54 +215,132 @@ const skills = [
   { name: "Leadership", level: 95 }
 ];
 
+const defaultHomepageProducts = [
+  { id: 1, name: "Invictus Elite Boxing Gloves", price: 89.99, image: "https://picsum.photos/seed/gloves/800/800" },
+  { id: 2, name: "WBC Referee Commemorative Tee", price: 34.99, image: "https://picsum.photos/seed/shirt/800/800" },
+  { id: 3, name: "Invictus MMA Shinguards", price: 59.99, image: "https://picsum.photos/seed/shinguard/800/800" },
+  { id: 4, name: "8-Week Combat Conditioning Program", price: 129.99, image: "https://picsum.photos/seed/program/800/800" },
+  { id: 5, name: "Classic Invictus Hoodie", price: 64.99, image: "https://picsum.photos/seed/hoodie/800/800" }
+];
+
 export default function PortfolioPage() {
   const [currentSlide, setCurrentSlide] = React.useState(0);
   const [menuOpen, setMenuOpen] = React.useState(false);
 
   // Dynamic schedule, pricing, and contact states loaded from localStorage if browser-side
-  const [currentSchedule, setCurrentSchedule] = React.useState(() => {
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem('invictus_schedule');
-      return stored ? JSON.parse(stored) : schedule;
-    }
-    return schedule;
-  });
+  const [currentSchedule, setCurrentSchedule] = React.useState(schedule);
+  const [currentPricing, setCurrentPricing] = React.useState(pricing);
+  const [heroSettings, setHeroSettings] = React.useState(defaultHeroSettings);
+  const [aboutSettings, setAboutSettings] = React.useState(defaultAboutSettings);
+  const [currentExperience, setCurrentExperience] = React.useState(experience);
 
-  const [currentPricing, setCurrentPricing] = React.useState(() => {
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem('invictus_pricing');
-      return stored ? JSON.parse(stored) : pricing;
-    }
-    return pricing;
-  });
-
-  const [heroSettings, setHeroSettings] = React.useState(() => {
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem('invictus_hero_settings');
-      return stored ? JSON.parse(stored) : defaultHeroSettings;
-    }
-    return defaultHeroSettings;
-  });
-
-  const [aboutSettings, setAboutSettings] = React.useState(() => {
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem('invictus_about_settings');
-      return stored ? JSON.parse(stored) : defaultAboutSettings;
-    }
-    return defaultAboutSettings;
-  });
-
-  const [currentExperience, setCurrentExperience] = React.useState(() => {
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem('invictus_experience');
-      return stored ? JSON.parse(stored) : experience;
-    }
-    return experience;
-  });
+  // Elite Gear homepage local states & carousel limit configurations
+  const [currentProducts, setCurrentProducts] = React.useState<any[]>(defaultHomepageProducts);
+  const [productIdx, setProductIdx] = React.useState(defaultHomepageProducts.length);
+  const [disableTransition, setDisableTransition] = React.useState(false);
+  const [itemWidth, setItemWidth] = React.useState(440);
+  const [carouselGap, setCarouselGap] = React.useState(24);
+  const [isCarouselHovered, setIsCarouselHovered] = React.useState(false);
 
   const [formData, setFormData] = React.useState({ name: '', email: '', message: '' });
   const [successToast, setSuccessToast] = React.useState(false);
   const [selectedScheduleDay, setSelectedScheduleDay] = React.useState<string>('All');
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const loadFromStorage = () => {
+        const storedSchedule = localStorage.getItem('invictus_schedule');
+        if (storedSchedule) setCurrentSchedule(JSON.parse(storedSchedule));
+
+        const storedPricing = localStorage.getItem('invictus_pricing');
+        if (storedPricing) setCurrentPricing(JSON.parse(storedPricing));
+
+        const storedHero = localStorage.getItem('invictus_hero_settings');
+        if (storedHero) setHeroSettings(JSON.parse(storedHero));
+
+        const storedAbout = localStorage.getItem('invictus_about_settings');
+        if (storedAbout) setAboutSettings(JSON.parse(storedAbout));
+
+        const storedExperience = localStorage.getItem('invictus_experience');
+        if (storedExperience) setCurrentExperience(JSON.parse(storedExperience));
+
+        const storedProducts = localStorage.getItem('invictus_products');
+        if (storedProducts) {
+          try {
+            const parsed = JSON.parse(storedProducts);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              setCurrentProducts(parsed);
+            }
+          } catch (e) {
+            // ignore
+          }
+        }
+      };
+      
+      setTimeout(loadFromStorage, 0);
+
+      const handleResize = () => {
+        const width = window.innerWidth;
+        if (width >= 1024) {
+          setItemWidth(450);
+          setCarouselGap(24);
+        } else if (width >= 768) {
+          setItemWidth(380);
+          setCarouselGap(20);
+        } else if (width >= 640) {
+          setItemWidth(320);
+          setCarouselGap(16);
+        } else if (width >= 400) {
+          setItemWidth(280);
+          setCarouselGap(12);
+        } else {
+          setItemWidth(240);
+          setCarouselGap(12);
+        }
+      };
+
+      handleResize();
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
+  }, []);
+
+  const nextProduct = () => {
+    if (disableTransition) return;
+    setProductIdx((prev) => prev + 1);
+  };
+
+  const prevProduct = () => {
+    if (disableTransition) return;
+    setProductIdx((prev) => prev - 1);
+  };
+
+  const handleTransitionEnd = () => {
+    const N = currentProducts.length;
+    if (N === 0) return;
+    
+    setProductIdx((prev) => {
+      if (prev >= N * 2) {
+        setDisableTransition(true);
+        return prev - N;
+      } else if (prev < N) {
+        setDisableTransition(true);
+        return prev + N;
+      }
+      return prev;
+    });
+  };
+
+  React.useEffect(() => {
+    if (disableTransition) {
+      const raf = requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setDisableTransition(false);
+        });
+      });
+      return () => cancelAnimationFrame(raf);
+    }
+  }, [disableTransition]);
 
   React.useEffect(() => {
     const timer = setInterval(() => {
@@ -271,6 +349,15 @@ export default function PortfolioPage() {
 
     return () => clearInterval(timer);
   }, [heroSettings]);
+
+  React.useEffect(() => {
+    if (isCarouselHovered) return;
+    const timer = setInterval(() => {
+      setProductIdx((prev) => prev + 1);
+    }, 3500);
+
+    return () => clearInterval(timer);
+  }, [isCarouselHovered]);
 
   const handleContactSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -473,63 +560,63 @@ export default function PortfolioPage() {
         <div className="absolute bottom-6 left-6 w-3 h-3 border-b-2 border-l-2 border-brand-border hidden lg:block" />
         <div className="absolute bottom-6 right-6 w-3 h-3 border-b-2 border-r-2 border-brand-border hidden lg:block" />
 
-        <div className="container max-w-7xl mx-auto relative">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+        <div className="container max-w-7xl mx-auto relative px-4 sm:px-6">
+          <div className="grid lg:grid-cols-2 gap-10 sm:gap-16 items-center">
             <motion.div 
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
               {/* Modern elegant glowing pill badge */}
-              <div className="hidden sm:inline-flex items-center gap-2.5 px-4.5 py-1.5 bg-brand-accent/10 border border-brand-accent/25 text-[10px] font-mono font-bold tracking-widest text-[#BFFF00] mb-8 rounded-full uppercase select-none transition-all duration-300 hover:border-brand-accent/40 hover:shadow-[0_0_15px_rgba(204,255,0,0.1)]">
+              <div className="inline-flex items-center gap-2.5 px-4.5 py-1.5 bg-brand-accent/10 border border-brand-accent/25 text-[10px] font-mono font-bold tracking-widest text-[#BFFF00] mb-6 sm:mb-8 rounded-full uppercase select-none transition-all duration-300 hover:border-brand-accent/40 hover:shadow-[0_0_15px_rgba(204,255,0,0.1)]">
                 <span className="w-2 h-2 rounded-full bg-brand-accent animate-[pulse_1.5s_infinite] shrink-0" />
                 {heroSettings.badge}
               </div>
 
-              <h1 className="font-display mb-6 sm:mb-8">
-                <span className="block text-xs sm:text-sm font-mono font-bold tracking-[0.25em] text-brand-muted uppercase mb-3">
+              <h1 className="font-display mb-6 sm:mb-8 text-left">
+                <span className="block text-[10px] sm:text-xs sm:text-sm font-mono font-bold tracking-[0.25em] text-brand-muted uppercase mb-3 leading-relaxed">
                   {heroSettings.subheading}
                 </span>
-                <span className="block text-4xl sm:text-5xl md:text-6xl font-black text-white tracking-tighter uppercase leading-[0.95] mb-5">
+                <span className="block text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-black text-white tracking-tighter uppercase leading-[0.95] mb-4 sm:mb-5">
                   {heroSettings.title}
                 </span>
-                <span className="relative inline-block text-black bg-brand-accent px-6 py-3 rounded-2xl select-none text-3xl sm:text-5xl md:text-6xl font-display font-black leading-none uppercase tracking-tight shadow-xl shadow-brand-accent/20">
+                <span className="relative inline-block text-black bg-brand-accent px-4 py-2 sm:px-6 sm:py-3 rounded-2xl select-none text-2xl xs:text-3xl sm:text-5xl md:text-6xl font-display font-black leading-none uppercase tracking-tight shadow-xl shadow-brand-accent/20 transition-transform duration-300 hover:scale-102">
                   {heroSettings.name}
                 </span>
               </h1>
 
-              <p className="text-sm sm:text-base md:text-lg text-brand-muted max-w-xl mb-8 sm:mb-12 leading-relaxed font-sans border-l-2 border-brand-border pl-4 whitespace-pre-line">
+              <p className="text-xs sm:text-sm md:text-lg text-brand-muted max-w-xl mb-8 sm:mb-12 leading-relaxed font-sans border-l-2 border-brand-border pl-4 whitespace-pre-line text-left">
                 {heroSettings.description}
               </p>
               
-              <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 mb-8 sm:mb-12">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-5 mb-8 sm:mb-12">
                 <a 
                   href="#contact" 
-                  className="px-8 py-4 sm:px-10 sm:py-4.5 bg-brand-accent hover:bg-brand-accent-hover text-black font-black uppercase tracking-widest text-xs sm:text-sm rounded-full transition-all duration-300 shadow-lg shadow-brand-accent/25 hover:shadow-brand-accent/40 hover:-translate-y-0.5 flex items-center justify-center gap-2.5 group text-center min-h-[48px]"
+                  className="px-6 py-3.5 sm:px-10 sm:py-4.5 bg-brand-accent hover:bg-brand-accent-hover text-black font-black uppercase tracking-widest text-xs sm:text-sm rounded-full transition-all duration-300 shadow-lg shadow-brand-accent/20 hover:shadow-brand-accent/40 active:scale-95 hover:-translate-y-0.5 flex items-center justify-center gap-2.5 group text-center min-h-[48px]"
                 >
                   Join Training
                   <Zap className="w-4 h-4 fill-black group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                 </a>
                 <a 
                   href="#schedule" 
-                  className="px-8 py-4 sm:px-10 sm:py-4.5 border border-brand-border hover:border-brand-accent/50 bg-transparent hover:bg-white/[0.02] text-white font-bold uppercase tracking-widest text-xs sm:text-sm rounded-full transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-center gap-2.5 text-center min-h-[48px]"
+                  className="px-6 py-3.5 sm:px-10 sm:py-4.5 border border-brand-border hover:border-brand-accent/50 bg-transparent hover:bg-white/[0.02] text-white font-bold uppercase tracking-widest text-xs sm:text-sm rounded-full transition-all duration-300 active:scale-95 hover:-translate-y-0.5 flex items-center justify-center gap-2.5 text-center min-h-[48px]"
                 >
                   View Schedule
                 </a>
               </div>
 
-              <div className="hidden sm:grid grid-cols-2 max-w-md border border-brand-border/60 bg-brand-secondary/40 backdrop-blur-md rounded-2xl divide-x divide-brand-border/60 overflow-hidden shadow-lg shadow-black/40">
-                <div className="p-4 flex flex-col justify-between hover:bg-brand-border/20 transition-colors">
+              <div className="grid grid-cols-2 max-w-md border border-brand-border/65 bg-brand-secondary/35 backdrop-blur-md rounded-2xl divide-x divide-brand-border/60 overflow-hidden shadow-lg shadow-black/40">
+                <div className="p-3.5 sm:p-4 flex flex-col justify-between hover:bg-brand-border/15 transition-colors">
                   <div className="text-[8px] sm:text-[9px] font-mono text-brand-muted tracking-widest font-black uppercase mb-1.5 sm:mb-2">LOCATION</div>
-                  <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-bold text-white">
-                    <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-brand-accent shrink-0" />
+                  <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs sm:text-sm font-bold text-white leading-tight">
+                    <MapPin className="w-3.5 h-3.5 text-brand-accent shrink-0" />
                     <span>KALABAGAN, DHAKA</span>
                   </div>
                 </div>
-                <div className="p-4 flex flex-col justify-between hover:bg-brand-border/20 transition-colors">
+                <div className="p-3.5 sm:p-4 flex flex-col justify-between hover:bg-brand-border/15 transition-colors">
                   <div className="text-[8px] sm:text-[9px] font-mono text-brand-muted tracking-widest font-black uppercase mb-1.5 sm:mb-2">HEADQUARTERS</div>
-                  <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-bold text-white">
-                    <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-brand-accent shrink-0" />
+                  <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs sm:text-sm font-bold text-white leading-tight">
+                    <Shield className="w-3.5 h-3.5 text-brand-accent shrink-0" />
                     <span>INVICTUS BJJ & MMA</span>
                   </div>
                 </div>
@@ -540,14 +627,14 @@ export default function PortfolioPage() {
               initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 1, delay: 0.2 }}
-              className="relative aspect-square rounded-[2rem] bg-brand-secondary/40 backdrop-blur-md border border-brand-border/85 overflow-hidden group select-none w-full max-w-md lg:max-w-none mx-auto shadow-2xl hover:shadow-[0_0_30px_rgba(204,255,0,0.03)] transition-all duration-500"
+              className="relative aspect-[4/5] sm:aspect-square rounded-[2rem] bg-brand-secondary/40 backdrop-blur-md border border-brand-border/85 overflow-hidden group select-none w-full max-w-md lg:max-w-none mx-auto shadow-2xl hover:shadow-[0_0_30px_rgba(204,255,0,0.03)] transition-all duration-500"
             >
               {/* Modern Badge Overlays */}
-              <div className="absolute top-5 left-5 z-40 bg-black/75 backdrop-blur-md px-3 py-1.5 text-[9px] font-mono text-brand-accent tracking-widest uppercase rounded-full border border-brand-accent/20 select-none">
+              <div className="absolute top-4 left-4 xs:top-5 xs:left-5 z-40 bg-black/75 backdrop-blur-md px-2.5 py-1.5 text-[8px] sm:text-[9px] font-mono text-brand-accent tracking-widest uppercase rounded-full border border-brand-accent/20 select-none">
                 SLIDE {currentSlide + 1} &bull; OVERVIEW
               </div>
               
-              <div className="absolute top-5 right-5 z-40 bg-black/75 backdrop-blur-md px-3 py-1.5 text-[9px] font-mono text-white/95 tracking-widest uppercase rounded-full border border-white/10 select-none flex items-center gap-1.5">
+              <div className="absolute top-4 right-4 xs:top-5 xs:right-5 z-40 bg-black/75 backdrop-blur-md px-2.5 py-1.5 text-[8px] sm:text-[9px] font-mono text-white/95 tracking-widest uppercase rounded-full border border-white/10 select-none flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 bg-brand-accent rounded-full animate-pulse" />
                 ACTIVE_PORTFOLIO
               </div>
@@ -561,7 +648,7 @@ export default function PortfolioPage() {
                   transition={{ duration: 0.4 }}
                   className="absolute inset-0"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent z-10" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent z-10" />
                   <Image 
                     src={heroSettings.images[currentSlide]?.url || "https://picsum.photos/seed/coach-ishtiaq/1000/1000"} 
                     alt={heroSettings.images[currentSlide]?.caption || "Slide Image"} 
@@ -570,25 +657,25 @@ export default function PortfolioPage() {
                     priority
                     referrerPolicy="no-referrer"
                   />
-                  <div className="absolute bottom-8 left-8 z-20">
-                    <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#BFFF00] mb-2">{heroSettings.images[currentSlide]?.caption}</div>
-                    <div className="text-3xl sm:text-4xl font-display font-black tracking-tighter text-white uppercase">{heroSettings.images[currentSlide]?.title}</div>
+                  <div className="absolute bottom-16 left-5 xs:bottom-20 xs:left-6 sm:bottom-24 sm:left-10 z-20">
+                    <div className="text-[9px] sm:text-[10px] font-mono font-bold uppercase tracking-widest text-[#BFFF00] mb-1.5 sm:mb-2">{heroSettings.images[currentSlide]?.caption}</div>
+                    <div className="text-xl xs:text-2xl sm:text-3xl md:text-4xl font-display font-black tracking-tighter text-white uppercase leading-tight">{heroSettings.images[currentSlide]?.title}</div>
                   </div>
                 </motion.div>
               </AnimatePresence>
  
               {/* Navigation Controls with modern rounded buttons */}
-              <div className="absolute bottom-6 right-6 z-30 flex gap-2">
+              <div className="absolute bottom-4 right-4 xs:bottom-6 xs:right-6 z-30 flex gap-2">
                 <button 
                   onClick={prevSlide}
-                  className="p-3 bg-black/60 backdrop-blur-md border border-white/10 text-white rounded-full hover:bg-brand-accent hover:text-black hover:border-brand-accent transition-all cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center shadow-lg"
+                  className="p-2.5 sm:p-3 bg-black/60 backdrop-blur-md border border-white/10 text-white rounded-full hover:bg-brand-accent hover:text-black hover:border-brand-accent transition-all cursor-pointer min-w-[38px] min-h-[38px] sm:min-w-[44px] sm:min-h-[44px] flex items-center justify-center shadow-lg active:scale-95"
                   aria-label="Previous slide"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
                 <button 
                   onClick={nextSlide}
-                  className="p-3 bg-black/60 backdrop-blur-md border border-white/10 text-white rounded-full hover:bg-brand-accent hover:text-black hover:border-brand-accent transition-all cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center shadow-lg"
+                  className="p-2.5 sm:p-3 bg-black/60 backdrop-blur-md border border-white/10 text-white rounded-full hover:bg-brand-accent hover:text-black hover:border-brand-accent transition-all cursor-pointer min-w-[38px] min-h-[38px] sm:min-w-[44px] sm:min-h-[44px] flex items-center justify-center shadow-lg active:scale-95"
                   aria-label="Next slide"
                 >
                   <ChevronRight className="w-4 h-4" />
@@ -596,7 +683,7 @@ export default function PortfolioPage() {
               </div>
  
               {/* Progress Indicators (Pills) */}
-              <div className="absolute bottom-8 left-8 z-30 flex gap-1.5">
+              <div className="absolute bottom-6 left-5 xs:bottom-8 xs:left-6 sm:bottom-10 sm:left-10 z-30 flex gap-1.5">
                 {(heroSettings.images || []).map((_: any, idx: number) => (
                   <button 
                     key={idx}
@@ -1079,8 +1166,8 @@ export default function PortfolioPage() {
       </section>
 
       {/* Elite Gear / Shop Preview Section */}
-      <section className="py-16 px-4 sm:px-12 lg:px-24 bg-brand-primary">
-        <div className="container max-w-7xl mx-auto">
+      <section className="py-16 bg-brand-primary overflow-hidden relative">
+        <div className="container max-w-7xl mx-auto px-4 sm:px-12 lg:px-24">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-16 gap-6 sm:gap-8">
             <div>
               <h2 className="text-3xl sm:text-5xl md:text-7xl font-display font-black tracking-tight mb-4 sm:mb-6 text-white leading-none">
@@ -1090,47 +1177,109 @@ export default function PortfolioPage() {
                 Hand-picked equipment and apparel designed for high-performance training. Tested in the gym, proven in the ring.
               </p>
             </div>
-            <Link 
-              href="/shop" 
-              className="inline-flex items-center gap-3 bg-brand-accent text-black px-6 py-3.5 sm:px-8 sm:py-4 rounded-full font-bold hover:bg-brand-accent-hover transition-all group shadow-lg shadow-brand-accent/20 text-sm"
-            >
-              Shop All Equipment
-              <ShoppingBag className="w-5 h-5 group-hover:scale-110 transition-transform" />
-            </Link>
-          </div>
- 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              { name: "Invictus Elite Gloves", price: "$89.99", img: "https://picsum.photos/seed/shop-1/800/800" },
-              { name: "WBC Referee Tee", price: "$34.99", img: "https://picsum.photos/seed/shop-2/800/800" },
-              { name: "Performance Wraps", price: "$14.99", img: "https://picsum.photos/seed/shop-3/800/800" }
-            ].map((product, idx) => (
-              <motion.div 
-                key={idx}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.1 }}
-                className="group cursor-pointer"
+            
+            <div className="flex items-center gap-4 self-start md:self-end">
+              <div className="flex gap-2">
+                <button
+                  onClick={prevProduct}
+                  className="p-3 bg-brand-secondary/80 border border-brand-border text-white rounded-full transition-all cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center shadow-lg active:scale-95 hover:bg-brand-accent hover:text-black hover:border-brand-accent"
+                  aria-label="Previous products"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={nextProduct}
+                  className="p-3 bg-brand-secondary/80 border border-brand-border text-white rounded-full transition-all cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center shadow-lg active:scale-95 hover:bg-brand-accent hover:text-black hover:border-brand-accent"
+                  aria-label="Next products"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
+
+              <Link 
+                href="/shop" 
+                className="inline-flex items-center gap-2.5 bg-brand-accent text-black px-5 py-3 rounded-full font-bold hover:bg-brand-accent-hover transition-all group shadow-lg shadow-brand-accent/20 text-xs sm:text-sm uppercase tracking-wider"
               >
-                <div className="relative aspect-square rounded-3xl overflow-hidden bg-brand-secondary border border-brand-border mb-6">
-                  <Image 
-                    src={product.img} 
-                    alt={product.name} 
-                    fill 
-                    className="object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
-                    referrerPolicy="no-referrer"
-                  />
-                  <div className="absolute inset-0 bg-brand-primary/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <span className="bg-brand-accent text-black px-6 py-2 rounded-full font-bold text-sm uppercase tracking-widest shadow-xl">Quick View</span>
+                <span>Shop All</span>
+                <ShoppingBag className="w-4 h-4 group-hover:scale-110 transition-transform" />
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Sliding Carousel Viewport stretching edge-to-edge */}
+        <div 
+          className="relative w-full py-6"
+          onMouseEnter={() => setIsCarouselHovered(true)}
+          onMouseLeave={() => setIsCarouselHovered(false)}
+        >
+          {/* Dynamic tracking lane centered using translateX math */}
+          <div 
+            className="flex"
+            style={{ 
+              transform: `translateX(calc(50% - (${itemWidth}px / 2) - (${productIdx} * (${itemWidth}px + ${carouselGap}px))))`,
+              gap: `${carouselGap}px`,
+              transition: disableTransition ? 'none' : 'transform 500ms cubic-bezier(0.25, 1, 0.5, 1)'
+            }}
+            onTransitionEnd={handleTransitionEnd}
+          >
+            {(currentProducts.length > 0 ? [...currentProducts, ...currentProducts, ...currentProducts] : []).map((product, idx) => {
+              const displayPrice = typeof product.price === 'number' ? `$${product.price.toFixed(2)}` : product.price;
+              const displayImg = product.image || product.img || "https://picsum.photos/seed/placeholder/800/800";
+              const isActive = idx === productIdx;
+              
+              return (
+                <Link 
+                  href="/shop"
+                  key={`${product.id || idx}-${idx}`}
+                  style={{ width: `${itemWidth}px` }}
+                  className={`shrink-0 group block cursor-pointer transition-all duration-500 transform ${
+                    isActive 
+                      ? 'scale-100 opacity-100 z-10' 
+                      : 'scale-[0.88] opacity-35 z-0'
+                  }`}
+                >
+                  <div className={`relative aspect-square rounded-3xl overflow-hidden bg-brand-secondary border transition-all duration-500 mb-5 sm:mb-6 ${
+                    isActive 
+                      ? 'border-brand-accent/70 shadow-2xl shadow-brand-accent/10' 
+                      : 'border-brand-border/60 shadow-none'
+                  }`}>
+                    <Image 
+                      src={displayImg} 
+                      alt={product.name} 
+                      fill 
+                      className={`object-cover transition-all duration-700 ${
+                        isActive 
+                          ? 'grayscale-0 scale-102' 
+                          : 'grayscale scale-100 group-hover:scale-102 group-hover:grayscale-[50%]'
+                      }`}
+                      referrerPolicy="no-referrer"
+                    />
+                    
+                    {/* Active centered glow/quick view overlay */}
+                    <div className={`absolute inset-0 bg-brand-primary/40 flex items-center justify-center transition-opacity duration-300 ${
+                      isActive ? 'opacity-0 group-hover:opacity-100' : 'opacity-0'
+                    }`}>
+                      <span className="bg-brand-accent text-black px-6 py-2.5 rounded-full font-bold text-xs uppercase tracking-widest shadow-xl transition-all duration-300 scale-90 group-hover:scale-100">
+                        Quick View
+                      </span>
+                    </div>
                   </div>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="font-bold text-lg text-white group-hover:text-brand-accent transition-colors">{product.name}</span>
-                  <span className="font-display font-black text-brand-accent/60">{product.price}</span>
-                </div>
-              </motion.div>
-            ))}
+
+                  {/* Title & Price blocks fading slightly when keeping off-focus */}
+                  <div className={`flex justify-between items-start gap-4 transition-opacity duration-500 ${
+                    isActive ? 'opacity-100' : 'opacity-40 group-hover:opacity-80'
+                  }`}>
+                    <span className="font-bold text-base sm:text-lg text-white group-hover:text-brand-accent transition-colors leading-snug">
+                      {product.name}
+                    </span>
+                    <span className="font-display font-black text-brand-accent shrink-0 text-sm sm:text-base">
+                      {displayPrice}
+                    </span>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
