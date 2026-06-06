@@ -251,6 +251,11 @@ export default function PortfolioPage() {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [successToast, setSuccessToast] = React.useState(false);
   const [selectedScheduleDay, setSelectedScheduleDay] = React.useState<string>('All');
+  const [achievementIdx, setAchievementIdx] = React.useState(0);
+  const [isAchievementHovered, setIsAchievementHovered] = React.useState(false);
+  const achievementsRef = React.useRef<HTMLDivElement>(null);
+  const [experienceIdx, setExperienceIdx] = React.useState(0);
+  const [isExperienceHovered, setIsExperienceHovered] = React.useState(false);
 
   const loadedRef = React.useRef(false);
 
@@ -396,6 +401,35 @@ export default function PortfolioPage() {
 
     return () => clearInterval(timer);
   }, [isCarouselHovered]);
+
+  // Achievements auto-play on mobile
+  React.useEffect(() => {
+    if (isAchievementHovered) return;
+    const timer = setInterval(() => {
+      setAchievementIdx((prev) => {
+        const next = prev + 1;
+        if (next >= achievements.length) return 0;
+        return next;
+      });
+    }, 3000);
+    return () => clearInterval(timer);
+  }, [isAchievementHovered, achievements.length]);
+
+  React.useEffect(() => {
+    if (!achievementsRef.current) return;
+    const container = achievementsRef.current;
+    const cardWidth = container.scrollWidth / achievements.length;
+    container.scrollTo({ left: cardWidth * achievementIdx, behavior: 'smooth' });
+  }, [achievementIdx, achievements.length]);
+
+  // Experience auto-play on mobile
+  React.useEffect(() => {
+    if (isExperienceHovered) return;
+    const timer = setInterval(() => {
+      setExperienceIdx((prev) => (prev + 1) % currentExperience.length);
+    }, 3500);
+    return () => clearInterval(timer);
+  }, [isExperienceHovered, currentExperience.length]);
 
   const validateForm = (): boolean => {
     const errors: {name?: string; email?: string; message?: string} = {};
@@ -574,7 +608,7 @@ export default function PortfolioPage() {
       </AnimatePresence>
 
       {/* Hero Section */}
-      <section className="relative pt-28 pb-12 sm:pt-44 sm:pb-20 px-4 sm:px-6 overflow-hidden border-b-2 border-brand-border bg-black">
+      <section className="relative pt-20 pb-12 sm:pt-44 sm:pb-20 px-4 sm:px-6 overflow-hidden border-b-2 border-brand-border bg-black">
         {/* Ambient Dark-Glow Cyberpunk Gradients */}
         <div className="absolute top-1/4 left-[-10%] w-[500px] h-[500px] rounded-full bg-brand-accent/15 blur-[120px] pointer-events-none -z-20 animate-pulse duration-[8s]" />
         <div className="absolute bottom-10 right-[-10%] w-[600px] h-[600px] rounded-full bg-brand-accent/10 blur-[150px] pointer-events-none -z-20" />
@@ -612,14 +646,15 @@ export default function PortfolioPage() {
         <div className="absolute bottom-6 right-6 w-3 h-3 border-b-2 border-r-2 border-brand-border hidden lg:block" />
 
         <div className="container max-w-7xl mx-auto relative px-4 sm:px-6">
-          <div className="grid lg:grid-cols-2 gap-10 sm:gap-16 items-center">
+          <div className="flex flex-col lg:grid lg:grid-cols-2 gap-10 sm:gap-16 items-start">
+            {/* Text Content: badge, heading, description - always first */}
             <motion.div 
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
+              className="w-full"
             >
-              {/* Modern elegant glowing pill badge */}
-              <div className="inline-flex items-center gap-2.5 px-4.5 py-1.5 bg-brand-accent/10 border border-brand-accent/25 text-[10px] font-mono font-bold tracking-widest text-[#BFFF00] mb-6 sm:mb-8 rounded-full uppercase select-none transition-all duration-300 hover:border-brand-accent/40 hover:shadow-[0_0_15px_rgba(204,255,0,0.1)]">
+              <div className="hidden sm:inline-flex items-center gap-2.5 px-4.5 py-1.5 bg-brand-accent/10 border border-brand-accent/25 text-[10px] font-mono font-bold tracking-widest text-[#BFFF00] mb-6 sm:mb-8 rounded-full uppercase select-none transition-all duration-300 hover:border-brand-accent/40 hover:shadow-[0_0_15px_rgba(204,255,0,0.1)]">
                 <span className="w-2 h-2 rounded-full bg-brand-accent animate-[pulse_1.5s_infinite] shrink-0" />
                 {heroSettings.badge}
               </div>
@@ -636,44 +671,12 @@ export default function PortfolioPage() {
                 </span>
               </h1>
 
-              <p className="text-xs sm:text-sm md:text-lg text-brand-muted max-w-xl mb-8 sm:mb-12 leading-relaxed font-sans border-l-2 border-brand-border pl-4 whitespace-pre-line text-left">
+              <p className="text-xs sm:text-sm md:text-lg text-brand-muted max-w-xl mb-0 leading-relaxed font-sans border-l-2 border-brand-border pl-4 whitespace-pre-line text-left">
                 {heroSettings.description}
               </p>
-              
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-5 mb-8 sm:mb-12">
-                <a 
-                  href="#contact" 
-                  className="px-6 py-3.5 sm:px-10 sm:py-4.5 bg-brand-accent hover:bg-brand-accent-hover text-black font-black uppercase tracking-widest text-xs sm:text-sm rounded-full transition-all duration-300 shadow-lg shadow-brand-accent/20 hover:shadow-brand-accent/40 active:scale-95 hover:-translate-y-0.5 flex items-center justify-center gap-2.5 group text-center min-h-[48px]"
-                >
-                  Join Training
-                  <Zap className="w-4 h-4 fill-black group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                </a>
-                <a 
-                  href="#schedule" 
-                  className="px-6 py-3.5 sm:px-10 sm:py-4.5 border border-brand-border hover:border-brand-accent/50 bg-transparent hover:bg-white/[0.02] text-white font-bold uppercase tracking-widest text-xs sm:text-sm rounded-full transition-all duration-300 active:scale-95 hover:-translate-y-0.5 flex items-center justify-center gap-2.5 text-center min-h-[48px]"
-                >
-                  View Schedule
-                </a>
-              </div>
-
-              <div className="grid grid-cols-2 max-w-md border border-brand-border/65 bg-brand-secondary/35 backdrop-blur-md rounded-2xl divide-x divide-brand-border/60 overflow-hidden shadow-lg shadow-black/40">
-                <div className="p-3.5 sm:p-4 flex flex-col justify-between hover:bg-brand-border/15 transition-colors">
-                  <div className="text-[8px] sm:text-[9px] font-mono text-brand-muted tracking-widest font-black uppercase mb-1.5 sm:mb-2">LOCATION</div>
-                  <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs sm:text-sm font-bold text-white leading-tight">
-                    <MapPin className="w-3.5 h-3.5 text-brand-accent shrink-0" />
-                    <span>KALABAGAN, DHAKA</span>
-                  </div>
-                </div>
-                <div className="p-3.5 sm:p-4 flex flex-col justify-between hover:bg-brand-border/15 transition-colors">
-                  <div className="text-[8px] sm:text-[9px] font-mono text-brand-muted tracking-widest font-black uppercase mb-1.5 sm:mb-2">HEADQUARTERS</div>
-                  <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs sm:text-sm font-bold text-white leading-tight">
-                    <Shield className="w-3.5 h-3.5 text-brand-accent shrink-0" />
-                    <span>INVICTUS BJJ & MMA</span>
-                  </div>
-                </div>
-              </div>
             </motion.div>
 
+            {/* Hero Image - second on mobile, adjacent to text on desktop */}
             <motion.div 
               initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -743,6 +746,47 @@ export default function PortfolioPage() {
                     aria-label={`Go to slide ${idx + 1}`}
                   />
                 ))}
+              </div>
+            </motion.div>
+
+            {/* CTA Buttons & Location Info - third on mobile, below text on desktop */}
+            <motion.div 
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className="w-full"
+            >
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-5">
+                <a 
+                  href="#contact" 
+                  className="px-6 py-3.5 sm:px-10 sm:py-4.5 bg-brand-accent hover:bg-brand-accent-hover text-black font-black uppercase tracking-widest text-xs sm:text-sm rounded-full transition-all duration-300 shadow-lg shadow-brand-accent/20 hover:shadow-brand-accent/40 active:scale-95 hover:-translate-y-0.5 flex items-center justify-center gap-2.5 group text-center min-h-[48px]"
+                >
+                  Join Training
+                  <Zap className="w-4 h-4 fill-black group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                </a>
+                <a 
+                  href="#schedule" 
+                  className="px-6 py-3.5 sm:px-10 sm:py-4.5 border border-brand-border hover:border-brand-accent/50 bg-transparent hover:bg-white/[0.02] text-white font-bold uppercase tracking-widest text-xs sm:text-sm rounded-full transition-all duration-300 active:scale-95 hover:-translate-y-0.5 flex items-center justify-center gap-2.5 text-center min-h-[48px]"
+                >
+                  View Schedule
+                </a>
+              </div>
+
+              <div className="grid grid-cols-2 max-w-md border border-brand-border/65 bg-brand-secondary/35 backdrop-blur-md rounded-2xl divide-x divide-brand-border/60 overflow-hidden shadow-lg shadow-black/40 mt-6">
+                <div className="p-3.5 sm:p-4 flex flex-col justify-between hover:bg-brand-border/15 transition-colors">
+                  <div className="text-[8px] sm:text-[9px] font-mono text-brand-muted tracking-widest font-black uppercase mb-1.5 sm:mb-2">LOCATION</div>
+                  <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs sm:text-sm font-bold text-white leading-tight">
+                    <MapPin className="w-3.5 h-3.5 text-brand-accent shrink-0" />
+                    <span>KALABAGAN, DHAKA</span>
+                  </div>
+                </div>
+                <div className="p-3.5 sm:p-4 flex flex-col justify-between hover:bg-brand-border/15 transition-colors">
+                  <div className="text-[8px] sm:text-[9px] font-mono text-brand-muted tracking-widest font-black uppercase mb-1.5 sm:mb-2">HEADQUARTERS</div>
+                  <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs sm:text-sm font-bold text-white leading-tight">
+                    <Shield className="w-3.5 h-3.5 text-brand-accent shrink-0" />
+                    <span>INVICTUS BJJ & MMA</span>
+                  </div>
+                </div>
               </div>
             </motion.div>
           </div>
@@ -853,14 +897,21 @@ export default function PortfolioPage() {
           <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-brand-accent mb-4 sm:mb-6 font-display">Recognition</h2>
           <h3 className="text-3xl sm:text-5xl font-display font-black tracking-tighter uppercase text-white">Key Achievements</h3>
         </div>
-        <div className="container max-w-7xl mx-auto grid md:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
+        <div 
+          ref={achievementsRef}
+          onMouseEnter={() => setIsAchievementHovered(true)}
+          onMouseLeave={() => setIsAchievementHovered(false)}
+          onTouchStart={() => setIsAchievementHovered(true)}
+          onTouchEnd={() => setTimeout(() => setIsAchievementHovered(false), 3000)}
+          className="container max-w-7xl mx-auto flex md:grid md:grid-cols-2 lg:grid-cols-4 gap-6 overflow-x-auto md:overflow-visible snap-x snap-mandatory relative z-10 [-ms-overflow-style:none] [scrollbar-width:none]"
+        >
           {achievements.map((item, idx) => {
             const IconComponent = item.icon;
             return (
               <motion.div 
                 key={idx}
                 whileHover={{ y: -6, scale: 1.01 }}
-                className="p-8 rounded-[2rem] bg-brand-secondary/45 border border-brand-border/60 hover:border-brand-accent/40 transition-all duration-500 group shadow-lg shadow-black/40 cursor-default"
+                className="min-w-[80vw] sm:min-w-[45vw] md:min-w-0 snap-start p-8 rounded-[2rem] bg-brand-secondary/45 border border-purple-500/20 hover:border-brand-accent/40 transition-all duration-500 group shadow-lg shadow-black/40 cursor-default"
               >
                 <div className="mb-6 inline-block p-3.5 rounded-2xl bg-brand-primary border border-brand-border/60 text-brand-accent group-hover:bg-brand-accent group-hover:text-black transition-all duration-500 shadow-sm">
                   <IconComponent className="w-5 h-5 transition-colors duration-500" />
@@ -871,6 +922,22 @@ export default function PortfolioPage() {
               </motion.div>
             );
           })}
+        </div>
+
+        {/* Dot indicators - mobile only */}
+        <div className="flex md:hidden items-center justify-center gap-2 mt-6 relative z-10">
+          {achievements.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => setAchievementIdx(idx)}
+              className={`rounded-full transition-all duration-300 cursor-pointer ${
+                idx === achievementIdx
+                  ? 'w-6 h-2 bg-brand-accent'
+                  : 'w-2 h-2 bg-brand-border hover:bg-brand-muted'
+              }`}
+              aria-label={`Go to achievement ${idx + 1}`}
+            />
+          ))}
         </div>
       </section>
 
@@ -994,7 +1061,8 @@ export default function PortfolioPage() {
               </div>
             </div>
             
-            <div className="lg:col-span-8 space-y-12">
+            {/* Desktop: full timeline */}
+            <div className="hidden lg:block lg:col-span-8 space-y-12">
               {currentExperience.map((exp: any, idx: number) => (
                 <div key={idx} className="relative pl-8 border-l border-brand-border pb-12 last:pb-0">
                   <div className="absolute left-[-5px] top-0 w-2 h-2 rounded-full bg-brand-accent" />
@@ -1006,6 +1074,58 @@ export default function PortfolioPage() {
                   <p className="text-sm sm:text-base text-brand-muted leading-relaxed max-w-2xl">{exp.description}</p>
                 </div>
               ))}
+            </div>
+
+            {/* Mobile: vertical carousel */}
+            <div
+              className="lg:hidden lg:col-span-8 relative min-h-[280px]"
+              onMouseEnter={() => setIsExperienceHovered(true)}
+              onMouseLeave={() => setIsExperienceHovered(false)}
+              onTouchStart={() => setIsExperienceHovered(true)}
+              onTouchEnd={() => setTimeout(() => setIsExperienceHovered(false), 3000)}
+            >
+              <div className="relative overflow-hidden min-h-[260px]">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={experienceIdx}
+                    initial={{ opacity: 0, y: 40 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -30 }}
+                    transition={{ duration: 0.4, ease: 'easeInOut' }}
+                    className="relative pl-8 border-l-2 border-brand-accent/40"
+                  >
+                    <div className="absolute left-[-7px] top-0 w-3 h-3 rounded-full bg-brand-accent shadow-[0_0_10px_rgba(204,255,0,0.3)]" />
+                    <div className="text-[11px] font-bold text-brand-muted uppercase tracking-widest mb-2">
+                      {currentExperience[experienceIdx]?.period}
+                    </div>
+                    <div className="text-xl sm:text-2xl font-display font-black mb-1 text-white">
+                      {currentExperience[experienceIdx]?.role}
+                    </div>
+                    <div className="text-base font-bold text-brand-accent mb-3">
+                      {currentExperience[experienceIdx]?.company}
+                    </div>
+                    <p className="text-sm text-brand-muted leading-relaxed">
+                      {currentExperience[experienceIdx]?.description}
+                    </p>
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+
+              {/* Dot indicators */}
+              <div className="flex items-center justify-center gap-2 mt-6">
+                {currentExperience.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setExperienceIdx(idx)}
+                    className={`rounded-full transition-all duration-300 cursor-pointer ${
+                      idx === experienceIdx
+                        ? 'w-6 h-2 bg-brand-accent'
+                        : 'w-2 h-2 bg-brand-border hover:bg-brand-muted'
+                    }`}
+                    aria-label={`Go to experience ${idx + 1}`}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </div>
