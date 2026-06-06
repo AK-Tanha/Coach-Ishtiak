@@ -256,6 +256,7 @@ export default function PortfolioPage() {
   const achievementsRef = React.useRef<HTMLDivElement>(null);
   const [experienceIdx, setExperienceIdx] = React.useState(0);
   const [isExperienceHovered, setIsExperienceHovered] = React.useState(false);
+  const [showAllExperience, setShowAllExperience] = React.useState(false);
 
   const loadedRef = React.useRef(false);
 
@@ -766,7 +767,7 @@ export default function PortfolioPage() {
                 </a>
                 <a 
                   href="#schedule" 
-                  className="px-6 py-3.5 sm:px-10 sm:py-4.5 border border-brand-border hover:border-brand-accent/50 bg-transparent hover:bg-white/[0.02] text-white font-bold uppercase tracking-widest text-xs sm:text-sm rounded-full transition-all duration-300 active:scale-95 hover:-translate-y-0.5 flex items-center justify-center gap-2.5 text-center min-h-[48px]"
+                  className="px-6 py-3.5 sm:px-10 sm:py-4.5 border border-brand-accent hover:border-brand-accent/50 bg-transparent hover:bg-white/[0.02] text-white font-bold uppercase tracking-widest text-xs sm:text-sm rounded-full transition-all duration-300 active:scale-95 hover:-translate-y-0.5 flex items-center justify-center gap-2.5 text-center min-h-[48px]"
                 >
                   View Schedule
                 </a>
@@ -950,31 +951,36 @@ export default function PortfolioPage() {
         <BoxingRingDecal className="absolute left-1/2 -translate-x-1/2 top-[15%] w-full max-w-6xl text-brand-accent/20 pointer-events-none select-none" />
 
         <div className="container max-w-7xl mx-auto relative z-10">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 sm:gap-8 mb-8 sm:mb-16">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 sm:gap-8 mb-6 sm:mb-16">
             <div>
-              <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-brand-accent mb-3 sm:mb-4 font-display">Training Hours</h2>
-              <h3 className="text-3xl sm:text-5xl font-display font-black tracking-tighter text-white uppercase leading-none">WEEKLY CLASS SCHEDULE</h3>
+              <h2 className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.3em] text-brand-accent mb-1 sm:mb-4 font-display">Training Hours</h2>
+              <h3 className="text-xl sm:text-5xl font-display font-black tracking-tighter text-white uppercase leading-none">WEEKLY CLASS SCHEDULE</h3>
             </div>
-            <div className="p-4 rounded-xl bg-brand-secondary border border-brand-accent/30 flex items-center gap-4">
-              <div className="p-2 rounded-full bg-brand-accent text-black">
-                <Clock className="w-5 h-5" />
+            <div className="flex items-center gap-2 sm:gap-4 p-2.5 sm:p-4 rounded-xl bg-brand-secondary border border-brand-accent/30">
+              <div className="p-1.5 sm:p-2 rounded-full bg-brand-accent text-black">
+                <Clock className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
               </div>
-              <div>
-                <div className="text-xs font-bold text-brand-muted">Status</div>
-                <div className="text-sm font-black text-white">ENROLLMENT OPEN</div>
+              <div className="flex sm:flex-col items-center sm:items-start gap-1 sm:gap-0">
+                <div className="text-[9px] sm:text-xs font-bold text-brand-muted">Status</div>
+                <div className="text-[10px] sm:text-sm font-black text-white">ENROLLMENT OPEN</div>
               </div>
             </div>
           </div>
  
-          {/* High-End Styled Day Switcher */}
-          <div className="flex flex-wrap items-center gap-2 mb-10 border-b border-brand-border/40 pb-6">
-            {['All', 'Saturday', 'Sunday', 'Tuesday', 'Wednesday', 'Thursday'].map((day) => {
-              const isActive = selectedScheduleDay === day;
+          {/* Day Switcher */}
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-6 sm:mb-10 border-b border-brand-border/40 pb-4 sm:pb-6">
+            {['All', 'Sat', 'Sun', 'Tue', 'Wed', 'Thu'].map((day) => {
+              const fullDay = day === 'All' ? 'All' : 
+                day === 'Sat' ? 'Saturday' :
+                day === 'Sun' ? 'Sunday' :
+                day === 'Tue' ? 'Tuesday' :
+                day === 'Wed' ? 'Wednesday' : 'Thursday';
+              const isActive = selectedScheduleDay === fullDay;
               return (
                 <button
                   key={day}
-                  onClick={() => setSelectedScheduleDay(day)}
-                  className={`relative px-5 py-2.5 text-[11px] sm:text-xs font-black uppercase tracking-widest transition-all rounded-full min-h-[44px] cursor-pointer flex items-center justify-center border leading-none ${
+                  onClick={() => setSelectedScheduleDay(fullDay)}
+                  className={`relative px-3 sm:px-5 py-2 sm:py-2.5 text-[10px] sm:text-xs font-black uppercase tracking-wider sm:tracking-widest transition-all rounded-full min-h-[36px] sm:min-h-[44px] cursor-pointer flex items-center justify-center border leading-none ${
                     isActive
                       ? 'bg-brand-accent text-black border-brand-accent shadow-md shadow-brand-accent/25'
                       : 'bg-brand-secondary/80 text-brand-muted border-brand-border/80 hover:text-white hover:border-brand-accent/40'
@@ -986,11 +992,14 @@ export default function PortfolioPage() {
             })}
           </div>
  
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             <AnimatePresence mode="popLayout">
               {currentSchedule
                 .filter((item: any) => selectedScheduleDay === 'All' || item.day === selectedScheduleDay)
-                .map((item: any, idx: number) => (
+                .map((item: any, idx: number) => {
+                  const dayColors = ['text-brand-accent', 'text-amber-400', 'text-rose-400', 'text-sky-400', 'text-purple-400'];
+                  const dayColor = dayColors[idx % dayColors.length];
+                  return (
                   <motion.div 
                     layout
                     key={item.day}
@@ -998,32 +1007,35 @@ export default function PortfolioPage() {
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: -10 }}
                     transition={{ duration: 0.3, delay: idx * 0.05 }}
-                    className="p-5 sm:p-8 rounded-3xl bg-brand-secondary/95 backdrop-blur-sm border border-brand-border hover:border-brand-accent hover:shadow-[0_0_20px_rgba(252,255,0,0.03)] transition-all duration-300 group"
+                    className="p-4 sm:p-8 rounded-2xl sm:rounded-3xl bg-brand-secondary/95 backdrop-blur-sm border border-brand-border hover:border-brand-accent hover:shadow-[0_0_20px_rgba(252,255,0,0.03)] transition-all duration-300 group"
                   >
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-brand-accent/10 group-hover:border-brand-accent/20 transition-colors">
-                        <Calendar className="w-4 h-4 text-brand-accent" />
+                    <div className="flex items-center gap-2.5 sm:gap-3 mb-4 sm:mb-6">
+                      <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center transition-colors`}>
+                        <Calendar className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${dayColor}`} />
                       </div>
-                      <h4 className="text-xl font-display font-black tracking-tight text-white group-hover:text-brand-accent transition-colors">{item.day}</h4>
+                      <h4 className={`text-base sm:text-xl font-display font-black tracking-tight transition-colors group-hover:text-brand-accent ${dayColor}`}>{item.day}</h4>
                     </div>
-                    <div className="space-y-4">
-                      {item.classes.map((cls: any, cIdx: number) => (
-                        <div key={cIdx} className="group cursor-default relative pl-3 border-l border-brand-border/60 hover:border-brand-accent transition-colors">
-                          <div className="text-xs font-mono text-brand-muted mb-1">{cls.time}</div>
-                          <div className="text-lg font-bold text-white group-hover:text-brand-accent transition-colors">{cls.activity}</div>
+                    <div className="space-y-3 sm:space-y-4">
+                      {item.classes.map((cls: any, cIdx: number) => {
+                        const activityColors = ['text-white', 'text-amber-200', 'text-rose-200', 'text-sky-200', 'text-purple-200', 'text-emerald-200'];
+                        const activityColor = activityColors[cIdx % activityColors.length];
+                        return (
+                        <div key={cIdx} className="group cursor-default relative pl-2.5 sm:pl-3 border-l transition-colors hover:border-brand-accent" style={{ borderColor: ['rgba(204,255,0,0.3)', 'rgba(251,191,36,0.3)', 'rgba(244,63,94,0.3)', 'rgba(56,189,248,0.3)', 'rgba(167,139,250,0.3)', 'rgba(52,211,153,0.3)'][cIdx % 6] }}>
+                          <div className="text-[11px] sm:text-xs font-mono text-brand-muted mb-0.5 sm:mb-1">{cls.time}</div>
+                          <div className={`text-sm sm:text-lg font-bold transition-colors group-hover:text-brand-accent ${activityColor}`}>{cls.activity}</div>
                         </div>
-                      ))}
+                      )})}
                     </div>
                   </motion.div>
-                ))}
+                )})}
             </AnimatePresence>
             
-            {/* Opening slots placeholder card rendered only when 'All' is selected to maintain grid balance */}
+            {/* Opening slots placeholder card */}
             {selectedScheduleDay === 'All' && (
-              <div className="flex p-5 sm:p-8 rounded-3xl border border-dashed border-brand-border flex-col items-center justify-center text-center min-h-[120px] sm:min-h-[200px]">
-                <div className="space-y-3 sm:space-y-4">
-                  <Zap className="w-6 h-6 sm:w-8 sm:h-8 text-brand-accent/40 mx-auto" />
-                  <p className="text-[11px] sm:text-xs font-bold text-brand-muted tracking-widest uppercase leading-relaxed">New slots opening soon</p>
+              <div className="flex p-4 sm:p-8 rounded-2xl sm:rounded-3xl border border-dashed border-brand-border flex-col items-center justify-center text-center min-h-[100px] sm:min-h-[200px]">
+                <div className="space-y-2 sm:space-y-4">
+                  <Zap className="w-5 h-5 sm:w-8 sm:h-8 text-brand-accent/40 mx-auto" />
+                  <p className="text-[10px] sm:text-xs font-bold text-brand-muted tracking-widest uppercase leading-relaxed">New slots opening soon</p>
                 </div>
               </div>
             )}
@@ -1041,70 +1053,113 @@ export default function PortfolioPage() {
         <BoxingGloveGraphic className="absolute -right-16 bottom-[10%] w-80 h-80 text-brand-muted/15 -rotate-12 pointer-events-none select-none" />
 
         <div className="container max-w-7xl mx-auto relative z-10">
-          <div className="grid lg:grid-cols-12 gap-10 lg:gap-16">
+          <div className="grid lg:grid-cols-12 gap-6 lg:gap-16">
             <div className="lg:col-span-4 lg:sticky lg:top-32 h-fit">
-              <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-brand-accent mb-4 sm:mb-6 font-display">The Journey</h2>
-              <h3 className="text-3xl sm:text-5xl font-display font-black leading-none tracking-tighter mb-6 sm:mb-8 text-white">
+              <h2 className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.3em] text-brand-accent mb-2 sm:mb-6 font-display">The Journey</h2>
+              <h3 className="text-2xl sm:text-5xl font-display font-black leading-none tracking-tighter mb-3 sm:mb-8 text-white">
                 PROFESSIONAL <br /> EXPERIENCE
               </h3>
-              <p className="text-brand-muted mb-8">
+              <p className="text-xs sm:text-base text-brand-muted mb-4 sm:mb-8 leading-relaxed">
                 A track record of leadership and institutional development in combat sports across Bangladesh.
               </p>
-              <div className="p-6 rounded-2xl bg-brand-secondary border border-brand-border">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="p-3 rounded-full bg-brand-primary text-brand-accent">
-                    <Users className="w-5 h-5" />
+              <div className="hidden sm:block p-4 sm:p-6 rounded-2xl bg-brand-secondary border border-brand-border">
+                <div className="flex items-center gap-3 sm:gap-4 mb-2 sm:mb-4">
+                  <div className="p-2 sm:p-3 rounded-full bg-brand-primary text-brand-accent">
+                    <Users className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
-                  <div className="text-sm font-bold text-white">Available for consultation</div>
+                  <div className="text-xs sm:text-sm font-bold text-white">Available for consultation</div>
                 </div>
-                <p className="text-xs text-brand-muted">Expertise in club management, event organization, and curriculum design.</p>
+                <p className="text-[11px] sm:text-xs text-brand-muted leading-relaxed">Expertise in club management, event organization, and curriculum design.</p>
               </div>
             </div>
             
-            {/* Desktop: full timeline */}
-            <div className="hidden lg:block lg:col-span-8 space-y-12">
-              {currentExperience.map((exp: any, idx: number) => (
-                <div key={idx} className="relative pl-8 border-l border-brand-border pb-12 last:pb-0">
-                  <div className="absolute left-[-5px] top-0 w-2 h-2 rounded-full bg-brand-accent" />
-                  <div className="text-xs font-bold text-brand-muted uppercase tracking-widest mb-2">{exp.period}</div>
-                  <div className="text-xl sm:text-3xl font-display font-black mb-1 group flex items-center gap-3 text-white">
-                    {exp.role}
+            {/* Desktop: full timeline with accordion */}
+            <div className="hidden lg:block lg:col-span-8">
+              {/* First 3 items always visible */}
+              <div className="space-y-12">
+                {currentExperience.slice(0, 3).map((exp: any, idx: number) => (
+                  <div key={idx} className="relative pl-8 border-l border-brand-border pb-12 last:pb-0">
+                    <div className="absolute left-[-5px] top-0 w-2 h-2 rounded-full bg-brand-accent" />
+                    <div className="text-xs font-bold text-brand-muted uppercase tracking-widest mb-2">{exp.period}</div>
+                    <div className="text-xl sm:text-3xl font-display font-black mb-1 group flex items-center gap-3 text-white">
+                      {exp.role}
+                    </div>
+                    <div className="text-base sm:text-lg font-bold text-brand-accent mb-4">{exp.company}</div>
+                    <p className="text-sm sm:text-base text-brand-muted leading-relaxed max-w-2xl">{exp.description}</p>
                   </div>
-                  <div className="text-base sm:text-lg font-bold text-brand-accent mb-4">{exp.company}</div>
-                  <p className="text-sm sm:text-base text-brand-muted leading-relaxed max-w-2xl">{exp.description}</p>
-                </div>
-              ))}
+                ))}
+              </div>
+
+              {/* Accordion for remaining items */}
+              {currentExperience.length > 3 && (
+                <>
+                  <motion.div 
+                    initial={false}
+                    animate={{ height: showAllExperience ? 'auto' : 0, opacity: showAllExperience ? 1 : 0 }}
+                    transition={{ duration: 0.4, ease: 'easeInOut' }}
+                    className="overflow-hidden"
+                  >
+                    <div className="space-y-12 pt-12">
+                      {currentExperience.slice(3).map((exp: any, idx: number) => (
+                        <div key={idx} className="relative pl-8 border-l border-brand-border/60 pb-12 last:pb-0">
+                          <div className="absolute left-[-5px] top-0 w-2 h-2 rounded-full bg-brand-accent/60" />
+                          <div className="text-xs font-bold text-brand-muted uppercase tracking-widest mb-2">{exp.period}</div>
+                          <div className="text-xl sm:text-3xl font-display font-black mb-1 group flex items-center gap-3 text-white">
+                            {exp.role}
+                          </div>
+                          <div className="text-base sm:text-lg font-bold text-brand-accent mb-4">{exp.company}</div>
+                          <p className="text-sm sm:text-base text-brand-muted leading-relaxed max-w-2xl">{exp.description}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+
+                  <button
+                    onClick={() => setShowAllExperience(!showAllExperience)}
+                    className="mt-8 inline-flex items-center gap-2 px-6 py-3.5 bg-brand-secondary border border-brand-border hover:border-brand-accent/40 text-white font-bold uppercase tracking-widest text-xs rounded-full transition-all duration-300 hover:bg-brand-accent hover:text-black group"
+                  >
+                    {showAllExperience ? 'Show Less' : `Show ${currentExperience.length - 3} More`}
+                    <motion.span
+                      animate={{ rotate: showAllExperience ? 180 : 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="inline-block"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </motion.span>
+                  </button>
+                </>
+              )}
             </div>
 
             {/* Mobile: vertical carousel */}
             <div
-              className="lg:hidden lg:col-span-8 relative min-h-[280px]"
+              className="lg:hidden relative"
               onMouseEnter={() => setIsExperienceHovered(true)}
               onMouseLeave={() => setIsExperienceHovered(false)}
               onTouchStart={() => setIsExperienceHovered(true)}
               onTouchEnd={() => setTimeout(() => setIsExperienceHovered(false), 3000)}
             >
-              <div className="relative overflow-hidden min-h-[260px]">
+              <div className="relative overflow-hidden min-h-[200px]">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={experienceIdx}
-                    initial={{ opacity: 0, y: 40 }}
+                    initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -30 }}
-                    transition={{ duration: 0.4, ease: 'easeInOut' }}
-                    className="relative pl-8 border-l-2 border-brand-accent/40"
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.35, ease: 'easeInOut' }}
+                    className="relative pl-6 border-l-2 border-brand-accent/40"
                   >
-                    <div className="absolute left-[-7px] top-0 w-3 h-3 rounded-full bg-brand-accent shadow-[0_0_10px_rgba(204,255,0,0.3)]" />
-                    <div className="text-[11px] font-bold text-brand-muted uppercase tracking-widest mb-2">
+                    <div className="absolute left-[-6px] top-0 w-2.5 h-2.5 rounded-full bg-brand-accent shadow-[0_0_8px_rgba(204,255,0,0.25)]" />
+                    <div className="text-[10px] font-bold text-brand-muted uppercase tracking-widest mb-1">
                       {currentExperience[experienceIdx]?.period}
                     </div>
-                    <div className="text-xl sm:text-2xl font-display font-black mb-1 text-white">
+                    <div className="text-lg font-display font-black mb-0.5 text-white">
                       {currentExperience[experienceIdx]?.role}
                     </div>
-                    <div className="text-base font-bold text-brand-accent mb-3">
+                    <div className="text-sm font-bold text-brand-accent mb-2">
                       {currentExperience[experienceIdx]?.company}
                     </div>
-                    <p className="text-sm text-brand-muted leading-relaxed">
+                    <p className="text-xs text-brand-muted leading-relaxed">
                       {currentExperience[experienceIdx]?.description}
                     </p>
                   </motion.div>
@@ -1112,15 +1167,15 @@ export default function PortfolioPage() {
               </div>
 
               {/* Dot indicators */}
-              <div className="flex items-center justify-center gap-2 mt-6">
+              <div className="flex items-center justify-center gap-1.5 mt-4">
                 {currentExperience.map((_, idx) => (
                   <button
                     key={idx}
                     onClick={() => setExperienceIdx(idx)}
                     className={`rounded-full transition-all duration-300 cursor-pointer ${
                       idx === experienceIdx
-                        ? 'w-6 h-2 bg-brand-accent'
-                        : 'w-2 h-2 bg-brand-border hover:bg-brand-muted'
+                        ? 'w-5 h-1.5 bg-brand-accent'
+                        : 'w-1.5 h-1.5 bg-brand-border hover:bg-brand-muted'
                     }`}
                     aria-label={`Go to experience ${idx + 1}`}
                   />
