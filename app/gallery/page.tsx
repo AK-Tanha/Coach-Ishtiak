@@ -70,7 +70,7 @@ export default function GalleryPage() {
           <button
             key={cat}
             onClick={() => setFilter(cat)}
-            className={`px-4 py-2 sm:px-6 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold uppercase tracking-wider border transition-all cursor-pointer min-h-[40px] flex items-center justify-center ${
+            className={`px-4 py-2 sm:px-6 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold uppercase tracking-wider border transition-all cursor-pointer min-h-[44px] flex items-center justify-center ${
               filter === cat 
                 ? 'bg-brand-accent text-black border-brand-accent' 
                 : 'bg-transparent text-brand-muted border-brand-border hover:border-brand-accent/50'

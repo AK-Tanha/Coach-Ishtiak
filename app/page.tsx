@@ -247,6 +247,8 @@ export default function PortfolioPage() {
   const [isCarouselHovered, setIsCarouselHovered] = React.useState(false);
 
   const [formData, setFormData] = React.useState({ name: '', email: '', message: '' });
+  const [formErrors, setFormErrors] = React.useState<{name?: string; email?: string; message?: string}>({});
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [successToast, setSuccessToast] = React.useState(false);
   const [selectedScheduleDay, setSelectedScheduleDay] = React.useState<string>('All');
 
@@ -395,19 +397,41 @@ export default function PortfolioPage() {
     return () => clearInterval(timer);
   }, [isCarouselHovered]);
 
+  const validateForm = (): boolean => {
+    const errors: {name?: string; email?: string; message?: string} = {};
+    if (!formData.name || formData.name.trim().length < 2) {
+      errors.name = 'Name must be at least 2 characters';
+    }
+    if (!formData.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      errors.email = 'Please enter a valid email address';
+    }
+    if (!formData.message || formData.message.trim().length < 10) {
+      errors.message = 'Message must be at least 10 characters';
+    }
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.email || !formData.message) return;
+    setFormErrors({});
+    if (!validateForm()) return;
 
-    await inquiriesApi.create({
-      name: formData.name,
-      email: formData.email,
-      message: formData.message,
-    });
-
-    setSuccessToast(true);
-    setFormData({ name: '', email: '', message: '' });
-    setTimeout(() => setSuccessToast(false), 5000);
+    setIsSubmitting(true);
+    try {
+      await inquiriesApi.create({
+        name: formData.name,
+        email: formData.email,
+        message: formData.message,
+      });
+      setSuccessToast(true);
+      setFormData({ name: '', email: '', message: '' });
+      setTimeout(() => setSuccessToast(false), 5000);
+    } catch {
+      setFormErrors({ message: 'Failed to send. Please try again.' });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % (heroSettings.images?.length || 3));
@@ -468,11 +492,11 @@ export default function PortfolioPage() {
               transition={{ duration: 0.3, ease: 'easeInOut' }}
               className="lg:hidden overflow-hidden border-t border-brand-border/50 bg-brand-primary/95 backdrop-blur-md"
             >
-              <div className="px-4 py-6 space-y-4 flex flex-col font-display font-bold uppercase tracking-widest text-xs">
+              <div className="px-4 py-6 space-y-1 flex flex-col font-display font-bold uppercase tracking-widest text-xs">
                 <a 
                   href="#about" 
                   onClick={() => setMenuOpen(false)}
-                  className="py-2.5 border-b border-brand-border/30 text-white hover:text-brand-accent transition-colors flex items-center justify-between"
+                  className="py-3 sm:py-2.5 border-b border-brand-border/30 text-white hover:text-brand-accent transition-colors flex items-center justify-between min-h-[48px]"
                 >
                   <span>About Coach</span>
                   <ChevronRight className="w-4 h-4 text-brand-accent/60" />
@@ -480,7 +504,7 @@ export default function PortfolioPage() {
                 <a 
                   href="#schedule" 
                   onClick={() => setMenuOpen(false)}
-                  className="py-2.5 border-b border-brand-border/30 text-white hover:text-brand-accent transition-colors flex items-center justify-between"
+                  className="py-3 sm:py-2.5 border-b border-brand-border/30 text-white hover:text-brand-accent transition-colors flex items-center justify-between min-h-[48px]"
                 >
                   <span>Class Schedule</span>
                   <ChevronRight className="w-4 h-4 text-brand-accent/60" />
@@ -488,7 +512,7 @@ export default function PortfolioPage() {
                 <Link 
                   href="/gallery" 
                   onClick={() => setMenuOpen(false)}
-                  className="py-2.5 border-b border-brand-border/30 text-white hover:text-brand-accent transition-colors flex items-center justify-between"
+                  className="py-3 sm:py-2.5 border-b border-brand-border/30 text-white hover:text-brand-accent transition-colors flex items-center justify-between min-h-[48px]"
                 >
                   <span>Gallery</span>
                   <ChevronRight className="w-4 h-4 text-brand-accent/60" />
@@ -496,7 +520,7 @@ export default function PortfolioPage() {
                 <Link 
                   href="/shop" 
                   onClick={() => setMenuOpen(false)}
-                  className="py-2.5 border-b border-brand-border/30 text-white hover:text-brand-accent transition-colors flex items-center justify-between"
+                  className="py-3 sm:py-2.5 border-b border-brand-border/30 text-white hover:text-brand-accent transition-colors flex items-center justify-between min-h-[48px]"
                 >
                   <span className="flex items-center gap-2">
                     Shop
@@ -507,7 +531,7 @@ export default function PortfolioPage() {
                 <a 
                   href="#pricing" 
                   onClick={() => setMenuOpen(false)}
-                  className="py-2.5 border-b border-brand-border/30 text-white hover:text-brand-accent transition-colors flex items-center justify-between"
+                  className="py-3 sm:py-2.5 border-b border-brand-border/30 text-white hover:text-brand-accent transition-colors flex items-center justify-between min-h-[48px]"
                 >
                   <span>Pricing plans</span>
                   <ChevronRight className="w-4 h-4 text-brand-accent/60" />
@@ -515,7 +539,7 @@ export default function PortfolioPage() {
                 <a 
                   href="#contact" 
                   onClick={() => setMenuOpen(false)}
-                  className="py-2.5 border-b border-brand-border/30 text-white hover:text-brand-accent transition-colors flex items-center justify-between"
+                  className="py-3 sm:py-2.5 border-b border-brand-border/30 text-white hover:text-brand-accent transition-colors flex items-center justify-between min-h-[48px]"
                 >
                   <span>Get In Touch</span>
                   <ChevronRight className="w-4 h-4 text-brand-accent/60" />
@@ -523,7 +547,7 @@ export default function PortfolioPage() {
                 <Link 
                   href="/admin" 
                   onClick={() => setMenuOpen(false)}
-                  className="py-2.5 text-brand-accent hover:text-white transition-colors flex items-center justify-between font-extrabold"
+                  className="py-3 sm:py-2.5 text-brand-accent hover:text-white transition-colors flex items-center justify-between font-extrabold min-h-[48px]"
                 >
                   <span>Coach Console 🛡️</span>
                   <ChevronRight className="w-4 h-4 text-brand-accent" />
@@ -533,6 +557,21 @@ export default function PortfolioPage() {
           )}
         </AnimatePresence>
       </nav>
+
+      {/* Mobile Menu Backdrop */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 lg:hidden"
+            onClick={() => setMenuOpen(false)}
+            aria-hidden="true"
+          />
+        )}
+      </AnimatePresence>
 
       {/* Hero Section */}
       <section className="relative pt-28 pb-12 sm:pt-44 sm:pb-20 px-4 sm:px-6 overflow-hidden border-b-2 border-brand-border bg-black">
@@ -750,14 +789,38 @@ export default function PortfolioPage() {
         <MmaCageDecal className="absolute -left-36 -bottom-36 w-[600px] h-[600px] text-brand-muted/10 -rotate-12 pointer-events-none select-none" />
  
         <div className="container max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
-            {/* Left Column: Premium Coach Action Image */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
+            {/* Right Column: Title, Headline, and Descriptions - first on mobile */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.15 }}
+              className="lg:col-span-7 flex flex-col justify-center order-1 lg:order-1"
+            >
+              <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-brand-accent mb-4 sm:mb-6 font-display">{aboutSettings.heading}</h2>
+              
+              <h3 className="text-2xl sm:text-4xl md:text-5xl font-display font-black leading-tight tracking-tighter mb-6 sm:mb-8 text-white uppercase">
+                {aboutSettings.subheading}
+              </h3>
+  
+              <div className="space-y-6 sm:space-y-8 text-brand-muted text-sm sm:text-base md:text-lg leading-relaxed font-sans">
+                <p className="whitespace-pre-line">
+                  {aboutSettings.para1}
+                </p>
+                <p className="whitespace-pre-line">
+                  {aboutSettings.para2}
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Left Column: Premium Coach Action Image - second on mobile */}
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
-              className="lg:col-span-5 relative group"
+              className="lg:col-span-5 relative group order-2 lg:order-2"
             >
               <div className="relative h-[320px] sm:h-[480px] lg:h-[560px] w-full rounded-[2.5rem] overflow-hidden border border-brand-border/80 group-hover:border-brand-accent/40 transition-all duration-500 shadow-2xl shadow-black/60">
                 <Image 
@@ -771,30 +834,6 @@ export default function PortfolioPage() {
                 <div className="absolute top-5 left-5 bg-black/80 backdrop-blur-md px-3.5 py-1.5 border border-white/10 rounded-full text-[9px] font-mono uppercase tracking-widest text-[#BFFF00]">
                   {aboutSettings.badge}
                 </div>
-              </div>
-            </motion.div>
- 
-            {/* Right Column: Title, Headline, and Descriptions */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.15 }}
-              className="lg:col-span-7 flex flex-col justify-center"
-            >
-              <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-brand-accent mb-4 sm:mb-6 font-display">{aboutSettings.heading}</h2>
-              
-              <h3 className="text-2xl sm:text-4xl md:text-5xl font-display font-black leading-tight tracking-tighter mb-6 sm:mb-8 text-white uppercase">
-                {aboutSettings.subheading}
-              </h3>
- 
-              <div className="space-y-6 sm:space-y-8 text-brand-muted text-sm sm:text-base md:text-lg leading-relaxed font-sans">
-                <p className="whitespace-pre-line">
-                  {aboutSettings.para1}
-                </p>
-                <p className="whitespace-pre-line">
-                  {aboutSettings.para2}
-                </p>
               </div>
             </motion.div>
           </div>
@@ -868,7 +907,7 @@ export default function PortfolioPage() {
                 <button
                   key={day}
                   onClick={() => setSelectedScheduleDay(day)}
-                  className={`relative px-5 py-2.5 text-xs font-black uppercase tracking-widest transition-all rounded-full min-h-[40px] cursor-pointer flex items-center justify-center border leading-none ${
+                  className={`relative px-5 py-2.5 text-[11px] sm:text-xs font-black uppercase tracking-widest transition-all rounded-full min-h-[44px] cursor-pointer flex items-center justify-center border leading-none ${
                     isActive
                       ? 'bg-brand-accent text-black border-brand-accent shadow-md shadow-brand-accent/25'
                       : 'bg-brand-secondary/80 text-brand-muted border-brand-border/80 hover:text-white hover:border-brand-accent/40'
@@ -892,7 +931,7 @@ export default function PortfolioPage() {
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: -10 }}
                     transition={{ duration: 0.3, delay: idx * 0.05 }}
-                    className="p-8 rounded-3xl bg-brand-secondary/95 backdrop-blur-sm border border-brand-border hover:border-brand-accent hover:shadow-[0_0_20px_rgba(252,255,0,0.03)] transition-all duration-300 group"
+                    className="p-5 sm:p-8 rounded-3xl bg-brand-secondary/95 backdrop-blur-sm border border-brand-border hover:border-brand-accent hover:shadow-[0_0_20px_rgba(252,255,0,0.03)] transition-all duration-300 group"
                   >
                     <div className="flex items-center gap-3 mb-6">
                       <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-brand-accent/10 group-hover:border-brand-accent/20 transition-colors">
@@ -914,10 +953,10 @@ export default function PortfolioPage() {
             
             {/* Opening slots placeholder card rendered only when 'All' is selected to maintain grid balance */}
             {selectedScheduleDay === 'All' && (
-              <div className="hidden lg:flex p-8 rounded-3xl border border-dashed border-brand-border flex-col items-center justify-center text-center">
-                <div className="space-y-4">
-                  <Zap className="w-8 h-8 text-brand-accent/40 mx-auto" />
-                  <p className="text-xs font-bold text-brand-muted tracking-widest uppercase">New slots opening soon</p>
+              <div className="flex p-5 sm:p-8 rounded-3xl border border-dashed border-brand-border flex-col items-center justify-center text-center min-h-[120px] sm:min-h-[200px]">
+                <div className="space-y-3 sm:space-y-4">
+                  <Zap className="w-6 h-6 sm:w-8 sm:h-8 text-brand-accent/40 mx-auto" />
+                  <p className="text-[11px] sm:text-xs font-bold text-brand-muted tracking-widest uppercase leading-relaxed">New slots opening soon</p>
                 </div>
               </div>
             )}
@@ -1358,10 +1397,11 @@ export default function PortfolioPage() {
                   <motion.div 
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
                     className="p-4 bg-brand-accent/10 border border-brand-accent text-brand-accent rounded-2xl text-xs font-black uppercase tracking-wider flex items-center gap-3"
                   >
                     <CheckCircle2 className="w-5 h-5 text-brand-accent shrink-0" />
-                    <span>Message logged! Athlete lead created in Coach Console.</span>
+                    <span>Message sent! We&apos;ll reply within 24 hours.</span>
                   </motion.div>
                 )}
                 <div className="space-y-2">
@@ -1370,11 +1410,20 @@ export default function PortfolioPage() {
                     type="text" 
                     id="name"
                     value={formData.name}
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                    onChange={(e) => {
+                      setFormData({...formData, name: e.target.value});
+                      if (formErrors.name) setFormErrors({...formErrors, name: undefined});
+                    }}
                     placeholder="John Doe"
-                    className="w-full bg-brand-primary border border-brand-border rounded-2xl py-4 px-6 focus:outline-none focus:border-brand-accent transition-colors text-white placeholder:text-white/10"
+                    className={`w-full bg-brand-primary border rounded-2xl py-4 px-6 focus:outline-none focus:border-brand-accent transition-colors text-white placeholder:text-white/20 text-base min-h-[44px] ${
+                      formErrors.name ? 'border-red-500/60' : 'border-brand-border'
+                    }`}
                     required
+                    minLength={2}
                   />
+                  {formErrors.name && (
+                    <p className="text-red-400 text-xs font-medium mt-1 ml-1">{formErrors.name}</p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <label htmlFor="email" className="text-xs font-black uppercase tracking-widest text-brand-muted ml-1">Email Address</label>
@@ -1382,11 +1431,19 @@ export default function PortfolioPage() {
                     type="email" 
                     id="email"
                     value={formData.email}
-                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                    onChange={(e) => {
+                      setFormData({...formData, email: e.target.value});
+                      if (formErrors.email) setFormErrors({...formErrors, email: undefined});
+                    }}
                     placeholder="john@example.com"
-                    className="w-full bg-brand-primary border border-brand-border rounded-2xl py-4 px-6 focus:outline-none focus:border-brand-accent transition-colors text-white placeholder:text-white/10"
+                    className={`w-full bg-brand-primary border rounded-2xl py-4 px-6 focus:outline-none focus:border-brand-accent transition-colors text-white placeholder:text-white/20 text-base min-h-[44px] ${
+                      formErrors.email ? 'border-red-500/60' : 'border-brand-border'
+                    }`}
                     required
                   />
+                  {formErrors.email && (
+                    <p className="text-red-400 text-xs font-medium mt-1 ml-1">{formErrors.email}</p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <label htmlFor="message" className="text-xs font-black uppercase tracking-widest text-brand-muted ml-1">Your Message</label>
@@ -1394,18 +1451,37 @@ export default function PortfolioPage() {
                     id="message"
                     rows={4}
                     value={formData.message}
-                    onChange={(e) => setFormData({...formData, message: e.target.value})}
+                    onChange={(e) => {
+                      setFormData({...formData, message: e.target.value});
+                      if (formErrors.message) setFormErrors({...formErrors, message: undefined});
+                    }}
                     placeholder="I'm interested in the 3-month MMA course..."
-                    className="w-full bg-brand-primary border border-brand-border rounded-2xl py-4 px-6 focus:outline-none focus:border-brand-accent transition-colors text-white placeholder:text-white/10"
+                    className={`w-full bg-brand-primary border rounded-2xl py-4 px-6 focus:outline-none focus:border-brand-accent transition-colors text-white placeholder:text-white/20 text-base min-h-[120px] ${
+                      formErrors.message ? 'border-red-500/60' : 'border-brand-border'
+                    }`}
                     required
+                    minLength={10}
                   />
+                  {formErrors.message && (
+                    <p className="text-red-400 text-xs font-medium mt-1 ml-1">{formErrors.message}</p>
+                  )}
                 </div>
                 <button 
                   type="submit"
-                  className="w-full py-5 bg-brand-accent text-black font-black uppercase tracking-widest text-sm rounded-2xl hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-brand-accent/20 flex items-center justify-center gap-3 group cursor-pointer"
+                  disabled={isSubmitting}
+                  className="w-full py-5 bg-brand-accent text-black font-black uppercase tracking-widest text-sm rounded-2xl hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-brand-accent/20 flex items-center justify-center gap-3 group cursor-pointer disabled:opacity-60 disabled:hover:scale-100 min-h-[48px]"
                 >
-                  Send Message
-                  <Send className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                  {isSubmitting ? (
+                    <>
+                      <span className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                      <span>Sending...</span>
+                    </>
+                  ) : (
+                    <>
+                      Send Message
+                      <Send className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                    </>
+                  )}
                 </button>
               </form>
             </motion.div>

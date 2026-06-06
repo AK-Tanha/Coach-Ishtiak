@@ -351,7 +351,7 @@ export default function ShopPage() {
                 <button
                   key={cat}
                   onClick={() => setFilter(cat)}
-                  className={`px-5 py-2.5 sm:px-6 rounded-full font-bold uppercase tracking-wider border transition-all duration-300 cursor-pointer min-h-[42px] flex items-center justify-center gap-2 group ${
+                  className={`px-5 py-2.5 sm:px-6 rounded-full font-bold uppercase tracking-wider border transition-all duration-300 cursor-pointer min-h-[44px] flex items-center justify-center gap-2 group ${
                     filter === cat 
                       ? 'bg-brand-accent text-black border-brand-accent shadow-[0_4px_15px_rgba(204,255,0,0.18)] font-black' 
                       : 'bg-[#15151b] text-brand-muted border-brand-border/60 hover:border-brand-accent/50 hover:text-white'
