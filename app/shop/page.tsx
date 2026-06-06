@@ -21,6 +21,7 @@ import {
   Sliders,
   Sparkles
 } from 'lucide-react';
+import { orders as ordersApi, products as productsApi, loadWithFallback } from '@/lib/api';
 
 const defaultProducts = [
   {
@@ -143,35 +144,29 @@ export default function ShopPage() {
   const cartLoadedRef = React.useRef(false);
 
   React.useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const loadFromStorage = () => {
-        const stored = localStorage.getItem('invictus_products');
-        if (stored) {
-          try {
-            const parsed = JSON.parse(stored);
-            if (Array.isArray(parsed) && parsed.length > 0) {
-              // Merge default specs for any products loaded from storage without them
-              const merged = parsed.map((p: any) => {
-                const def = defaultProducts.find(dp => dp.id === p.id);
-                return {
-                  ...p,
-                  specs: p.specs || def?.specs || {
-                    material: "Industrial Sport-Grade Grade",
-                    weight: "Standard Fit",
-                    tier: "Elite Edition",
-                    durability: "95%",
-                    absorption: "90%"
-                  }
-                };
-              });
-              setProducts(merged);
-            }
-          } catch (e) {
-            setProducts(defaultProducts);
-          }
-        } else {
-          localStorage.setItem('invictus_products', JSON.stringify(defaultProducts));
-          setProducts(defaultProducts);
+    if (typeof window !== 'undefined' && !cartLoadedRef.current) {
+      const loadData = async () => {
+        // Load products from API with fallback
+        const result = await loadWithFallback(
+          () => productsApi.list(),
+          'invictus_products',
+          defaultProducts
+        );
+        if (Array.isArray(result) && result.length > 0) {
+          const merged = result.map((p: any) => {
+            const def = defaultProducts.find(dp => dp.id === p.id);
+            return {
+              ...p,
+              specs: p.specs || def?.specs || {
+                material: "Industrial Sport-Grade Grade",
+                weight: "Standard Fit",
+                tier: "Elite Edition",
+                durability: "95%",
+                absorption: "90%"
+              }
+            };
+          });
+          setProducts(merged);
         }
 
         const storedCart = localStorage.getItem('invictus_cart');
@@ -185,7 +180,7 @@ export default function ShopPage() {
         cartLoadedRef.current = true;
       };
       
-      setTimeout(loadFromStorage, 0);
+      loadData();
     }
   }, []);
 
@@ -234,7 +229,7 @@ export default function ShopPage() {
   const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
   const cartSubtotal = cart.reduce((acc, item) => acc + (item.product.price * item.quantity), 0);
 
-  const handlePlaceOrder = (e: React.FormEvent) => {
+  const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     if (cart.length === 0) return;
 
@@ -251,6 +246,10 @@ export default function ShopPage() {
       date: new Date().toISOString().split('T')[0]
     };
 
+    // Save to API
+    await ordersApi.create(newOrder).catch(console.warn);
+
+    // Also save to localStorage as fallback
     if (typeof window !== 'undefined') {
       const existingOrdersStr = localStorage.getItem('invictus_orders');
       const existingOrders = existingOrdersStr ? JSON.parse(existingOrdersStr) : [];

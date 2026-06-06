@@ -1,0 +1,48 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { supabaseAdmin } from '@/lib/supabase-server';
+
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+
+  try {
+    const body = await request.json();
+    const { status } = body;
+
+    if (!status) {
+      return NextResponse.json(
+        { success: false, error: 'Status is required' },
+        { status: 400 }
+      );
+    }
+
+    const { data, error } = await supabaseAdmin
+      .from('orders')
+      .update({ status })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true, data });
+  } catch {
+    return NextResponse.json({ success: false, error: 'Invalid request' }, { status: 400 });
+  }
+}
+
+export async function DELETE(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+
+  const { error } = await supabaseAdmin
+    .from('orders')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ success: true });
+}

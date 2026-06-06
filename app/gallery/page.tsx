@@ -5,6 +5,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft, Maximize2, X } from 'lucide-react';
+import { gallery as galleryApi, loadWithFallback } from '@/lib/api';
+import type { GalleryImage } from '@/lib/types';
 
 const galleryImages = [
   { id: 1, url: "https://picsum.photos/seed/mma1/800/1000", title: "WBC Refereeing", category: "Events" },
@@ -21,9 +23,27 @@ const galleryImages = [
 export default function GalleryPage() {
   const [selectedImage, setSelectedImage] = React.useState<null | typeof galleryImages[0]>(null);
   const [filter, setFilter] = React.useState('All');
+  const [images, setImages] = React.useState<GalleryImage[]>(galleryImages);
+  const [loading, setLoading] = React.useState(true);
 
-  const categories = ['All', ...Array.from(new Set(galleryImages.map(img => img.category)))];
-  const filteredImages = filter === 'All' ? galleryImages : galleryImages.filter(img => img.category === filter);
+  React.useEffect(() => {
+    const load = async () => {
+      setLoading(true);
+      const result = await loadWithFallback(
+        () => galleryApi.list(),
+        'invictus_gallery',
+        galleryImages
+      );
+      if (Array.isArray(result) && result.length > 0) {
+        setImages(result);
+      }
+      setLoading(false);
+    };
+    load();
+  }, []);
+
+  const categories = ['All', ...Array.from(new Set(images.map(img => img.category)))];
+  const filteredImages = filter === 'All' ? images : images.filter(img => img.category === filter);
 
   return (
     <main className="min-h-screen bg-brand-primary text-white py-12 px-4 sm:py-20 sm:px-8 lg:px-24">

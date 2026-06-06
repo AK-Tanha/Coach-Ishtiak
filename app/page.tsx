@@ -37,6 +37,8 @@ import {
   BoxingGloveGraphic, 
   MmaGloveGraphic 
 } from '../components/CombatGraphics';
+import { schedule as scheduleApi, pricing as pricingApi, content as contentApi, experience as experienceApi, products as productsApi, inquiries as inquiriesApi, loadWithFallback } from '@/lib/api';
+import type { ScheduleDay, PricingPlan, Experience } from '@/lib/types';
 
 const heroImages = [
   {
@@ -112,14 +114,16 @@ const schedule = [
   }
 ];
 
-const pricing = [
+const defaultPricingData = [
   {
+    id: "plan-monthly",
     title: "Monthly Plan",
     price: "3,000/-",
     features: ["No Admission Fee", "All Standard Classes", "Access to MMA & Boxing"],
     highlight: false
   },
   {
+    id: "plan-quarterly",
     title: "3 Months Course",
     price: "8,000/-",
     originalPrice: "9,000/-",
@@ -229,7 +233,7 @@ export default function PortfolioPage() {
 
   // Dynamic schedule, pricing, and contact states loaded from localStorage if browser-side
   const [currentSchedule, setCurrentSchedule] = React.useState(schedule);
-  const [currentPricing, setCurrentPricing] = React.useState(pricing);
+  const [currentPricing, setCurrentPricing] = React.useState(defaultPricingData as PricingPlan[]);
   const [heroSettings, setHeroSettings] = React.useState(defaultHeroSettings);
   const [aboutSettings, setAboutSettings] = React.useState(defaultAboutSettings);
   const [currentExperience, setCurrentExperience] = React.useState(experience);
@@ -246,64 +250,96 @@ export default function PortfolioPage() {
   const [successToast, setSuccessToast] = React.useState(false);
   const [selectedScheduleDay, setSelectedScheduleDay] = React.useState<string>('All');
 
+  const loadedRef = React.useRef(false);
+
   React.useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const loadFromStorage = () => {
-        const storedSchedule = localStorage.getItem('invictus_schedule');
-        if (storedSchedule) setCurrentSchedule(JSON.parse(storedSchedule));
+    if (loadedRef.current) return;
+    loadedRef.current = true;
 
-        const storedPricing = localStorage.getItem('invictus_pricing');
-        if (storedPricing) setCurrentPricing(JSON.parse(storedPricing));
+    const loadAll = async () => {
+      // Load schedule
+      const scheduleResult = await loadWithFallback(
+        () => scheduleApi.list(),
+        'invictus_schedule',
+        schedule
+      );
+      if (Array.isArray(scheduleResult)) {
+        setCurrentSchedule(scheduleResult);
+      }
 
-        const storedHero = localStorage.getItem('invictus_hero_settings');
-        if (storedHero) setHeroSettings(JSON.parse(storedHero));
+      // Load pricing
+      const pricingResult = await loadWithFallback(
+        () => pricingApi.list(),
+        'invictus_pricing',
+        defaultPricingData
+      );
+      if (Array.isArray(pricingResult)) {
+        setCurrentPricing(pricingResult);
+      }
 
-        const storedAbout = localStorage.getItem('invictus_about_settings');
-        if (storedAbout) setAboutSettings(JSON.parse(storedAbout));
+      // Load hero settings
+      const heroResult = await loadWithFallback(
+        () => contentApi.getHero(),
+        'invictus_hero_settings',
+        defaultHeroSettings
+      );
+      if (heroResult) setHeroSettings(heroResult as typeof defaultHeroSettings);
 
-        const storedExperience = localStorage.getItem('invictus_experience');
-        if (storedExperience) setCurrentExperience(JSON.parse(storedExperience));
+      // Load about settings
+      const aboutResult = await loadWithFallback(
+        () => contentApi.getAbout(),
+        'invictus_about_settings',
+        defaultAboutSettings
+      );
+      if (aboutResult) setAboutSettings(aboutResult as typeof defaultAboutSettings);
 
-        const storedProducts = localStorage.getItem('invictus_products');
-        if (storedProducts) {
-          try {
-            const parsed = JSON.parse(storedProducts);
-            if (Array.isArray(parsed) && parsed.length > 0) {
-              setCurrentProducts(parsed);
-            }
-          } catch (e) {
-            // ignore
-          }
-        }
-      };
-      
-      setTimeout(loadFromStorage, 0);
+      // Load experience
+      const expResult = await loadWithFallback(
+        () => experienceApi.list(),
+        'invictus_experience',
+        experience
+      );
+      if (Array.isArray(expResult)) {
+        setCurrentExperience(expResult);
+      }
 
-      const handleResize = () => {
-        const width = window.innerWidth;
-        if (width >= 1024) {
-          setItemWidth(450);
-          setCarouselGap(24);
-        } else if (width >= 768) {
-          setItemWidth(380);
-          setCarouselGap(20);
-        } else if (width >= 640) {
-          setItemWidth(320);
-          setCarouselGap(16);
-        } else if (width >= 400) {
-          setItemWidth(280);
-          setCarouselGap(12);
-        } else {
-          setItemWidth(240);
-          setCarouselGap(12);
-        }
-      };
+      // Load products
+      const prodResult = await loadWithFallback(
+        () => productsApi.list(),
+        'invictus_products',
+        defaultHomepageProducts
+      );
+      if (Array.isArray(prodResult) && prodResult.length > 0) {
+        setCurrentProducts(prodResult);
+      }
+    };
+    
+    loadAll();
+    
+    const handleResize = () => {
+      const width = window.innerWidth;
+      if (width >= 1024) {
+        setItemWidth(450);
+        setCarouselGap(24);
+      } else if (width >= 768) {
+        setItemWidth(380);
+        setCarouselGap(20);
+      } else if (width >= 640) {
+        setItemWidth(320);
+        setCarouselGap(16);
+      } else if (width >= 400) {
+        setItemWidth(280);
+        setCarouselGap(12);
+      } else {
+        setItemWidth(240);
+        setCarouselGap(12);
+      }
+    };
 
-      handleResize();
-      window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
-    }
-  }, []);
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [currentProducts.length]);
 
   const nextProduct = () => {
     if (disableTransition) return;
@@ -359,39 +395,15 @@ export default function PortfolioPage() {
     return () => clearInterval(timer);
   }, [isCarouselHovered]);
 
-  const handleContactSubmit = (e: React.FormEvent) => {
+  const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.email || !formData.message) return;
 
-    if (typeof window !== 'undefined') {
-      const storedInquiriesStr = localStorage.getItem('invictus_inquiries');
-      const storedInquiries = storedInquiriesStr ? JSON.parse(storedInquiriesStr) : [];
-      
-      const newInquiry = {
-        id: "inq-" + Date.now(),
-        name: formData.name,
-        email: formData.email,
-        message: formData.message,
-        date: new Date().toISOString().split('T')[0],
-        read: false
-      };
-
-      localStorage.setItem('invictus_inquiries', JSON.stringify([newInquiry, ...storedInquiries]));
-
-      // Automatically register athlete lead as "Pending" for a brilliant simulation!
-      const storedStudentsStr = localStorage.getItem('invictus_students');
-      const storedStudents = storedStudentsStr ? JSON.parse(storedStudentsStr) : [];
-      const newStudentBooking = {
-        id: "st-" + Date.now(),
-        name: formData.name,
-        email: formData.email,
-        phone: "017" + Math.floor(10000000 + Math.random() * 90000000), // Dynamic BD number
-        course: "3 Months Course",
-        status: "Pending",
-        enrolledDate: new Date().toISOString().split('T')[0]
-      };
-      localStorage.setItem('invictus_students', JSON.stringify([newStudentBooking, ...storedStudents]));
-    }
+    await inquiriesApi.create({
+      name: formData.name,
+      email: formData.email,
+      message: formData.message,
+    });
 
     setSuccessToast(true);
     setFormData({ name: '', email: '', message: '' });

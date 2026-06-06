@@ -35,6 +35,7 @@ import {
   ShoppingBag,
   Package
 } from 'lucide-react';
+import { auth as authApi, students as studentsApi, schedule as scheduleApi, pricing as pricingApi, inquiries as inquiriesApi, products as productsApi, orders as ordersApi, experience as experienceApi, content as contentApi } from '@/lib/api';
 
 // Default mock data to populate localStorage if empty
 const defaultSchedule = [
@@ -307,13 +308,10 @@ const ImageUploader = ({
 };
 
 export default function AdminPage() {
-  const [isAuthenticated, setIsAuthenticated] = React.useState(() => {
-    if (typeof window !== 'undefined') {
-      return sessionStorage.getItem('invictus_admin_auth') === 'true';
-    }
-    return false;
-  });
-  const [passcode, setPasscode] = React.useState('');
+  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+  const [authLoading, setAuthLoading] = React.useState(true);
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
   const [loginError, setLoginError] = React.useState('');
   
   // Dashboard states
@@ -437,6 +435,12 @@ export default function AdminPage() {
   const [newClassTime, setNewClassTime] = React.useState('');
   const [newClassActivity, setNewClassActivity] = React.useState('');
 
+  // Schedule edit
+  const [editingClassDay, setEditingClassDay] = React.useState<string | null>(null);
+  const [editingClassId, setEditingClassId] = React.useState<string | null>(null);
+  const [editingClassTime, setEditingClassTime] = React.useState('');
+  const [editingClassActivity, setEditingClassActivity] = React.useState('');
+
   // Toast / System status notification
   const [systemNotification, setSystemNotification] = React.useState<{ text: string; type: 'success' | 'error' } | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
@@ -485,36 +489,92 @@ export default function AdminPage() {
 
   const syncToStorage = (key: string, data: any) => {
     localStorage.setItem(key, JSON.stringify(data));
+    syncToApi(key, data);
   };
 
-  // Auth check
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (passcode === '1234' || passcode.toLowerCase() === 'admin') {
-      setIsAuthenticated(true);
-      sessionStorage.setItem('invictus_admin_auth', 'true');
-      setLoginError('');
-      triggerNotification('Access Granted. Session Initialized.', 'success');
-    } else {
-      setLoginError('Invalid Passcode or Command. Access Denied.');
+  const syncToApi = async (key: string, data: any) => {
+    try {
+      switch (key) {
+        case 'invictus_students':
+          // Individual CRUD is handled per-action; this is a bulk fallback
+          break;
+        case 'invictus_schedule':
+          await scheduleApi.update(data);
+          break;
+        case 'invictus_pricing':
+          // Handled per-action
+          break;
+        case 'invictus_inquiries':
+          // Handled per-action
+          break;
+        case 'invictus_products':
+          // Handled per-action
+          break;
+        case 'invictus_orders':
+          // Handled per-action
+          break;
+        case 'invictus_experience':
+          // Handled per-action
+          break;
+        case 'invictus_hero_settings':
+          await contentApi.updateHero(data);
+          break;
+        case 'invictus_about_settings':
+          await contentApi.updateAbout(data);
+          break;
+      }
+    } catch (err) {
+      console.warn(`API sync failed for ${key}:`, err);
     }
   };
 
-  const handleLogout = () => {
+  // Verify token on mount
+  React.useEffect(() => {
+    const checkAuth = async () => {
+      const result = await authApi.verify();
+      if (result.success) {
+        setIsAuthenticated(true);
+      }
+      setAuthLoading(false);
+    };
+    checkAuth();
+  }, []);
+
+  // Auth check
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginError('');
+
+    if (!email || !password) {
+      setLoginError('Email and password are required.');
+      return;
+    }
+
+    const result = await authApi.login(email, password);
+    if (result.success) {
+      setIsAuthenticated(true);
+      setLoginError('');
+      triggerNotification('Access Granted. Session Initialized.', 'success');
+    } else {
+      setLoginError(result.error || 'Invalid credentials. Access Denied.');
+    }
+  };
+
+  const handleLogout = async () => {
+    await authApi.logout();
     setIsAuthenticated(false);
-    sessionStorage.removeItem('invictus_admin_auth');
-    setPasscode('');
+    setEmail('');
+    setPassword('');
     triggerNotification('Security Lock Enabled. Logged out.');
   };
 
   const handleBypass = () => {
     setIsAuthenticated(true);
-    sessionStorage.setItem('invictus_admin_auth', 'true');
     triggerNotification('Bypass Mode Authorized.', 'success');
   };
 
   // Student Actions
-  const handleAddStudent = (e: React.FormEvent) => {
+  const handleAddStudent = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newStudent.name || !newStudent.phone) {
       triggerNotification('Name and Phone are mandatory.', 'error');
@@ -526,13 +586,14 @@ export default function AdminPage() {
       email: newStudent.email || "N/A",
       phone: newStudent.phone,
       course: newStudent.course,
-      status: newStudent.status,
+      status: newStudent.status as 'Active' | 'Pending' | 'Canceled',
       enrolledDate: new Date().toISOString().split('T')[0],
       image: newStudent.image || ""
     };
     const updated = [newlyCreated, ...students];
     setStudents(updated);
     syncToStorage('invictus_students', updated);
+    studentsApi.create(newlyCreated).catch(console.warn);
     setNewStudent({ name: '', email: '', phone: '', course: '3 Months Course', status: 'Pending', image: '' });
     setAthleteSubTab('list');
     triggerNotification(`Athlete ${newlyCreated.name} successfully registered!`);
@@ -552,7 +613,7 @@ export default function AdminPage() {
     triggerNotification(`Editing record of: ${student.name}`);
   };
 
-  const saveEditedStudent = (id: string) => {
+  const saveEditedStudent = async (id: string) => {
     if (!editingStudentForm.name || !editingStudentForm.phone) {
       triggerNotification('Name and Phone are required.', 'error');
       return;
@@ -573,21 +634,23 @@ export default function AdminPage() {
     });
     setStudents(updated);
     syncToStorage('invictus_students', updated);
+    studentsApi.update(id, { ...editingStudentForm, status: editingStudentForm.status as 'Active' | 'Pending' | 'Canceled' }).catch(console.warn);
     setEditingStudentId(null);
     setAthleteSubTab('list');
     triggerNotification(`Athlete ${editingStudentForm.name} updated successfully.`);
   };
 
-  const handleDeleteStudent = (id: string, name: string) => {
+  const handleDeleteStudent = async (id: string, name: string) => {
     if (confirm(`Remove athlete ${name} registration record?`)) {
       const updated = students.filter(s => s.id !== id);
       setStudents(updated);
       syncToStorage('invictus_students', updated);
+      studentsApi.remove(id).catch(console.warn);
       triggerNotification(`Removed record lock for ${name}.`);
     }
   };
 
-  const handleToggleStudentStatus = (id: string, currentStatus: string) => {
+  const handleToggleStudentStatus = async (id: string, currentStatus: string) => {
     const nextStatus = currentStatus === 'Pending' ? 'Active' : currentStatus === 'Active' ? 'Canceled' : 'Pending';
     const updated = students.map(s => {
       if (s.id === id) {
@@ -597,30 +660,35 @@ export default function AdminPage() {
     });
     setStudents(updated);
     syncToStorage('invictus_students', updated);
+    studentsApi.update(id, { status: nextStatus }).catch(console.warn);
     triggerNotification(`Updated status to ${nextStatus}.`);
   };
 
   // Inquiry Actions
-  const handleDeleteInquiry = (id: string) => {
+  const handleDeleteInquiry = async (id: string) => {
     const updated = inquiries.filter(i => i.id !== id);
     setInquiries(updated);
     syncToStorage('invictus_inquiries', updated);
+    inquiriesApi.remove(id).catch(console.warn);
     triggerNotification('Inquiry record deleted.');
   };
 
-  const handleToggleInquiryRead = (id: string) => {
+  const handleToggleInquiryRead = async (id: string) => {
+    const target = inquiries.find(i => i.id === id);
+    const newRead = !target?.read;
     const updated = inquiries.map(i => {
       if (i.id === id) {
-        return { ...i, read: !i.read };
+        return { ...i, read: newRead };
       }
       return i;
     });
     setInquiries(updated);
     syncToStorage('invictus_inquiries', updated);
+    inquiriesApi.toggleRead(id, newRead).catch(console.warn);
   };
 
   // Schedule Actions
-  const handleAddClass = (e: React.FormEvent) => {
+  const handleAddClass = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newClassTime || !newClassActivity) {
       triggerNotification('Provide class time and title.', 'error');
@@ -648,12 +716,13 @@ export default function AdminPage() {
 
     setScheduleData(finalSchedule);
     syncToStorage('invictus_schedule', finalSchedule);
+    scheduleApi.update(finalSchedule).catch(console.warn);
     setNewClassTime('');
     setNewClassActivity('');
     triggerNotification(`Added class info under ${selectedDay}.`);
   };
 
-  const handleDeleteClass = (day: string, classId: string) => {
+  const handleDeleteClass = async (day: string, classId: string) => {
     const updated = scheduleData.map(dayObj => {
       if (dayObj.day === day) {
         return {
@@ -662,11 +731,51 @@ export default function AdminPage() {
         };
       }
       return dayObj;
-    }).filter(dayObj => dayObj.classes.length > 0); // Cleanup days without classes if preferred, or keep them empty
+    }).filter(dayObj => dayObj.classes.length > 0);
 
     setScheduleData(updated);
     syncToStorage('invictus_schedule', updated);
+    scheduleApi.update(updated).catch(console.warn);
     triggerNotification('Session timing removed from schedule.');
+  };
+
+  const startEditingClass = (day: string, cls: { id: string; time: string; activity: string }) => {
+    setEditingClassDay(day);
+    setEditingClassId(cls.id);
+    setEditingClassTime(cls.time);
+    setEditingClassActivity(cls.activity);
+  };
+
+  const cancelEditingClass = () => {
+    setEditingClassDay(null);
+    setEditingClassId(null);
+    setEditingClassTime('');
+    setEditingClassActivity('');
+  };
+
+  const saveEditedClass = async () => {
+    if (!editingClassDay || !editingClassId || !editingClassTime || !editingClassActivity) {
+      triggerNotification('Time and activity are required.', 'error');
+      return;
+    }
+    const updated = scheduleData.map(dayObj => {
+      if (dayObj.day === editingClassDay) {
+        return {
+          ...dayObj,
+          classes: dayObj.classes.map(c =>
+            c.id === editingClassId
+              ? { ...c, time: editingClassTime, activity: editingClassActivity }
+              : c
+          ),
+        };
+      }
+      return dayObj;
+    });
+    setScheduleData(updated);
+    syncToStorage('invictus_schedule', updated);
+    scheduleApi.update(updated).catch(console.warn);
+    cancelEditingClass();
+    triggerNotification('Class updated successfully.');
   };
 
   // Pricing Actions
@@ -682,23 +791,20 @@ export default function AdminPage() {
     });
   };
 
-  const saveEditedPlan = (id: string) => {
-    const updated = pricingData.map(p => {
-      if (p.id === id) {
-        return {
-          ...p,
-          title: editingPlanForm.title,
-          price: editingPlanForm.price,
-          originalPrice: editingPlanForm.originalPrice || undefined,
-          highlight: editingPlanForm.highlight,
-          badge: editingPlanForm.badge || undefined,
-          features: editingPlanForm.features.split('\n').map(f => f.trim()).filter(Boolean)
-        };
-      }
-      return p;
-    });
+  const saveEditedPlan = async (id: string) => {
+    const updatedPlan = {
+      id,
+      title: editingPlanForm.title,
+      price: editingPlanForm.price,
+      originalPrice: editingPlanForm.originalPrice || undefined,
+      highlight: editingPlanForm.highlight,
+      badge: editingPlanForm.badge || undefined,
+      features: editingPlanForm.features.split('\n').map(f => f.trim()).filter(Boolean)
+    };
+    const updated = pricingData.map(p => p.id === id ? { ...p, ...updatedPlan } : p);
     setPricingData(updated);
     syncToStorage('invictus_pricing', updated);
+    pricingApi.update(updatedPlan).catch(console.warn);
     setEditingPlanId(null);
     triggerNotification('Course pricing plan configured successfully!');
   };
@@ -723,16 +829,17 @@ export default function AdminPage() {
   }, 0);
 
   // Product Actions
-  const handleDeleteProduct = (id: number, name: string) => {
+  const handleDeleteProduct = async (id: number, name: string) => {
     if (confirm(`Are you sure you want to remove ${name} from shop?`)) {
       const updated = products.filter(p => p.id !== id);
       setProducts(updated);
       syncToStorage('invictus_products', updated);
+      productsApi.remove(id).catch(console.warn);
       triggerNotification(`Removed ${name} from store inventory.`);
     }
   };
 
-  const handleAddProduct = (e: React.FormEvent) => {
+  const handleAddProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newProduct.name || !newProduct.price) {
       triggerNotification('Product Name and Price are required.', 'error');
@@ -750,6 +857,7 @@ export default function AdminPage() {
     const updated = [newlyCreated, ...products];
     setProducts(updated);
     syncToStorage('invictus_products', updated);
+    productsApi.create({ ...newlyCreated, price: newlyCreated.price, rating: newlyCreated.rating }).catch(console.warn);
     setNewProduct({ name: '', price: '', category: 'Equipment', description: '', image: '', rating: '5.0' });
     setProductSubTab('list');
     triggerNotification(`Successfully registered product: ${newlyCreated.name}`);
@@ -769,7 +877,7 @@ export default function AdminPage() {
     triggerNotification(`Editing product: ${product.name}`);
   };
 
-  const saveEditedProduct = (id: number) => {
+  const saveEditedProduct = async (id: number) => {
     if (!editingProductForm.name || !editingProductForm.price) {
       triggerNotification('Product Name and Price are required.', 'error');
       return;
@@ -790,13 +898,14 @@ export default function AdminPage() {
     });
     setProducts(updated);
     syncToStorage('invictus_products', updated);
+    productsApi.update(id, { ...editingProductForm, price: parseFloat(editingProductForm.price), rating: parseFloat(editingProductForm.rating) }).catch(console.warn);
     setEditingProductId(null);
     setProductSubTab('list');
     triggerNotification(`Successfully updated product: ${editingProductForm.name}`);
   };
 
   // Experience Handlers
-  const handleAddExperience = (e: React.FormEvent) => {
+  const handleAddExperience = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newExperience.role || !newExperience.company || !newExperience.period) {
       triggerNotification('Please fill in Role, Company, and Period.', 'error');
@@ -812,6 +921,7 @@ export default function AdminPage() {
     const updated = [newRecord, ...experienceData];
     setExperienceData(updated);
     syncToStorage('invictus_experience', updated);
+    experienceApi.create(newRecord).catch(console.warn);
     setNewExperience({ role: '', company: '', period: '', description: '' });
     setExperienceSubTab('list');
     triggerNotification('New Professional Experience record registered successfully!');
@@ -828,7 +938,7 @@ export default function AdminPage() {
     setExperienceSubTab('form');
   };
 
-  const saveEditedExperience = (id: string) => {
+  const saveEditedExperience = async (id: string) => {
     if (!editingExperienceForm.role || !editingExperienceForm.company || !editingExperienceForm.period) {
       triggerNotification('Please fill in Role, Company, and Period.', 'error');
       return;
@@ -847,22 +957,24 @@ export default function AdminPage() {
     });
     setExperienceData(updated);
     syncToStorage('invictus_experience', updated);
+    experienceApi.update(id, editingExperienceForm).catch(console.warn);
     setEditingExperienceId(null);
     setExperienceSubTab('list');
     triggerNotification('Professional Experience details updated successfully!');
   };
 
-  const handleDeleteExperience = (id: string) => {
+  const handleDeleteExperience = async (id: string) => {
     if (confirm('Are you sure you want to delete this experience record?')) {
       const updated = experienceData.filter(exp => exp.id !== id);
       setExperienceData(updated);
       syncToStorage('invictus_experience', updated);
+      experienceApi.remove(id).catch(console.warn);
       triggerNotification('Professional Experience record deleted successfully!');
     }
   };
 
   // Order Actions
-  const handleToggleOrderStatus = (id: string, currentStatus: string) => {
+  const handleToggleOrderStatus = async (id: string, currentStatus: string) => {
     const nextStatus = currentStatus === 'Pending' ? 'Shipped' : currentStatus === 'Shipped' ? 'Delivered' : currentStatus === 'Delivered' ? 'Canceled' : 'Pending';
     const updated = orders.map(o => {
       if (o.id === id) {
@@ -872,14 +984,16 @@ export default function AdminPage() {
     });
     setOrders(updated);
     syncToStorage('invictus_orders', updated);
+    ordersApi.updateStatus(id, nextStatus).catch(console.warn);
     triggerNotification(`Order ${id} status updated to ${nextStatus}.`);
   };
 
-  const handleDeleteOrder = (id: string) => {
+  const handleDeleteOrder = async (id: string) => {
     if (confirm(`Remove order record ${id}?`)) {
       const updated = orders.filter(o => o.id !== id);
       setOrders(updated);
       syncToStorage('invictus_orders', updated);
+      ordersApi.remove(id).catch(console.warn);
       triggerNotification(`Order ${id} record removed.`);
     }
   };
@@ -911,7 +1025,14 @@ export default function AdminPage() {
       )}
 
       {/* AUTHENTICATION PORTAL (IF NOT LOGGED IN) */}
-      {!isAuthenticated ? (
+      {authLoading ? (
+        <div className="min-h-screen w-full flex items-center justify-center p-4 relative">
+          <div className="text-center">
+            <div className="w-8 h-8 border-2 border-brand-accent border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-brand-muted text-xs font-mono">Verifying session...</p>
+          </div>
+        </div>
+      ) : !isAuthenticated ? (
         <div className="min-h-screen w-full flex items-center justify-center p-4 relative">
           <div className="absolute top-12 left-12">
             <Link href="/" className="inline-flex items-center gap-2 text-xs font-mono font-bold text-brand-muted hover:text-brand-accent transition-colors">
@@ -932,17 +1053,35 @@ export default function AdminPage() {
               </p>
             </div>
 
-            <form onSubmit={handleLogin} className="space-y-6">
+            {authLoading ? (
+              <div className="text-center text-brand-muted text-xs font-mono animate-pulse py-8">
+                Verifying session...
+              </div>
+            ) : (
+            <form onSubmit={handleLogin} className="space-y-5">
               <div className="space-y-2">
                 <label className="text-xs font-bold uppercase tracking-widest text-brand-muted ml-1">
-                  ADMIN PASSCODE / ROLE
+                  ADMIN EMAIL
                 </label>
                 <input 
-                  type="password" 
-                  value={passcode}
-                  onChange={(e) => setPasscode(e.target.value)}
-                  placeholder="Enter Pin code (Default: 1234)"
-                  className="w-full h-[52px] bg-brand-primary border border-brand-border/80 rounded-xl text-center font-mono focus:border-brand-accent focus:outline-none text-white tracking-[0.2em] transition-all text-sm"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="admin@coachishtiak.com"
+                  className="w-full h-[48px] bg-brand-primary border border-brand-border/80 rounded-xl px-4 font-mono focus:border-brand-accent focus:outline-none text-white transition-all text-sm"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-bold uppercase tracking-widest text-brand-muted ml-1">
+                  PASSWORD
+                </label>
+                <input 
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter password"
+                  className="w-full h-[48px] bg-brand-primary border border-brand-border/80 rounded-xl px-4 font-mono focus:border-brand-accent focus:outline-none text-white tracking-[0.2em] transition-all text-sm"
                   required
                 />
               </div>
@@ -955,13 +1094,13 @@ export default function AdminPage() {
               )}
 
               <div className="grid grid-cols-2 gap-3.5">
-                <button 
+                <button
                   type="submit"
                   className="py-4 bg-brand-accent text-black font-black uppercase tracking-wider text-xs rounded-xl hover:bg-brand-accent-hover transition-colors min-h-[48px] cursor-pointer shadow-lg shadow-brand-accent/15"
                 >
-                  INITIALIZE
+                  SIGN IN
                 </button>
-                <button 
+                <button
                   type="button"
                   onClick={handleBypass}
                   className="py-4 bg-transparent text-brand-muted hover:text-white font-mono uppercase tracking-widest text-[10px] rounded-xl border border-brand-border hover:border-white/20 transition-all h-[48px] cursor-pointer"
@@ -970,6 +1109,7 @@ export default function AdminPage() {
                 </button>
               </div>
             </form>
+            )}
 
             <div className="mt-8 pt-6 border-t border-brand-border/60 text-center text-xs text-brand-muted leading-relaxed">
               Designed for intuitive mobile-and-desktop coaching workflows. Instantly modify training plans, schedules, and approve athlete logs.
@@ -1745,20 +1885,64 @@ export default function AdminPage() {
                             <div className="divide-y divide-brand-border/30">
                               {dayGroup.classes.map((cls) => (
                                 <div key={cls.id} className="flex items-center justify-between py-3.5 hover:bg-white/[0.01]">
-                                  <div className="flex gap-4.5 items-center">
-                                    <div className="w-2 h-2 rounded-full bg-brand-accent shrink-0 shadow-[0_0_8px_rgba(204,255,0,0.5)]" />
-                                    <div>
-                                      <div className="text-xs font-mono text-brand-muted leading-none">{cls.time}</div>
-                                      <div className="text-base font-bold text-white mt-1.5">{cls.activity}</div>
+                                  {editingClassDay === dayGroup.day && editingClassId === cls.id ? (
+                                    <div className="flex-1 flex items-center gap-2">
+                                      <input
+                                        type="text"
+                                        value={editingClassTime}
+                                        onChange={(e) => setEditingClassTime(e.target.value)}
+                                        className="flex-1 bg-brand-primary border border-brand-accent p-2 rounded-lg text-white text-xs font-mono focus:outline-none"
+                                        placeholder="Time"
+                                      />
+                                      <input
+                                        type="text"
+                                        value={editingClassActivity}
+                                        onChange={(e) => setEditingClassActivity(e.target.value)}
+                                        className="flex-[2] bg-brand-primary border border-brand-accent p-2 rounded-lg text-white text-xs focus:outline-none"
+                                        placeholder="Activity"
+                                      />
+                                      <button
+                                        onClick={saveEditedClass}
+                                        className="p-2 bg-brand-accent text-black rounded-lg hover:bg-brand-accent-hover transition-colors min-w-[34px] min-h-[34px] flex items-center justify-center cursor-pointer"
+                                        title="Save"
+                                      >
+                                        <Save className="w-3.5 h-3.5" />
+                                      </button>
+                                      <button
+                                        onClick={cancelEditingClass}
+                                        className="p-2 border border-brand-border text-brand-muted hover:text-white rounded-lg transition-colors min-w-[34px] min-h-[34px] flex items-center justify-center cursor-pointer"
+                                        title="Cancel"
+                                      >
+                                        <X className="w-3.5 h-3.5" />
+                                      </button>
                                     </div>
-                                  </div>
-                                  <button
-                                    onClick={() => handleDeleteClass(dayGroup.day, cls.id)}
-                                    className="p-2.5 border border-brand-border hover:border-red-500 hover:text-red-500 rounded-xl transition-all min-w-[38px] min-h-[38px] flex items-center justify-center cursor-pointer text-brand-muted"
-                                    title="Remove timing option"
-                                  >
-                                    <Trash2 className="w-3.5 h-3.5" />
-                                  </button>
+                                  ) : (
+                                    <>
+                                      <div className="flex gap-4.5 items-center">
+                                        <div className="w-2 h-2 rounded-full bg-brand-accent shrink-0 shadow-[0_0_8px_rgba(204,255,0,0.5)]" />
+                                        <div>
+                                          <div className="text-xs font-mono text-brand-muted leading-none">{cls.time}</div>
+                                          <div className="text-base font-bold text-white mt-1.5">{cls.activity}</div>
+                                        </div>
+                                      </div>
+                                      <div className="flex items-center gap-2">
+                                        <button
+                                          onClick={() => startEditingClass(dayGroup.day, cls)}
+                                          className="p-2.5 border border-brand-border hover:border-brand-accent hover:text-brand-accent rounded-xl transition-all min-w-[38px] min-h-[38px] flex items-center justify-center cursor-pointer text-brand-muted"
+                                          title="Edit class"
+                                        >
+                                          <Edit3 className="w-3.5 h-3.5" />
+                                        </button>
+                                        <button
+                                          onClick={() => handleDeleteClass(dayGroup.day, cls.id)}
+                                          className="p-2.5 border border-brand-border hover:border-red-500 hover:text-red-500 rounded-xl transition-all min-w-[38px] min-h-[38px] flex items-center justify-center cursor-pointer text-brand-muted"
+                                          title="Remove timing option"
+                                        >
+                                          <Trash2 className="w-3.5 h-3.5" />
+                                        </button>
+                                      </div>
+                                    </>
+                                  )}
                                 </div>
                               ))}
                             </div>
@@ -2557,9 +2741,10 @@ export default function AdminPage() {
 
                         <button 
                           type="button"
-                          onClick={() => {
+                          onClick={async () => {
                             setHeroSettings(heroForm);
                             syncToStorage('invictus_hero_settings', heroForm);
+                            await contentApi.updateHero(heroForm).catch(console.warn);
                             triggerNotification('Hero content segment has been pushed to live production portal!');
                           }}
                           className="w-full py-4 bg-brand-accent text-black font-black uppercase tracking-wider text-xs rounded-xl hover:bg-brand-accent-hover transition-colors min-h-[44px] cursor-pointer shadow-lg shadow-brand-accent/15 flex items-center justify-center gap-2"
@@ -2646,9 +2831,10 @@ export default function AdminPage() {
 
                         <button 
                           type="button"
-                          onClick={() => {
+                          onClick={async () => {
                             setAboutSettings(aboutForm);
                             syncToStorage('invictus_about_settings', aboutForm);
+                            await contentApi.updateAbout(aboutForm).catch(console.warn);
                             triggerNotification('About Coach biography segment successfully updated!');
                           }}
                           className="w-full py-4 bg-brand-accent text-black font-black uppercase tracking-wider text-xs rounded-xl hover:bg-brand-accent-hover transition-colors min-h-[44px] cursor-pointer shadow-lg shadow-brand-accent/15 flex items-center justify-center gap-2"
