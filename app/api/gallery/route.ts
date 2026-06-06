@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase-server';
+import { getSupabaseAdmin } from '@/lib/supabase-server';
 
 export async function GET() {
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await getSupabaseAdmin()
     .from('gallery_images')
     .select('*')
     .order('created_at', { ascending: false });
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await getSupabaseAdmin()
       .from('gallery_images')
       .insert({ url, title, category })
       .select()
@@ -58,7 +58,7 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ success: false, error: 'Invalid id' }, { status: 400 });
   }
 
-  const { error } = await supabaseAdmin
+  const { error } = await getSupabaseAdmin()
     .from('gallery_images')
     .delete()
     .eq('id', imageId);

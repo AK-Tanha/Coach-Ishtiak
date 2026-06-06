@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase-server';
+import { getSupabaseAdmin } from '@/lib/supabase-server';
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -22,9 +22,9 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ success: false, error: 'Invalid product id' }, { status: 400 });
     }
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await getSupabaseAdmin()
       .from('products')
-      .update(updates)
+      .update(updates as never)
       .eq('id', productId)
       .select()
       .single();
@@ -47,7 +47,7 @@ export async function DELETE(_request: NextRequest, { params }: { params: Promis
     return NextResponse.json({ success: false, error: 'Invalid product id' }, { status: 400 });
   }
 
-  const { error } = await supabaseAdmin
+  const { error } = await getSupabaseAdmin()
     .from('products')
     .delete()
     .eq('id', productId);

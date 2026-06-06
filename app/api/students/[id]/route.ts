@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase-server';
+import { getSupabaseAdmin } from '@/lib/supabase-server';
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -16,9 +16,9 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     if (status !== undefined) updates.status = status;
     if (image !== undefined) updates.image = image;
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await getSupabaseAdmin()
       .from('students')
-      .update(updates)
+      .update(updates as never)
       .eq('id', id)
       .select()
       .single();
@@ -36,7 +36,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 export async function DELETE(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
-  const { error } = await supabaseAdmin
+  const { error } = await getSupabaseAdmin()
     .from('students')
     .delete()
     .eq('id', id);

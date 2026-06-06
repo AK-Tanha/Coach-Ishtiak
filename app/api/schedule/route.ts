@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase-server';
+import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { parseJsonFields } from '@/lib/supabase-utils';
 
 export async function GET() {
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await getSupabaseAdmin()
     .from('schedules')
     .select('*')
     .order('day');
@@ -32,7 +32,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Delete all existing schedules and re-insert
-    const { error: deleteError } = await supabaseAdmin
+    const { error: deleteError } = await getSupabaseAdmin()
       .from('schedules')
       .delete()
       .neq('day', '');
@@ -47,7 +47,7 @@ export async function PUT(request: NextRequest) {
     }));
 
     if (rows.length > 0) {
-      const { data, error: insertError } = await supabaseAdmin
+      const { data, error: insertError } = await getSupabaseAdmin()
         .from('schedules')
         .insert(rows)
         .select();

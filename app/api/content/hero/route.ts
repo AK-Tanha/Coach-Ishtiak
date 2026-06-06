@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase-server';
+import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { parseJsonFields } from '@/lib/supabase-utils';
 
 export async function GET() {
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await getSupabaseAdmin()
     .from('hero_settings')
     .select('*')
     .eq('id', 1)
@@ -30,9 +30,9 @@ export async function PUT(request: NextRequest) {
     if (images !== undefined) updates.images = images;
     updates.updated_at = new Date().toISOString();
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await getSupabaseAdmin()
       .from('hero_settings')
-      .update(updates)
+      .update(updates as never)
       .eq('id', 1)
       .select()
       .single();

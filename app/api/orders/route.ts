@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase-server';
+import { getSupabaseAdmin } from '@/lib/supabase-server';
 
 export async function GET() {
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await getSupabaseAdmin()
     .from('orders')
     .select('*')
     .order('created_at', { ascending: false });
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
       date: new Date().toISOString().split('T')[0],
     };
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await getSupabaseAdmin()
       .from('orders')
       .insert(newOrder)
       .select()

@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase-server';
+import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { parseJsonFields } from '@/lib/supabase-utils';
 
 export async function GET() {
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await getSupabaseAdmin()
     .from('products')
     .select('*')
     .order('created_at', { ascending: false });
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
       specs: specs || null,
     };
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await getSupabaseAdmin()
       .from('products')
       .insert(newProduct)
       .select()

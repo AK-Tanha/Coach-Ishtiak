@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase-server';
+import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { parseJsonFields } from '@/lib/supabase-utils';
 
 export async function GET() {
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await getSupabaseAdmin()
     .from('pricing_plans')
     .select('*');
 
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
       badge: badge || null,
     };
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await getSupabaseAdmin()
       .from('pricing_plans')
       .insert(newPlan)
       .select()
@@ -76,9 +76,9 @@ export async function PUT(request: NextRequest) {
     if (highlight !== undefined) updates.highlight = highlight;
     if (badge !== undefined) updates.badge = badge || null;
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await getSupabaseAdmin()
       .from('pricing_plans')
-      .update(updates)
+      .update(updates as never)
       .eq('id', id)
       .select()
       .single();
@@ -104,7 +104,7 @@ export async function DELETE(request: NextRequest) {
     );
   }
 
-  const { error } = await supabaseAdmin
+  const { error } = await getSupabaseAdmin()
     .from('pricing_plans')
     .delete()
     .eq('id', id);

@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase-server';
+import { getSupabaseAdmin } from '@/lib/supabase-server';
 
 export async function GET() {
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await getSupabaseAdmin()
     .from('students')
     .select('*')
     .order('created_at', { ascending: false });
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
       image: image || '',
     };
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await getSupabaseAdmin()
       .from('students')
       .insert(newStudent)
       .select()

@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase-server';
+import { getSupabaseAdmin } from '@/lib/supabase-server';
 
 export async function GET() {
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await getSupabaseAdmin()
     .from('inquiries')
     .select('*')
     .order('created_at', { ascending: false });
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
       read: false,
     };
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await getSupabaseAdmin()
       .from('inquiries')
       .insert(newInquiry)
       .select()
@@ -63,7 +63,7 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await getSupabaseAdmin()
       .from('inquiries')
       .update({ read })
       .eq('id', id)
@@ -91,7 +91,7 @@ export async function DELETE(request: NextRequest) {
     );
   }
 
-  const { error } = await supabaseAdmin
+  const { error } = await getSupabaseAdmin()
     .from('inquiries')
     .delete()
     .eq('id', id);
