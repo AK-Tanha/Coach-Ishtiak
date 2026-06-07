@@ -3,6 +3,7 @@
 import * as React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { motion } from 'motion/react';
 import { 
   Trophy, 
@@ -22,9 +23,6 @@ import {
   Calendar,
   Zap,
   CheckCircle2,
-  Images,
-  ShoppingBag,
-  Send,
   Menu,
   X,
   Facebook,
@@ -39,7 +37,21 @@ import {
 } from '../components/CombatGraphics';
 import { schedule as scheduleApi, pricing as pricingApi, content as contentApi, experience as experienceApi, products as productsApi, inquiries as inquiriesApi, loadWithFallback } from '@/lib/api';
 import type { ScheduleDay, PricingPlan, Experience } from '@/lib/types';
-import { HeroSkeleton, StatsSkeleton, AboutSkeleton, AchievementsSkeleton, ScheduleSkeleton, ExperienceSkeleton, SkillsSkeleton, PricingSkeleton, GalleryPreviewSkeleton, ProductsSkeleton, ContactSkeleton } from '../components/PageSkeletons';
+
+const GalleryPreview = dynamic(() => import('../components/GalleryPreview'), {
+  ssr: false,
+  loading: () => null,
+});
+
+const ProductsCarousel = dynamic(() => import('../components/ProductsCarousel'), {
+  ssr: false,
+  loading: () => null,
+});
+
+const ContactSection = dynamic(() => import('../components/ContactSection'), {
+  ssr: false,
+  loading: () => null,
+});
 
 const heroImages = [
   { url: "/images/placeholder.svg", caption: "First WBC Referee BD", title: "BANGLADESH" },
@@ -248,7 +260,6 @@ export default function PortfolioPage() {
   const [showAllExperience, setShowAllExperience] = React.useState(false);
 
   const loadedRef = React.useRef(false);
-  const [pageLoading, setPageLoading] = React.useState(true);
 
   React.useEffect(() => {
     if (loadedRef.current) return;
@@ -312,7 +323,7 @@ export default function PortfolioPage() {
       }
     };
     
-    loadAll().finally(() => setPageLoading(false));
+    loadAll();
     
     const handleResize = () => {
       const width = window.innerWidth;
@@ -596,23 +607,7 @@ export default function PortfolioPage() {
         )}
       </AnimatePresence>
 
-      {pageLoading ? (
-        <>
-          <HeroSkeleton />
-          <StatsSkeleton />
-          <AboutSkeleton />
-          <AchievementsSkeleton />
-          <ScheduleSkeleton />
-          <ExperienceSkeleton />
-          <SkillsSkeleton />
-          <PricingSkeleton />
-          <GalleryPreviewSkeleton />
-          <ProductsSkeleton />
-          <ContactSkeleton />
-        </>
-      ) : (
-        <>
-      {/* Hero Section */}
+      {/* Hero Section - Always renders immediately (critical for LCP) */}
       <section className="relative pt-16 pb-8 sm:pt-44 sm:pb-20 px-4 sm:px-6 overflow-hidden border-b-2 border-brand-border bg-black">
         {/* Ambient Dark-Glow Cyberpunk Gradients */}
         <div className="absolute top-1/4 left-[-10%] w-[500px] h-[500px] rounded-full bg-brand-accent/15 blur-[120px] pointer-events-none -z-20 animate-pulse duration-[8s]" />
@@ -624,11 +619,11 @@ export default function PortfolioPage() {
         <div className="absolute -top-6 -right-6 w-32 h-32 bg-[repeating-linear-gradient(-45deg,#FCFF00_0,#FCFF00_8px,transparent_8px,transparent_16px)] opacity-[0.07] pointer-events-none rotate-12 -z-10" />
         <div className="absolute bottom-4 left-4 w-48 h-12 bg-[repeating-linear-gradient(45deg,#FCFF00_0,#FCFF00_6px,transparent_6px,transparent_12px)] opacity-[0.05] pointer-events-none -z-10" />
 
-        {/* Massive Outline Brutalist Backdrop Text */}
-        <div className="absolute top-[20%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-[14vw] font-display font-black leading-none text-transparent select-none pointer-events-none -z-10 tracking-widest uppercase opacity-[0.04] whitespace-nowrap" style={{ WebkitTextStroke: '1.5px rgba(255,255,255,0.8)' }}>
+        {/* Subtle backdrop text (no text-stroke - expensive for LCP) */}
+        <div className="absolute top-[20%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-[14vw] font-display font-black leading-none text-white/5 select-none pointer-events-none -z-10 tracking-widest uppercase whitespace-nowrap">
           INVICTUS
         </div>
-        <div className="absolute bottom-[-10%] left-[10%] text-[8vw] font-display font-black leading-none text-transparent select-none pointer-events-none -z-10 tracking-wider uppercase opacity-[0.02] whitespace-nowrap" style={{ WebkitTextStroke: '1px rgba(255,255,255,0.6)' }}>
+        <div className="absolute bottom-[-10%] left-[10%] text-[8vw] font-display font-black leading-none text-white/5 select-none pointer-events-none -z-10 tracking-wider uppercase whitespace-nowrap">
           FIGHT LAB
         </div>
 
@@ -653,12 +648,7 @@ export default function PortfolioPage() {
         <div className="container max-w-7xl mx-auto relative px-4 sm:px-6">
           <div className="flex flex-col lg:grid lg:grid-cols-2 gap-10 sm:gap-16 items-start">
             {/* Text Content: badge, heading, description - always first */}
-            <motion.div 
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="w-full"
-            >
+            <div className="w-full">
               <div className="hidden sm:inline-flex items-center gap-2.5 px-4.5 py-1.5 bg-brand-accent/10 border border-brand-accent/25 text-[10px] font-mono font-bold tracking-widest text-[#BFFF00] mb-6 sm:mb-8 rounded-full uppercase select-none transition-all duration-300 hover:border-brand-accent/40 hover:shadow-[0_0_15px_rgba(204,255,0,0.1)]">
                 <span className="w-2 h-2 rounded-full bg-brand-accent animate-[pulse_1.5s_infinite] shrink-0" />
                 {heroSettings.badge}
@@ -679,15 +669,10 @@ export default function PortfolioPage() {
               <p className="text-xs sm:text-sm md:text-lg text-brand-muted max-w-xl mb-0 leading-relaxed font-sans border-l-2 border-brand-border pl-4 whitespace-pre-line text-left">
                 {heroSettings.description}
               </p>
-            </motion.div>
+            </div>
 
             {/* Hero Image - second on mobile, adjacent to text on desktop */}
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 1, delay: 0.2 }}
-              className="relative aspect-[4/5] sm:aspect-square rounded-[2rem] bg-brand-secondary/40 backdrop-blur-md border border-brand-border/85 overflow-hidden group select-none w-full max-w-md lg:max-w-none mx-auto shadow-2xl hover:shadow-[0_0_30px_rgba(204,255,0,0.03)] transition-all duration-500"
-            >
+            <div className="relative aspect-[4/5] sm:aspect-square rounded-[2rem] bg-brand-secondary/40 backdrop-blur-md border border-brand-border/85 overflow-hidden group select-none w-full max-w-md lg:max-w-none mx-auto shadow-2xl hover:shadow-[0_0_30px_rgba(204,255,0,0.03)] transition-all duration-500">
               {/* Modern Badge Overlays */}
               <div className="absolute top-4 left-4 xs:top-5 xs:left-5 z-40 bg-black/75 backdrop-blur-md px-2.5 py-1.5 text-[8px] sm:text-[9px] font-mono text-brand-accent tracking-widest uppercase rounded-full border border-brand-accent/20 select-none">
                 SLIDE {currentSlide + 1} &bull; OVERVIEW
@@ -753,15 +738,10 @@ export default function PortfolioPage() {
                   />
                 ))}
               </div>
-            </motion.div>
+            </div>
 
             {/* CTA Buttons & Location Info - third on mobile, below text on desktop */}
-            <motion.div 
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-              className="w-full"
-            >
+            <div className="w-full">
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-5">
                 <a 
                   href="#contact" 
@@ -794,7 +774,7 @@ export default function PortfolioPage() {
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
@@ -1307,396 +1287,31 @@ export default function PortfolioPage() {
         </div>
       </section>
 
-      {/* Gallery Preview Section */}
-      <section className="py-10 px-4 sm:py-32 sm:px-12 lg:px-24 bg-brand-secondary/30">
-        <div className="container max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-16 gap-6 sm:gap-8">
-            <div>
-              <h2 className="text-3xl sm:text-5xl md:text-7xl font-display font-black tracking-tight mb-4 sm:mb-6 text-white leading-none">
-                MOMENTS <span className="text-brand-accent italic">IN MOTION</span>
-              </h2>
-              <p className="text-base sm:text-lg md:text-xl text-brand-muted max-w-xl leading-relaxed">
-                Take a look at our highlight events, training sessions, and the journey of combat sports in Bangladesh.
-              </p>
-            </div>
-            <Link 
-              href="/gallery" 
-              className="inline-flex items-center gap-3 bg-brand-accent text-black px-6 py-3.5 sm:px-8 sm:py-4 rounded-full font-bold hover:bg-brand-accent-hover transition-all group shadow-lg shadow-brand-accent/20 text-sm self-start md:self-auto"
-            >
-              View Full Gallery
-              <Images className="w-5 h-5 group-hover:scale-110 transition-transform" />
-            </Link>
-          </div>
- 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:h-[600px]">
-            <motion.div 
-              whileInView={{ opacity: 1, y: 0 }}
-              initial={{ opacity: 0, y: 20 }}
-              viewport={{ once: true }}
-              whileHover={{ scale: 0.98 }}
-              className="md:col-span-2 relative h-[250px] md:h-full rounded-2xl sm:rounded-3xl overflow-hidden group border border-brand-border shadow-xl"
-            >
-              <Image 
-                src="/images/placeholder.svg" 
-                alt="WBC Refereeing" 
-                fill 
-                className="object-cover transition-transform duration-700 group-hover:scale-110"
-                loading="lazy"
-                quality={75}
-                referrerPolicy="no-referrer"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-brand-primary/95 via-transparent to-transparent p-6 sm:p-8 flex flex-col justify-end">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-brand-accent mb-1">International Presence</p>
-                <p className="text-xl sm:text-2xl font-bold font-display text-white">WBC Global Refereeing</p>
-              </div>
-            </motion.div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-4 md:h-full">
-              <motion.div 
-                whileInView={{ opacity: 1, y: 0 }}
-                initial={{ opacity: 0, y: 20 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1 }}
-                whileHover={{ scale: 0.98 }}
-                className="relative h-[180px] sm:h-[220px] md:h-full rounded-2xl sm:rounded-3xl overflow-hidden group border border-brand-border shadow-lg"
-              >
-                <Image 
-                  src="/images/placeholder.svg" 
-                  alt="Training Workshop" 
-                  fill 
-                  className="object-cover transition-transform duration-700 group-hover:scale-110"
-                  loading="lazy"
-                  quality={75}
-                  referrerPolicy="no-referrer"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-brand-primary/95 via-transparent to-transparent p-5 sm:p-6 flex flex-col justify-end">
-                  <p className="text-lg sm:text-xl font-bold font-display leading-tight text-white">Elite Workshops</p>
-                </div>
-              </motion.div>
-              <motion.div 
-                whileInView={{ opacity: 1, y: 0 }}
-                initial={{ opacity: 0, y: 20 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2 }}
-                whileHover={{ scale: 0.98 }}
-                className="relative h-[180px] sm:h-[220px] md:h-full rounded-2xl sm:rounded-3xl overflow-hidden group border border-brand-border shadow-lg"
-              >
-                <Image 
-                  src="/images/placeholder.svg" 
-                  alt="Championship Night" 
-                  fill 
-                  className="object-cover transition-transform duration-700 group-hover:scale-110"
-                  loading="lazy"
-                  quality={75}
-                  referrerPolicy="no-referrer"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-brand-primary/95 via-transparent to-transparent p-5 sm:p-6 flex flex-col justify-end">
-                  <p className="text-lg sm:text-xl font-bold font-display leading-tight text-white">Championship Nights</p>
-                </div>
-              </motion.div>
-            </div>
- 
-            <motion.div 
-              whileInView={{ opacity: 1, y: 0 }}
-              initial={{ opacity: 0, y: 20 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.3 }}
-              whileHover={{ scale: 0.98 }}
-              className="relative h-[250px] sm:h-[350px] md:h-full rounded-2xl sm:rounded-3xl overflow-hidden group border border-brand-border shadow-xl col-span-1 sm:col-span-2 md:col-span-1"
-            >
-              <Image 
-                src="/images/placeholder.svg" 
-                alt="Personal Training" 
-                fill 
-                className="object-cover transition-transform duration-700 group-hover:scale-110"
-                loading="lazy"
-                quality={75}
-                referrerPolicy="no-referrer"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-brand-primary/95 via-transparent to-transparent p-6 sm:p-8 flex flex-col justify-end">
-                <p className="text-xl sm:text-2xl font-bold font-display leading-tight text-white">Private Mentorship</p>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
+      <GalleryPreview />
 
-      {/* Elite Gear / Shop Preview Section */}
-      <section className="py-10 bg-brand-primary overflow-hidden relative">
-        <div className="container max-w-7xl mx-auto px-4 sm:px-12 lg:px-24">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-16 gap-6 sm:gap-8">
-            <div>
-              <h2 className="text-3xl sm:text-5xl md:text-7xl font-display font-black tracking-tight mb-4 sm:mb-6 text-white leading-none">
-                ELITE <span className="text-brand-accent">GEAR</span>
-              </h2>
-              <p className="text-base sm:text-lg md:text-xl text-brand-muted max-w-xl leading-relaxed">
-                Hand-picked equipment and apparel designed for high-performance training. Tested in the gym, proven in the ring.
-              </p>
-            </div>
-            
-            <div className="flex items-center gap-4 self-start md:self-end">
-              <div className="flex gap-2">
-                <button
-                  onClick={prevProduct}
-                  className="p-3 bg-brand-secondary/80 border border-brand-border text-white rounded-full transition-all cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center shadow-lg active:scale-95 hover:bg-brand-accent hover:text-black hover:border-brand-accent"
-                  aria-label="Previous products"
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={nextProduct}
-                  className="p-3 bg-brand-secondary/80 border border-brand-border text-white rounded-full transition-all cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center shadow-lg active:scale-95 hover:bg-brand-accent hover:text-black hover:border-brand-accent"
-                  aria-label="Next products"
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-              </div>
+      <ProductsCarousel
+        currentProducts={currentProducts}
+        productIdx={productIdx}
+        itemWidth={itemWidth}
+        carouselGap={carouselGap}
+        isCarouselHovered={isCarouselHovered}
+        skipTransitionRef={skipTransitionRef}
+        nextProduct={nextProduct}
+        prevProduct={prevProduct}
+        handleTransitionEnd={handleTransitionEnd}
+        setIsCarouselHovered={setIsCarouselHovered}
+      />
 
-              <Link 
-                href="/shop" 
-                className="inline-flex items-center gap-2.5 bg-brand-accent text-black px-5 py-3 rounded-full font-bold hover:bg-brand-accent-hover transition-all group shadow-lg shadow-brand-accent/20 text-xs sm:text-sm uppercase tracking-wider"
-              >
-                <span>Shop All</span>
-                <ShoppingBag className="w-4 h-4 group-hover:scale-110 transition-transform" />
-              </Link>
-            </div>
-          </div>
-        </div>
-
-        {/* Sliding Carousel Viewport stretching edge-to-edge */}
-        <div 
-          className="relative w-full py-6"
-          onMouseEnter={() => setIsCarouselHovered(true)}
-          onMouseLeave={() => setIsCarouselHovered(false)}
-        >
-          {/* Dynamic tracking lane centered using translateX math */}
-          <div 
-            className="flex"
-            style={{ 
-              transform: `translateX(calc(50% - (${itemWidth}px / 2) - (${productIdx} * (${itemWidth}px + ${carouselGap}px))))`,
-              gap: `${carouselGap}px`,
-              transition: skipTransitionRef.current ? 'none' : 'transform 500ms cubic-bezier(0.25, 1, 0.5, 1)'
-            }}
-            onTransitionEnd={handleTransitionEnd}
-          >
-            {(currentProducts.length > 0 ? [...currentProducts, ...currentProducts, ...currentProducts] : []).map((product, idx) => {
-              const displayPrice = typeof product.price === 'number' ? `$${product.price.toFixed(2)}` : product.price;
-              const displayImg = product.image || product.img || "/images/shop/placeholder.svg";
-              const isActive = idx === productIdx;
-              
-              return (
-                <Link 
-                  href="/shop"
-                  key={`${product.id || idx}-${idx}`}
-                  style={{ width: `${itemWidth}px` }}
-                  className={`shrink-0 group block cursor-pointer transition-all duration-500 transform ${
-                    isActive 
-                      ? 'scale-100 opacity-100 z-10' 
-                      : 'scale-[0.92] opacity-60 z-0'
-                  }`}
-                >
-                  <div className={`relative aspect-square rounded-3xl overflow-hidden bg-brand-secondary border transition-all duration-500 mb-5 sm:mb-6 ${
-                    isActive 
-                      ? 'border-brand-accent/70 shadow-2xl shadow-brand-accent/10' 
-                      : 'border-brand-border/60 shadow-none'
-                  }`}>
-                    <Image 
-                      src={displayImg} 
-                      alt={product.name} 
-                      fill 
-                      className={`object-cover transition-all duration-700 ${
-                        isActive 
-                      ? 'grayscale-0 scale-102' 
-                      : 'grayscale-[60%] scale-100 group-hover:scale-102 group-hover:grayscale-0'
-                      }`}
-                      loading="lazy"
-                      quality={75}
-                      referrerPolicy="no-referrer"
-                    />
-                    
-                    {/* Active centered glow/quick view overlay */}
-                    <div className={`absolute inset-0 bg-brand-primary/40 flex items-center justify-center transition-opacity duration-300 ${
-                      isActive ? 'opacity-0 group-hover:opacity-100' : 'opacity-0'
-                    }`}>
-                      <span className="bg-brand-accent text-black px-6 py-2.5 rounded-full font-bold text-xs uppercase tracking-widest shadow-xl transition-all duration-300 scale-90 group-hover:scale-100">
-                        Quick View
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Title & Price blocks fading slightly when keeping off-focus */}
-                  <div className={`flex justify-between items-start gap-4 transition-opacity duration-500 ${
-                    isActive ? 'opacity-100' : 'opacity-60 group-hover:opacity-100'
-                  }`}>
-                    <span className="font-bold text-base sm:text-lg text-white group-hover:text-brand-accent transition-colors leading-snug">
-                      {product.name}
-                    </span>
-                    <span className="font-display font-black text-brand-accent shrink-0 text-sm sm:text-base">
-                      {displayPrice}
-                    </span>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Contact Section */}
-      <section id="contact" className="py-10 px-4 sm:px-12 lg:px-24 bg-brand-secondary/10 border-t border-brand-border relative overflow-hidden">
-        {/* Immersive Arena Fight Lights Spot gradients */}
-        <div className="absolute top-[30%] left-[10%] w-[450px] h-[450px] bg-brand-accent/5 rounded-full blur-[100px] pointer-events-none -z-10" />
-        <div className="absolute bottom-10 right-10 w-[400px] h-[400px] bg-red-600/5 rounded-full blur-[100px] pointer-events-none -z-10" />
-
-        {/* MMA Cage wireframe background anchor */}
-        <MmaCageDecal className="absolute -left-36 bottom-[-20%] w-[600px] h-[600px] text-brand-accent/15 rotate-[15deg] pointer-events-none select-none" />
-
-        <div className="container max-w-7xl mx-auto relative z-10">
-          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-start">
-            <div>
-              <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-brand-accent mb-4 sm:mb-6 font-display">Get Started</h2>
-              <h3 className="text-3xl sm:text-5xl md:text-7xl font-display font-black tracking-tighter mb-6 sm:mb-8 text-white uppercase leading-none">
-                COMMIT TO <br />
-                <span className="text-brand-accent italic">BE FIT.</span>
-              </h3>
-              <p className="text-base sm:text-lg md:text-xl text-brand-muted max-w-md leading-relaxed mb-8 sm:mb-12">
-                Have questions about our classes or looking for private mentorship? Send us a message and start your journey today.
-              </p>
-              
-              <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-brand-secondary border border-brand-border flex items-center justify-center text-brand-accent">
-                    <Mail className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <div className="text-[10px] font-black uppercase tracking-widest text-brand-muted">Email Us</div>
-                    <div className="text-lg font-bold text-white">coachishtiak@gmail.com</div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-brand-secondary border border-brand-border flex items-center justify-center text-brand-accent">
-                    <Phone className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <div className="text-[10px] font-black uppercase tracking-widest text-brand-muted">Call Directly</div>
-                    <div className="text-lg font-bold text-white">016-2233-9080</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <motion.div 
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="p-5 sm:p-8 md:p-12 rounded-[1.5rem] sm:rounded-[2.5rem] bg-brand-secondary border border-brand-border shadow-2xl relative overflow-hidden"
-            >
-              {/* Overlapping technical overlays */}
-              <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
-                <Send className="w-32 h-32 text-brand-accent" />
-              </div>
-              <div className="absolute -right-20 -bottom-20 opacity-[0.14] pointer-events-none">
-                <MmaGloveGraphic className="w-80 h-80 text-brand-accent !static" />
-              </div>
-              
-              <form className="space-y-6 relative z-10" onSubmit={handleContactSubmit}>
-                {successToast && (
-                  <motion.div 
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    className="p-4 bg-brand-accent/10 border border-brand-accent text-brand-accent rounded-2xl text-xs font-black uppercase tracking-wider flex items-center gap-3"
-                  >
-                    <CheckCircle2 className="w-5 h-5 text-brand-accent shrink-0" />
-                    <span>Message sent! We&apos;ll reply within 24 hours.</span>
-                  </motion.div>
-                )}
-                <div className="space-y-2">
-                  <label htmlFor="name" className="text-xs font-black uppercase tracking-widest text-brand-muted ml-1">Full Name</label>
-                  <input 
-                    type="text" 
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) => {
-                      setFormData({...formData, name: e.target.value});
-                      if (formErrors.name) setFormErrors({...formErrors, name: undefined});
-                    }}
-                    placeholder="John Doe"
-                    className={`w-full bg-brand-primary border rounded-2xl py-4 px-6 focus:outline-none focus:border-brand-accent transition-colors text-white placeholder:text-white/20 text-base min-h-[44px] ${
-                      formErrors.name ? 'border-red-500/60' : 'border-brand-border'
-                    }`}
-                    required
-                    minLength={2}
-                  />
-                  {formErrors.name && (
-                    <p className="text-red-400 text-xs font-medium mt-1 ml-1">{formErrors.name}</p>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="email" className="text-xs font-black uppercase tracking-widest text-brand-muted ml-1">Email Address</label>
-                  <input 
-                    type="email" 
-                    id="email"
-                    value={formData.email}
-                    onChange={(e) => {
-                      setFormData({...formData, email: e.target.value});
-                      if (formErrors.email) setFormErrors({...formErrors, email: undefined});
-                    }}
-                    placeholder="john@example.com"
-                    className={`w-full bg-brand-primary border rounded-2xl py-4 px-6 focus:outline-none focus:border-brand-accent transition-colors text-white placeholder:text-white/20 text-base min-h-[44px] ${
-                      formErrors.email ? 'border-red-500/60' : 'border-brand-border'
-                    }`}
-                    required
-                  />
-                  {formErrors.email && (
-                    <p className="text-red-400 text-xs font-medium mt-1 ml-1">{formErrors.email}</p>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="message" className="text-xs font-black uppercase tracking-widest text-brand-muted ml-1">Your Message</label>
-                  <textarea 
-                    id="message"
-                    rows={4}
-                    value={formData.message}
-                    onChange={(e) => {
-                      setFormData({...formData, message: e.target.value});
-                      if (formErrors.message) setFormErrors({...formErrors, message: undefined});
-                    }}
-                    placeholder="I'm interested in the 3-month MMA course..."
-                    className={`w-full bg-brand-primary border rounded-2xl py-4 px-6 focus:outline-none focus:border-brand-accent transition-colors text-white placeholder:text-white/20 text-base min-h-[120px] ${
-                      formErrors.message ? 'border-red-500/60' : 'border-brand-border'
-                    }`}
-                    required
-                    minLength={10}
-                  />
-                  {formErrors.message && (
-                    <p className="text-red-400 text-xs font-medium mt-1 ml-1">{formErrors.message}</p>
-                  )}
-                </div>
-                <button 
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full py-5 bg-brand-accent text-black font-black uppercase tracking-widest text-sm rounded-2xl hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-brand-accent/20 flex items-center justify-center gap-3 group cursor-pointer disabled:opacity-60 disabled:hover:scale-100 min-h-[48px]"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <span className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
-                      <span>Sending...</span>
-                    </>
-                  ) : (
-                    <>
-                      Send Message
-                      <Send className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                    </>
-                  )}
-                </button>
-              </form>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-        </>
-      )}
+      <ContactSection
+        formData={formData}
+        setFormData={setFormData}
+        formErrors={formErrors}
+        setFormErrors={setFormErrors}
+        isSubmitting={isSubmitting}
+        successToast={successToast}
+        setSuccessToast={setSuccessToast}
+        handleContactSubmit={handleContactSubmit}
+      />
 
       {/* CTA Section */}
       <section className="py-16 px-4 relative overflow-hidden bg-brand-primary border-t border-brand-border/30">
