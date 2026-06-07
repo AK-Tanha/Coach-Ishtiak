@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft, Maximize2, X } from 'lucide-react';
 import { gallery as galleryApi, loadWithFallback } from '@/lib/api';
 import type { GalleryImage } from '@/lib/types';
+import { GalleryGridSkeleton } from '../../components/PageSkeletons';
 
 const galleryImages = [
   { id: 1, url: "https://picsum.photos/seed/mma1/800/1000", title: "WBC Refereeing", category: "Events" },
@@ -82,6 +83,9 @@ export default function GalleryPage() {
       </div>
 
       {/* Grid */}
+      {loading ? (
+        <GalleryGridSkeleton />
+      ) : (
       <div className="container max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <AnimatePresence mode="popLayout">
           {filteredImages.map((image, idx) => (
@@ -115,6 +119,7 @@ export default function GalleryPage() {
           ))}
         </AnimatePresence>
       </div>
+      )}
 
       {/* Lightbox */}
       <AnimatePresence>

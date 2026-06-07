@@ -22,6 +22,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { orders as ordersApi, products as productsApi, loadWithFallback } from '@/lib/api';
+import { ShopProductsGridSkeleton } from '../../components/PageSkeletons';
 
 const defaultProducts = [
   {
@@ -124,6 +125,7 @@ const defaultProducts = [
 
 export default function ShopPage() {
   const [products, setProducts] = React.useState<any[]>(defaultProducts);
+  const [loading, setLoading] = React.useState(true);
   const [filter, setFilter] = React.useState('All');
   const [searchQuery, setSearchQuery] = React.useState('');
   const [cart, setCart] = React.useState<{ id: number; product: any; quantity: number; selectedSize?: string }[]>([]);
@@ -178,9 +180,12 @@ export default function ShopPage() {
           }
         }
         cartLoadedRef.current = true;
+        setLoading(false);
       };
       
       loadData();
+    } else {
+      setLoading(false);
     }
   }, []);
 
@@ -382,7 +387,9 @@ export default function ShopPage() {
       {/* Main Specialized Store Showcase Grid */}
       <section className="pb-28 sm:pb-36 px-4 sm:px-12 lg:px-24 relative z-10">
         <div className="container max-w-7xl mx-auto">
-          {filteredProducts.length === 0 ? (
+          {loading ? (
+            <ShopProductsGridSkeleton />
+          ) : filteredProducts.length === 0 ? (
             <div className="py-24 text-center border border-dashed border-brand-border/60 rounded-[2.5rem] bg-brand-secondary/40 backdrop-blur-sm">
               <Sliders className="w-10 h-10 mx-auto mb-4 text-brand-muted/70 stroke-[1.2]" />
               <p className="text-brand-muted text-sm font-mono tracking-wide uppercase">No system blueprints match current parameters</p>

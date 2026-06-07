@@ -12,14 +12,11 @@ import type {
   ApiResponse,
 } from './types';
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
-
 async function request<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<ApiResponse<T>> {
   try {
-    const url = `${BASE_URL}${endpoint}`;
     const token = getToken();
 
     const headers: Record<string, string> = {
@@ -34,7 +31,7 @@ async function request<T>(
       headers['Content-Type'] = 'application/json';
     }
 
-    const res = await fetch(url, {
+    const res = await fetch(endpoint, {
       ...options,
       headers,
       credentials: 'include',

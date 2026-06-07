@@ -39,6 +39,7 @@ import {
 } from '../components/CombatGraphics';
 import { schedule as scheduleApi, pricing as pricingApi, content as contentApi, experience as experienceApi, products as productsApi, inquiries as inquiriesApi, loadWithFallback } from '@/lib/api';
 import type { ScheduleDay, PricingPlan, Experience } from '@/lib/types';
+import { HeroSkeleton, StatsSkeleton, AboutSkeleton, AchievementsSkeleton, ScheduleSkeleton, ExperienceSkeleton, SkillsSkeleton, PricingSkeleton, GalleryPreviewSkeleton, ProductsSkeleton, ContactSkeleton } from '../components/PageSkeletons';
 
 const heroImages = [
   {
@@ -259,6 +260,7 @@ export default function PortfolioPage() {
   const [showAllExperience, setShowAllExperience] = React.useState(false);
 
   const loadedRef = React.useRef(false);
+  const [pageLoading, setPageLoading] = React.useState(true);
 
   React.useEffect(() => {
     if (loadedRef.current) return;
@@ -322,7 +324,7 @@ export default function PortfolioPage() {
       }
     };
     
-    loadAll();
+    loadAll().finally(() => setPageLoading(false));
     
     const handleResize = () => {
       const width = window.innerWidth;
@@ -608,6 +610,22 @@ export default function PortfolioPage() {
         )}
       </AnimatePresence>
 
+      {pageLoading ? (
+        <>
+          <HeroSkeleton />
+          <StatsSkeleton />
+          <AboutSkeleton />
+          <AchievementsSkeleton />
+          <ScheduleSkeleton />
+          <ExperienceSkeleton />
+          <SkillsSkeleton />
+          <PricingSkeleton />
+          <GalleryPreviewSkeleton />
+          <ProductsSkeleton />
+          <ContactSkeleton />
+        </>
+      ) : (
+        <>
       {/* Hero Section */}
       <section className="relative pt-20 pb-12 sm:pt-44 sm:pb-20 px-4 sm:px-6 overflow-hidden border-b-2 border-brand-border bg-black">
         {/* Ambient Dark-Glow Cyberpunk Gradients */}
@@ -1663,6 +1681,8 @@ export default function PortfolioPage() {
           </div>
         </div>
       </section>
+        </>
+      )}
 
       {/* CTA Section */}
       <section className="py-16 px-4 relative overflow-hidden bg-brand-primary border-t border-brand-border/30">
