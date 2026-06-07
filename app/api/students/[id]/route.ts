@@ -2,6 +2,24 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { requireAuth } from '@/lib/auth';
 
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const user = requireAuth(request);
+  if (!user) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+  const { id } = await params;
+
+  const { data, error } = await getSupabaseAdmin()
+    .from('students')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ success: true, data });
+}
+
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = requireAuth(request);
   if (!user) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });

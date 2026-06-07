@@ -625,7 +625,7 @@ export default function PortfolioPage() {
       ) : (
         <>
       {/* Hero Section */}
-      <section className="relative pt-20 pb-12 sm:pt-44 sm:pb-20 px-4 sm:px-6 overflow-hidden border-b-2 border-brand-border bg-black">
+      <section className="relative pt-16 pb-8 sm:pt-44 sm:pb-20 px-4 sm:px-6 overflow-hidden border-b-2 border-brand-border bg-black">
         {/* Ambient Dark-Glow Cyberpunk Gradients */}
         <div className="absolute top-1/4 left-[-10%] w-[500px] h-[500px] rounded-full bg-brand-accent/15 blur-[120px] pointer-events-none -z-20 animate-pulse duration-[8s]" />
         <div className="absolute bottom-10 right-[-10%] w-[600px] h-[600px] rounded-full bg-brand-accent/10 blur-[150px] pointer-events-none -z-20" />
@@ -724,7 +724,7 @@ export default function PortfolioPage() {
                     src={heroSettings.images[currentSlide]?.url || "https://picsum.photos/seed/coach-ishtiaq/1000/1000"} 
                     alt={heroSettings.images[currentSlide]?.caption || "Slide Image"} 
                     fill
-                    className="w-full h-full object-cover grayscale brightness-90 contrast-[1.05] group-hover:scale-105 transition-transform duration-700"
+                    className="w-full h-full object-cover brightness-90 contrast-[1.05] group-hover:scale-105 transition-transform duration-700"
                     priority
                     referrerPolicy="no-referrer"
                   />
@@ -811,7 +811,7 @@ export default function PortfolioPage() {
       </section>
 
       {/* Stats/Highlight Section */}
-      <section className="py-12 sm:py-20 border-y border-brand-border/40 bg-brand-primary/50 backdrop-blur-md relative overflow-hidden">
+      <section className="py-8 sm:py-20 border-y border-brand-border/40 bg-brand-primary/50 backdrop-blur-md relative overflow-hidden">
         {/* Decorative background grid effect */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none opacity-15" />
         
@@ -841,7 +841,7 @@ export default function PortfolioPage() {
       </section>
 
       {/* About Section */}
-      <section id="about" className="py-16 sm:py-28 px-4 sm:px-6 overflow-hidden bg-brand-primary relative">
+      <section id="about" className="py-10 sm:py-28 px-4 sm:px-6 overflow-hidden bg-brand-primary relative">
         {/* Subtle Background Glow Spot */}
         <div className="absolute top-1/2 right-0 -translate-y-1/2 w-[350px] h-[350px] bg-brand-accent/5 rounded-full blur-[80px] pointer-events-none -z-10" />
         
@@ -864,6 +864,20 @@ export default function PortfolioPage() {
               <h3 className="text-2xl sm:text-4xl md:text-5xl font-display font-black leading-tight tracking-tighter mb-6 sm:mb-8 text-white uppercase">
                 {aboutSettings.subheading}
               </h3>
+
+              {/* Mobile image - shows between subheading and paragraphs */}
+              <div className="lg:hidden relative h-[280px] w-full rounded-[2.5rem] overflow-hidden border border-brand-border/80 mb-8 shadow-2xl shadow-black/60">
+                <Image 
+                  src={aboutSettings.image || "https://picsum.photos/seed/coach-ishtiaq/800/1000"} 
+                  alt="Coach Ishtiak Philosophy"
+                  fill
+                  className="object-cover object-top brightness-95"
+                  referrerPolicy="no-referrer"
+                />
+                <div className="absolute top-5 left-5 bg-black/80 backdrop-blur-md px-3.5 py-1.5 border border-white/10 rounded-full text-[9px] font-mono uppercase tracking-widest text-[#BFFF00]">
+                  {aboutSettings.badge}
+                </div>
+              </div>
   
               <div className="space-y-6 sm:space-y-8 text-brand-muted text-sm sm:text-base md:text-lg leading-relaxed font-sans">
                 <p className="whitespace-pre-line">
@@ -875,15 +889,15 @@ export default function PortfolioPage() {
               </div>
             </motion.div>
 
-            {/* Left Column: Premium Coach Action Image - second on mobile */}
+            {/* Left Column: Premium Coach Action Image - desktop only */}
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
-              className="lg:col-span-5 relative group order-2 lg:order-2"
+              className="hidden lg:block lg:col-span-5 relative group order-2 lg:order-2"
             >
-              <div className="relative h-[320px] sm:h-[480px] lg:h-[560px] w-full rounded-[2.5rem] overflow-hidden border border-brand-border/80 group-hover:border-brand-accent/40 transition-all duration-500 shadow-2xl shadow-black/60">
+              <div className="relative h-[480px] lg:h-[560px] w-full rounded-[2.5rem] overflow-hidden border border-brand-border/80 group-hover:border-brand-accent/40 transition-all duration-500 shadow-2xl shadow-black/60">
                 <Image 
                   src={aboutSettings.image || "https://picsum.photos/seed/coach-ishtiaq/800/1000"} 
                   alt="Coach Ishtiak Philosophy"
@@ -891,7 +905,6 @@ export default function PortfolioPage() {
                   className="object-cover object-top transition-transform duration-700 group-hover:scale-103 brightness-95"
                   referrerPolicy="no-referrer"
                 />
-                {/* Visual design badge detailing */}
                 <div className="absolute top-5 left-5 bg-black/80 backdrop-blur-md px-3.5 py-1.5 border border-white/10 rounded-full text-[9px] font-mono uppercase tracking-widest text-[#BFFF00]">
                   {aboutSettings.badge}
                 </div>
@@ -902,7 +915,7 @@ export default function PortfolioPage() {
       </section>
  
       {/* Achievements Grid */}
-      <section id="achievements" className="py-16 sm:py-28 px-4 sm:px-6 bg-brand-secondary/30 relative overflow-hidden border-t border-b border-brand-border/40">
+      <section id="achievements" className="py-10 sm:py-28 px-4 sm:px-6 bg-brand-secondary/30 relative overflow-hidden border-t border-b border-brand-border/40">
         {/* Deep Yellow Glow Background Gradient */}
         <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] bg-brand-accent/5 rounded-full blur-[100px] pointer-events-none -z-10" />
  
@@ -959,7 +972,7 @@ export default function PortfolioPage() {
       </section>
 
       {/* Class Schedule Section */}
-      <section id="schedule" className="py-12 sm:py-24 px-4 sm:px-6 border-y border-brand-border bg-brand-primary relative overflow-hidden">
+      <section id="schedule" className="py-8 sm:py-24 px-4 sm:px-6 border-y border-brand-border bg-brand-primary relative overflow-hidden">
         {/* Subtle Backdrop Gradients */}
         <div className="absolute top-1/2 left-0 -translate-y-1/2 w-[500px] h-[500px] bg-brand-accent/5 rounded-full blur-[120px] pointer-events-none -z-10" />
         
@@ -1060,7 +1073,7 @@ export default function PortfolioPage() {
       </section>
 
       {/* Experience Timeline */}
-      <section id="experience" className="py-12 sm:py-24 px-4 sm:px-6 bg-brand-primary relative overflow-hidden border-b border-brand-border/30">
+      <section id="experience" className="py-8 sm:py-24 px-4 sm:px-6 bg-brand-primary relative overflow-hidden border-b border-brand-border/30">
         {/* Soft Red Combat Glow backdrop */}
         <div className="absolute top-1/3 right-1/4 w-[450px] h-[450px] bg-red-600/5 rounded-full blur-[110px] pointer-events-none -z-10" />
 
@@ -1203,7 +1216,7 @@ export default function PortfolioPage() {
       </section>
 
       {/* Skills Section */}
-      <section id="skills" className="py-12 sm:py-24 px-4 sm:px-6 bg-brand-secondary/20 backdrop-blur-sm border-t border-b border-brand-border relative overflow-hidden">
+      <section id="skills" className="py-8 sm:py-24 px-4 sm:px-6 bg-brand-secondary/20 backdrop-blur-sm border-t border-b border-brand-border relative overflow-hidden">
         {/* Subtle arena ropes backdrop */}
         <BoxingRingDecal className="absolute left-1/2 -translate-x-1/2 bottom-[10%] w-full max-w-6xl text-white/5 pointer-events-none select-none" />
 
@@ -1235,7 +1248,7 @@ export default function PortfolioPage() {
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="py-12 sm:py-24 px-4 sm:px-6 bg-brand-primary relative overflow-hidden">
+      <section id="pricing" className="py-8 sm:py-24 px-4 sm:px-6 bg-brand-primary relative overflow-hidden">
         {/* Spot light radial gradient */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-brand-accent/5 rounded-full blur-[130px] pointer-events-none -z-10" />
 
@@ -1302,7 +1315,7 @@ export default function PortfolioPage() {
       </section>
 
       {/* Gallery Preview Section */}
-      <section className="py-16 px-4 sm:py-32 sm:px-12 lg:px-24 bg-brand-secondary/30">
+      <section className="py-10 px-4 sm:py-32 sm:px-12 lg:px-24 bg-brand-secondary/30">
         <div className="container max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-16 gap-6 sm:gap-8">
             <div>
@@ -1408,7 +1421,7 @@ export default function PortfolioPage() {
       </section>
 
       {/* Elite Gear / Shop Preview Section */}
-      <section className="py-16 bg-brand-primary overflow-hidden relative">
+      <section className="py-10 bg-brand-primary overflow-hidden relative">
         <div className="container max-w-7xl mx-auto px-4 sm:px-12 lg:px-24">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-16 gap-6 sm:gap-8">
             <div>
@@ -1527,7 +1540,7 @@ export default function PortfolioPage() {
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="py-16 px-4 sm:px-12 lg:px-24 bg-brand-secondary/10 border-t border-brand-border relative overflow-hidden">
+      <section id="contact" className="py-10 px-4 sm:px-12 lg:px-24 bg-brand-secondary/10 border-t border-brand-border relative overflow-hidden">
         {/* Immersive Arena Fight Lights Spot gradients */}
         <div className="absolute top-[30%] left-[10%] w-[450px] h-[450px] bg-brand-accent/5 rounded-full blur-[100px] pointer-events-none -z-10" />
         <div className="absolute bottom-10 right-10 w-[400px] h-[400px] bg-red-600/5 rounded-full blur-[100px] pointer-events-none -z-10" />
