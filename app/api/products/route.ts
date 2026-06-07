@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { parseJsonFields } from '@/lib/supabase-utils';
+import { requireAuth } from '@/lib/auth';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const user = requireAuth(request);
+  if (!user) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
   const { data, error } = await getSupabaseAdmin()
     .from('products')
     .select('*')
@@ -20,6 +23,8 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  const user = requireAuth(request);
+  if (!user) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
   try {
     const body = await request.json();
     const { name, price, category, image, rating, description, specs } = body;

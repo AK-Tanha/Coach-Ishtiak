@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
+import { requireAuth } from '@/lib/auth';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const user = requireAuth(request);
+  if (!user) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
   const { data, error } = await getSupabaseAdmin()
     .from('gallery_images')
     .select('*')
@@ -15,6 +18,8 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  const user = requireAuth(request);
+  if (!user) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
   try {
     const body = await request.json();
     const { url, title, category } = body;
@@ -43,6 +48,8 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  const user = requireAuth(request);
+  if (!user) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
   const { searchParams } = new URL(request.url);
   const id = searchParams.get('id');
 

@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
+import { requireAuth } from '@/lib/auth';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const user = requireAuth(request);
+  if (!user) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
   const { data, error } = await getSupabaseAdmin()
     .from('about_settings')
     .select('*')
@@ -16,6 +19,8 @@ export async function GET() {
 }
 
 export async function PUT(request: NextRequest) {
+  const user = requireAuth(request);
+  if (!user) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
   try {
     const body = await request.json();
     const { badge, heading, subheading, para1, para2, image } = body;

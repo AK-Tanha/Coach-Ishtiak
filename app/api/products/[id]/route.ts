@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
+import { requireAuth } from '@/lib/auth';
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const user = requireAuth(request);
+  if (!user) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
   const { id } = await params;
 
   try {
@@ -40,6 +43,8 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 }
 
 export async function DELETE(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const user = requireAuth(_request);
+  if (!user) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
   const { id } = await params;
 
   const productId = parseInt(id, 10);
