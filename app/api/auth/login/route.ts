@@ -12,7 +12,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!validateCredentials(email, password)) {
+    const valid = await validateCredentials(email, password);
+
+    if (!valid) {
       return NextResponse.json(
         { success: false, error: 'Invalid credentials' },
         { status: 401 }

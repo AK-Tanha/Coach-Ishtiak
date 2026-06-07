@@ -1,9 +1,8 @@
 import jwt from 'jsonwebtoken';
 import { NextRequest } from 'next/server';
+import { getSupabaseAdmin } from './supabase-server';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'rahmat_sany_secret_2024';
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@coachishtiak.com';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
 
 export interface JwtPayload {
   email: string;
@@ -13,7 +12,7 @@ export interface JwtPayload {
 }
 
 export function signToken(): string {
-  const payload: JwtPayload = { email: ADMIN_EMAIL, role: 'admin' };
+  const payload: JwtPayload = { email: 'admin@coachishtiak.com', role: 'admin' };
   return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
 }
 
@@ -25,8 +24,10 @@ export function verifyToken(token: string): JwtPayload | null {
   }
 }
 
-export function validateCredentials(email: string, password: string): boolean {
-  return email === ADMIN_EMAIL && password === ADMIN_PASSWORD;
+export async function validateCredentials(email: string, password: string): Promise<boolean> {
+  const supabase = getSupabaseAdmin();
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  return !error;
 }
 
 export function getTokenFromRequest(request: NextRequest): string | null {
