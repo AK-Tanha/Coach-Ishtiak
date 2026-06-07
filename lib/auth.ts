@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import { NextRequest } from 'next/server';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'rahmat_sany_secret_2024';
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@coachsany.com';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@coachishtiak.com';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
 
 export interface JwtPayload {
