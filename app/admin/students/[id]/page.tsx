@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowLeft, Mail, Phone, Calendar, Edit3, Send, ChevronRight, Zap, Loader2 } from 'lucide-react';
 import { students as studentsApi } from '@/lib/api';
 import MessageDialog from '@/components/admin/MessageDialog';
@@ -158,7 +159,7 @@ export default function StudentDetailPage() {
             {/* Avatar */}
             <div className="relative w-20 h-20 sm:w-28 sm:h-28 rounded-full overflow-hidden shrink-0 border-2 border-brand-border bg-brand-primary">
               {student.image ? (
-                <img src={student.image} alt={student.name} className="object-cover w-full h-full" />
+                <Image src={student.image} alt={student.name} fill className="object-cover" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-xl sm:text-2xl font-black text-brand-accent uppercase">
                   {student.name.split(' ').map(n => n[0]).join('').slice(0, 2)}

@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import Image from 'next/image';
 import { Plus } from 'lucide-react';
 
 export default function ImageUploader({
@@ -43,7 +44,7 @@ export default function ImageUploader({
         {value ? (
           <div className="flex items-center gap-3 w-full">
             <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 border border-brand-border bg-brand-primary">
-              <img src={value} alt="Preview" className="object-cover w-full h-full" />
+              <Image src={value} alt="Preview" width={200} height={200} className="object-cover w-full h-full" />
             </div>
             <div className="text-left text-[11px] text-brand-muted truncate flex-1 leading-normal">
               Image loaded successfully. Click to replace.

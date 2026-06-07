@@ -1,0 +1,11 @@
+<svg width="800" height="800" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="800" fill="#141417"/>
+  <rect x="200" y="200" width="400" height="300" rx="24" fill="#1C1C20" stroke="#2A2A30" stroke-width="2"/>
+  <rect x="280" y="250" width="240" height="40" rx="8" fill="#CCFF00" opacity="0.1"/>
+  <rect x="300" y="310" width="200" height="8" rx="4" fill="#2A2A30"/>
+  <rect x="320" y="335" width="160" height="6" rx="3" fill="#1C1C20"/>
+  <rect x="280" y="380" width="240" height="50" rx="10" fill="#CCFF00" opacity="0.15"/>
+  <text x="400" y="410" text-anchor="middle" fill="#CCFF00" font-family="monospace" font-size="10" font-weight="bold" letter-spacing="2" opacity="0.5">PRODUCT</text>
+  <rect x="250" y="540" width="300" height="60" rx="12" fill="#2A2A30" opacity="0.5"/>
+  <text x="400" y="575" text-anchor="middle" fill="#CCFF00" font-family="monospace" font-size="9" letter-spacing="2" opacity="0.3">SHOP PLACEHOLDER</text>
+</svg>

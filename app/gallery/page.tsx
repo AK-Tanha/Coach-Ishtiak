@@ -10,15 +10,15 @@ import type { GalleryImage } from '@/lib/types';
 import { GalleryGridSkeleton } from '../../components/PageSkeletons';
 
 const galleryImages = [
-  { id: 1, url: "https://picsum.photos/seed/mma1/800/1000", title: "WBC Refereeing", category: "Events" },
-  { id: 2, url: "https://picsum.photos/seed/mma2/1000/800", title: "Sparring Session", category: "Training" },
-  { id: 3, url: "https://picsum.photos/seed/mma3/800/800", title: "Championship Belt", category: "Awards" },
-  { id: 4, url: "https://picsum.photos/seed/mma4/1000/1200", title: "Heavy Bag Work", category: "Training" },
-  { id: 5, url: "https://picsum.photos/seed/mma5/1200/800", title: "Team Photo", category: "Events" },
-  { id: 6, url: "https://picsum.photos/seed/mma6/800/1000", title: "Grappling Drill", category: "Training" },
-  { id: 7, url: "https://picsum.photos/seed/mma7/1000/1000", title: "WBC Certification", category: "Awards" },
-  { id: 8, url: "https://picsum.photos/seed/mma8/800/1200", title: "Cornering a Fight", category: "Events" },
-  { id: 9, url: "https://picsum.photos/seed/mma9/1200/1000", title: "Youth Program", category: "Training" },
+  { id: 1, url: "/images/gallery/placeholder.svg", title: "WBC Refereeing", category: "Events" },
+  { id: 2, url: "/images/gallery/placeholder.svg", title: "Sparring Session", category: "Training" },
+  { id: 3, url: "/images/gallery/placeholder.svg", title: "Championship Belt", category: "Awards" },
+  { id: 4, url: "/images/gallery/placeholder.svg", title: "Heavy Bag Work", category: "Training" },
+  { id: 5, url: "/images/gallery/placeholder.svg", title: "Team Photo", category: "Events" },
+  { id: 6, url: "/images/gallery/placeholder.svg", title: "Grappling Drill", category: "Training" },
+  { id: 7, url: "/images/gallery/placeholder.svg", title: "WBC Certification", category: "Awards" },
+  { id: 8, url: "/images/gallery/placeholder.svg", title: "Cornering a Fight", category: "Events" },
+  { id: 9, url: "/images/gallery/placeholder.svg", title: "Youth Program", category: "Training" },
 ];
 
 export default function GalleryPage() {
@@ -103,6 +103,8 @@ export default function GalleryPage() {
                 src={image.url}
                 alt={image.title}
                 fill
+                quality={75}
+                loading="lazy"
                 className="object-cover transition-transform duration-700 group-hover:scale-110 grayscale hover:grayscale-0"
                 referrerPolicy="no-referrer"
               />
@@ -149,6 +151,8 @@ export default function GalleryPage() {
                 src={selectedImage.url}
                 alt={selectedImage.title}
                 fill
+                quality={75}
+                loading="lazy"
                 className="object-contain"
                 referrerPolicy="no-referrer"
               />

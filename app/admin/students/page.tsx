@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Users, Mail, Phone, Edit3, Trash2, Search, UserPlus, CheckCircle2, Clock, DollarSign, Zap, Plus, ArrowLeft, X, Send, MessageSquare, CheckCheck } from 'lucide-react';
 import { auth as authApi, students as studentsApi } from '@/lib/api';
 import ImageUploader from '@/components/admin/ImageUploader';
@@ -9,8 +10,8 @@ import ConfirmDialog from '@/components/admin/ConfirmDialog';
 import MessageDialog from '@/components/admin/MessageDialog';
 
 const defaultStudents = [
-  { id: "st-1", name: "Tanvir Rahman", email: "tanvir@gmail.com", phone: "01711223344", course: "3 Months Course", status: "Active", enrolledDate: "2026-05-10", image: "https://picsum.photos/seed/tanvir/800/800" },
-  { id: "st-2", name: "Fahim Ahmed", email: "fahim.ah@gmail.com", phone: "01822445566", course: "Monthly Plan", status: "Pending", enrolledDate: "2026-05-18", image: "https://picsum.photos/seed/fahim/800/800" },
+  { id: "st-1", name: "Tanvir Rahman", email: "tanvir@gmail.com", phone: "01711223344", course: "3 Months Course", status: "Active", enrolledDate: "2026-05-10", image: "/images/placeholder.svg" },
+  { id: "st-2", name: "Fahim Ahmed", email: "fahim.ah@gmail.com", phone: "01822445566", course: "Monthly Plan", status: "Pending", enrolledDate: "2026-05-18", image: "/images/placeholder.svg" },
   { id: "st-3", name: "Imtiaz Hassan", email: "imtiaz@hassan.info", phone: "01677338899", course: "3 Months Course", status: "Active", enrolledDate: "2026-04-12", image: "" },
   { id: "st-4", name: "Anika Bushra", email: "anika.bushra@outlook.com", phone: "01944112233", course: "3 Months Course", status: "Active", enrolledDate: "2026-05-02", image: "" },
   { id: "st-5", name: "Raihan Kabir", email: "raihan@kabir.net", phone: "01588667744", course: "Monthly Plan", status: "Canceled", enrolledDate: "2026-05-15", image: "" }
@@ -473,7 +474,7 @@ export default function StudentsPage() {
                               <div className="flex items-center gap-3">
                                 <div className="relative w-9 h-9 rounded-full overflow-hidden shrink-0 border border-brand-border bg-brand-primary flex items-center justify-center">
                                   {athlete.image ? (
-                                    <img src={athlete.image} alt={athlete.name} className="object-cover w-full h-full" />
+                                    <Image src={athlete.image} alt={athlete.name} width={36} height={36} className="object-cover w-full h-full" />
                                   ) : (
                                     <span className="text-[10px] font-mono tracking-wider font-extrabold text-brand-accent uppercase">
                                       {athlete.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
@@ -550,7 +551,7 @@ export default function StudentsPage() {
                             />
                             <div className="relative w-8 h-8 rounded-full overflow-hidden shrink-0 border border-brand-border bg-brand-primary flex items-center justify-center">
                               {athlete.image ? (
-                                <img src={athlete.image} alt={athlete.name} className="object-cover w-full h-full" />
+                                <Image src={athlete.image} alt={athlete.name} width={36} height={36} className="object-cover w-full h-full" />
                               ) : (
                                 <span className="text-[9px] font-mono tracking-wider font-extrabold text-brand-accent uppercase">
                                   {athlete.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}

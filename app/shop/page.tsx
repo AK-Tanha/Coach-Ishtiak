@@ -30,7 +30,7 @@ const defaultProducts = [
     name: "Invictus Elite Boxing Gloves",
     price: 89.99,
     category: "Equipment",
-    image: "https://picsum.photos/seed/gloves/800/800",
+    image: "/images/shop/placeholder.svg",
     rating: 4.9,
     description: "Professional grade leather gloves used by Coach Ishtiaq in training sessions. Engineered with triple-density foam and safe wrist lock straps.",
     specs: {
@@ -46,7 +46,7 @@ const defaultProducts = [
     name: "WBC Referee Commemorative Tee",
     price: 34.99,
     category: "Apparel",
-    image: "https://picsum.photos/seed/shirt/800/800",
+    image: "/images/shop/placeholder.svg",
     rating: 4.8,
     description: "Limited edition technical t-shirt celebrating Bangladesh's first WBC referee. Highly breathable, sweat-wicking lightweight athletic fit.",
     specs: {
@@ -62,7 +62,7 @@ const defaultProducts = [
     name: "Invictus MMA Shinguards",
     price: 59.99,
     category: "Equipment",
-    image: "https://picsum.photos/seed/shinguard/800/800",
+    image: "/images/shop/placeholder.svg",
     rating: 4.7,
     description: "Multi-layered protective foam guards offering high shock absorption. Ergonomically shaped for superior fit and minimal moving during heavy grappling/sparring.",
     specs: {
@@ -78,7 +78,7 @@ const defaultProducts = [
     name: "8-Week Combat Conditioning Program",
     price: 129.99,
     category: "Digital",
-    image: "https://picsum.photos/seed/program/800/800",
+    image: "/images/shop/placeholder.svg",
     rating: 5.0,
     description: "A comprehensive digital athletic guide to peak physical combat performance. Contains day-to-day macro plans and strength routines certified by Coach Ishtiaq.",
     specs: {
@@ -94,7 +94,7 @@ const defaultProducts = [
     name: "Classic Invictus Heavyweight Hoodie",
     price: 64.99,
     category: "Apparel",
-    image: "https://picsum.photos/seed/hoodie/800/800",
+    image: "/images/shop/placeholder.svg",
     rating: 4.9,
     description: "Heavyweight premium cotton fleece hoodie featuring high-durability embroidered chest lockups. Tailored with a relaxed combat-athlete profile fit.",
     specs: {
@@ -110,7 +110,7 @@ const defaultProducts = [
     name: "Professional Elastic Hand Wraps",
     price: 14.99,
     category: "Equipment",
-    image: "https://picsum.photos/seed/wraps/800/800",
+    image: "/images/shop/placeholder.svg",
     rating: 4.6,
     description: "Premium length stretch cotton wraps providing high support to small knuckle joints and wrist segments during heavy bag sessions.",
     specs: {
@@ -251,8 +251,8 @@ export default function ShopPage() {
       date: new Date().toISOString().split('T')[0]
     };
 
-    // Save to API
-    await ordersApi.create(newOrder).catch(console.warn);
+    // Save to API (silent fallback to localStorage)
+    try { await ordersApi.create(newOrder); } catch {}
 
     // Also save to localStorage as fallback
     if (typeof window !== 'undefined') {
@@ -425,13 +425,15 @@ export default function ShopPage() {
                       <div>
                         {/* Upper Card Graphic Header */}
                         <div className="relative aspect-square rounded-[1.6rem] overflow-hidden bg-[#15151b] border border-brand-border/70 mb-5 group-hover:border-brand-accent/25 transition-all duration-500">
-                          <Image 
-                            src={product.image} 
-                            alt={product.name} 
-                            fill 
-                            className="object-cover grayscale brightness-[0.82] transition-all duration-700 ease-out group-hover:grayscale-0 group-hover:scale-103 group-hover:brightness-95"
-                            referrerPolicy="no-referrer"
-                          />
+<Image 
+  src={product.image} 
+  alt={product.name} 
+  fill 
+  className="object-cover grayscale brightness-[0.82] transition-all duration-700 ease-out group-hover:grayscale-0 group-hover:scale-103 group-hover:brightness-95"
+  referrerPolicy="no-referrer"
+  quality={75}
+  loading="lazy"
+/>
                           <div className="absolute top-4 left-4 z-10 flex gap-2">
                             <span className="bg-black/85 backdrop-blur-md px-3.5 py-1.5 rounded-full text-[9px] font-mono font-extrabold uppercase tracking-widest text-[#BFFF00] border border-brand-accent/15">
                               {product.category}
@@ -529,13 +531,15 @@ export default function ShopPage() {
 
               {/* Product Visual Container (5 cols) */}
               <div className="md:col-span-5 relative aspect-square md:aspect-auto md:h-full min-h-[300px] md:min-h-[500px] bg-[#15151b] border-b md:border-b-0 md:border-r border-brand-border">
-                <Image 
-                  src={quickViewProduct.image} 
-                  alt={quickViewProduct.name} 
-                  fill 
-                  className="object-cover grayscale hover:grayscale-0 transition-all duration-700"
-                  referrerPolicy="no-referrer"
-                />
+<Image 
+  src={quickViewProduct.image} 
+  alt={quickViewProduct.name} 
+  fill 
+  className="object-cover grayscale hover:grayscale-0 transition-all duration-700"
+  referrerPolicy="no-referrer"
+  quality={75}
+  loading="lazy"
+/>
                 
                 {/* Visual indicators */}
                 <div className="absolute bottom-5 left-5 right-5 bg-black/60 backdrop-blur-md p-4 rounded-2xl border border-white/10 text-xs font-mono">
@@ -725,13 +729,15 @@ export default function ShopPage() {
                       {cart.map((item, index) => (
                         <div key={`${item.id}-${item.selectedSize || index}`} className="flex items-center gap-4 bg-[#15151b]/40 border border-brand-border/60 p-3.5 rounded-2.5xl">
                           <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-[#15151b] border border-brand-border shrink-0">
-                            <Image 
-                              src={item.product.image} 
-                              alt={item.product.name} 
-                              fill 
-                              className="object-cover grayscale"
-                              referrerPolicy="no-referrer"
-                            />
+<Image 
+  src={item.product.image} 
+  alt={item.product.name} 
+  fill 
+  className="object-cover grayscale"
+  referrerPolicy="no-referrer"
+  quality={75}
+  loading="lazy"
+/>
                           </div>
                           
                           <div className="flex-1 min-w-0">

@@ -13,9 +13,9 @@ const defaultHeroSettings = {
   name: "COACH ISHTIAK",
   description: "A Coach, A Student & An Athlete. Over a decade forging champions in MMA, BJJ, and Boxing. Founder of core combat sport institutions in Bangladesh.",
   images: [
-    { url: "https://picsum.photos/seed/coach-ishtiaq/1000/1000", caption: "First WBC Referee BD", title: "BANGLADESH" },
-    { url: "https://picsum.photos/seed/mma-training-1/1000/1000", caption: "Head Coach", title: "INVICTUS" },
-    { url: "https://picsum.photos/seed/boxing-match-1/1000/1000", caption: "Founder", title: "BMMAA" }
+    { url: "/images/placeholder.svg", caption: "First WBC Referee BD", title: "BANGLADESH" },
+    { url: "/images/placeholder.svg", caption: "Head Coach", title: "INVICTUS" },
+    { url: "/images/placeholder.svg", caption: "Founder", title: "BMMAA" }
   ]
 };
 
@@ -25,7 +25,7 @@ const defaultAboutSettings = {
   subheading: "Building champions inside and outside the cage.",
   para1: "Recognized as Bangladesh's first WBC-certified boxing referee, my journey has been defined by a relentless pursuit of excellence and the development of combat sports on a national level. As the Founder and General Secretary of the Bangladesh Mixed Martial Arts Association (BMMAA), I have pioneered the first organized MMA events in our nation.",
   para2: "My coaching methodology combines technical precision with mental fortitude. From tactical boxing instructions for the Bangladesh Army to leading high-performance training at Invictus BJJ, I focus on the holistic development of my athletes.",
-  image: "https://picsum.photos/seed/coach-ishtiaq/800/1000"
+  image: "/images/placeholder-portrait.svg"
 };
 
 export default function ContentPage() {

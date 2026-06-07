@@ -42,21 +42,9 @@ import type { ScheduleDay, PricingPlan, Experience } from '@/lib/types';
 import { HeroSkeleton, StatsSkeleton, AboutSkeleton, AchievementsSkeleton, ScheduleSkeleton, ExperienceSkeleton, SkillsSkeleton, PricingSkeleton, GalleryPreviewSkeleton, ProductsSkeleton, ContactSkeleton } from '../components/PageSkeletons';
 
 const heroImages = [
-  {
-    url: "https://picsum.photos/seed/coach-ishtiaq/1000/1000",
-    caption: "First WBC Referee BD",
-    title: "BANGLADESH"
-  },
-  {
-    url: "https://picsum.photos/seed/mma-training-1/1000/1000",
-    caption: "Head Coach",
-    title: "INVITCTUS"
-  },
-  {
-    url: "https://picsum.photos/seed/boxing-match-1/1000/1000",
-    caption: "Founder",
-    title: "BMMAA"
-  }
+  { url: "/images/placeholder.svg", caption: "First WBC Referee BD", title: "BANGLADESH" },
+  { url: "/images/placeholder.svg", caption: "Head Coach", title: "INVICTUS" },
+  { url: "/images/placeholder.svg", caption: "Founder", title: "BMMAA" }
 ];
 
 const defaultHeroSettings = {
@@ -74,7 +62,7 @@ const defaultAboutSettings = {
   subheading: "Building champions inside and outside the cage.",
   para1: "Recognized as Bangladesh's first WBC-certified boxing referee, my journey has been defined by a relentless pursuit of excellence and the development of combat sports on a national level. As the Founder and General Secretary of the Bangladesh Mixed Martial Arts Association (BMMAA), I have pioneered the first organized MMA events in our nation.",
   para2: "My coaching methodology combines technical precision with mental fortitude. From tactical boxing instructions for the Bangladesh Army to leading high-performance training at Invictus BJJ, I focus on the holistic development of my athletes.",
-  image: "https://picsum.photos/seed/coach-ishtiaq/800/1000"
+  image: "/images/placeholder-portrait.svg"
 };
 
 const schedule = [
@@ -221,11 +209,11 @@ const skills = [
 ];
 
 const defaultHomepageProducts = [
-  { id: 1, name: "Invictus Elite Boxing Gloves", price: 89.99, image: "https://picsum.photos/seed/gloves/800/800" },
-  { id: 2, name: "WBC Referee Commemorative Tee", price: 34.99, image: "https://picsum.photos/seed/shirt/800/800" },
-  { id: 3, name: "Invictus MMA Shinguards", price: 59.99, image: "https://picsum.photos/seed/shinguard/800/800" },
-  { id: 4, name: "8-Week Combat Conditioning Program", price: 129.99, image: "https://picsum.photos/seed/program/800/800" },
-  { id: 5, name: "Classic Invictus Hoodie", price: 64.99, image: "https://picsum.photos/seed/hoodie/800/800" }
+  { id: 1, name: "Invictus Elite Boxing Gloves", price: 89.99, image: "/images/shop/placeholder.svg" },
+  { id: 2, name: "WBC Referee Commemorative Tee", price: 34.99, image: "/images/shop/placeholder.svg" },
+  { id: 3, name: "Invictus MMA Shinguards", price: 59.99, image: "/images/shop/placeholder.svg" },
+  { id: 4, name: "8-Week Combat Conditioning Program", price: 129.99, image: "/images/shop/placeholder.svg" },
+  { id: 5, name: "Classic Invictus Hoodie", price: 64.99, image: "/images/shop/placeholder.svg" }
 ];
 
 export default function PortfolioPage() {
@@ -721,11 +709,12 @@ export default function PortfolioPage() {
                 >
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent z-10" />
                   <Image 
-                    src={heroSettings.images[currentSlide]?.url || "https://picsum.photos/seed/coach-ishtiaq/1000/1000"} 
+                    src={heroSettings.images[currentSlide]?.url || "/images/placeholder.svg"} 
                     alt={heroSettings.images[currentSlide]?.caption || "Slide Image"} 
                     fill
                     className="w-full h-full object-cover brightness-90 contrast-[1.05] group-hover:scale-105 transition-transform duration-700"
                     priority
+                    quality={75}
                     referrerPolicy="no-referrer"
                   />
                   <div className="absolute bottom-16 left-5 xs:bottom-20 xs:left-6 sm:bottom-24 sm:left-10 z-20">
@@ -868,10 +857,12 @@ export default function PortfolioPage() {
               {/* Mobile image - shows between subheading and paragraphs */}
               <div className="lg:hidden relative h-[280px] w-full rounded-[2.5rem] overflow-hidden border border-brand-border/80 mb-8 shadow-2xl shadow-black/60">
                 <Image 
-                  src={aboutSettings.image || "https://picsum.photos/seed/coach-ishtiaq/800/1000"} 
+                  src={aboutSettings.image || "/images/placeholder-portrait.svg"} 
                   alt="Coach Ishtiak Philosophy"
                   fill
                   className="object-cover object-top brightness-95"
+                  loading="lazy"
+                  quality={75}
                   referrerPolicy="no-referrer"
                 />
                 <div className="absolute top-5 left-5 bg-black/80 backdrop-blur-md px-3.5 py-1.5 border border-white/10 rounded-full text-[9px] font-mono uppercase tracking-widest text-[#BFFF00]">
@@ -899,10 +890,12 @@ export default function PortfolioPage() {
             >
               <div className="relative h-[480px] lg:h-[560px] w-full rounded-[2.5rem] overflow-hidden border border-brand-border/80 group-hover:border-brand-accent/40 transition-all duration-500 shadow-2xl shadow-black/60">
                 <Image 
-                  src={aboutSettings.image || "https://picsum.photos/seed/coach-ishtiaq/800/1000"} 
+                  src={aboutSettings.image || "/images/placeholder-portrait.svg"} 
                   alt="Coach Ishtiak Philosophy"
                   fill
                   className="object-cover object-top transition-transform duration-700 group-hover:scale-103 brightness-95"
+                  loading="lazy"
+                  quality={75}
                   referrerPolicy="no-referrer"
                 />
                 <div className="absolute top-5 left-5 bg-black/80 backdrop-blur-md px-3.5 py-1.5 border border-white/10 rounded-full text-[9px] font-mono uppercase tracking-widest text-[#BFFF00]">
@@ -1344,10 +1337,12 @@ export default function PortfolioPage() {
               className="md:col-span-2 relative h-[250px] md:h-full rounded-2xl sm:rounded-3xl overflow-hidden group border border-brand-border shadow-xl"
             >
               <Image 
-                src="https://picsum.photos/seed/gall-1/1200/800" 
+                src="/images/placeholder.svg" 
                 alt="WBC Refereeing" 
                 fill 
                 className="object-cover transition-transform duration-700 group-hover:scale-110"
+                loading="lazy"
+                quality={75}
                 referrerPolicy="no-referrer"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-brand-primary/95 via-transparent to-transparent p-6 sm:p-8 flex flex-col justify-end">
@@ -1366,10 +1361,12 @@ export default function PortfolioPage() {
                 className="relative h-[180px] sm:h-[220px] md:h-full rounded-2xl sm:rounded-3xl overflow-hidden group border border-brand-border shadow-lg"
               >
                 <Image 
-                  src="https://picsum.photos/seed/gall-2/600/600" 
+                  src="/images/placeholder.svg" 
                   alt="Training Workshop" 
                   fill 
                   className="object-cover transition-transform duration-700 group-hover:scale-110"
+                  loading="lazy"
+                  quality={75}
                   referrerPolicy="no-referrer"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-brand-primary/95 via-transparent to-transparent p-5 sm:p-6 flex flex-col justify-end">
@@ -1385,10 +1382,12 @@ export default function PortfolioPage() {
                 className="relative h-[180px] sm:h-[220px] md:h-full rounded-2xl sm:rounded-3xl overflow-hidden group border border-brand-border shadow-lg"
               >
                 <Image 
-                  src="https://picsum.photos/seed/gall-3/600/600" 
+                  src="/images/placeholder.svg" 
                   alt="Championship Night" 
                   fill 
                   className="object-cover transition-transform duration-700 group-hover:scale-110"
+                  loading="lazy"
+                  quality={75}
                   referrerPolicy="no-referrer"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-brand-primary/95 via-transparent to-transparent p-5 sm:p-6 flex flex-col justify-end">
@@ -1406,10 +1405,12 @@ export default function PortfolioPage() {
               className="relative h-[250px] sm:h-[350px] md:h-full rounded-2xl sm:rounded-3xl overflow-hidden group border border-brand-border shadow-xl col-span-1 sm:col-span-2 md:col-span-1"
             >
               <Image 
-                src="https://picsum.photos/seed/gall-4/600/1000" 
+                src="/images/placeholder.svg" 
                 alt="Personal Training" 
                 fill 
                 className="object-cover transition-transform duration-700 group-hover:scale-110"
+                loading="lazy"
+                quality={75}
                 referrerPolicy="no-referrer"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-brand-primary/95 via-transparent to-transparent p-6 sm:p-8 flex flex-col justify-end">
@@ -1480,7 +1481,7 @@ export default function PortfolioPage() {
           >
             {(currentProducts.length > 0 ? [...currentProducts, ...currentProducts, ...currentProducts] : []).map((product, idx) => {
               const displayPrice = typeof product.price === 'number' ? `$${product.price.toFixed(2)}` : product.price;
-              const displayImg = product.image || product.img || "https://picsum.photos/seed/placeholder/800/800";
+              const displayImg = product.image || product.img || "/images/shop/placeholder.svg";
               const isActive = idx === productIdx;
               
               return (
@@ -1508,6 +1509,8 @@ export default function PortfolioPage() {
                       ? 'grayscale-0 scale-102' 
                       : 'grayscale-[60%] scale-100 group-hover:scale-102 group-hover:grayscale-0'
                       }`}
+                      loading="lazy"
+                      quality={75}
                       referrerPolicy="no-referrer"
                     />
                     

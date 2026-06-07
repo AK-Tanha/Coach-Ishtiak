@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import Image from 'next/image';
 import { ShoppingBag, Edit3, Trash2, Save, Search, Zap } from 'lucide-react';
 import { products as productsApi } from '@/lib/api';
 import ImageUploader from '@/components/admin/ImageUploader';
@@ -12,7 +13,7 @@ const defaultProducts = [
     name: "Invictus Elite Boxing Gloves",
     price: 89.99,
     category: "Equipment",
-    image: "https://picsum.photos/seed/gloves/800/800",
+    image: "/images/shop/placeholder.svg",
     rating: 4.9,
     description: "Professional grade leather gloves used by Coach Ishtiaq in training sessions."
   },
@@ -21,7 +22,7 @@ const defaultProducts = [
     name: "WBC Referee Commemorative Tee",
     price: 34.99,
     category: "Apparel",
-    image: "https://picsum.photos/seed/shirt/800/800",
+    image: "/images/shop/placeholder.svg",
     rating: 4.8,
     description: "Limited edition t-shirt celebrating Bangladesh's first WBC referee."
   },
@@ -30,7 +31,7 @@ const defaultProducts = [
     name: "Invictus MMA Shinguards",
     price: 59.99,
     category: "Equipment",
-    image: "https://picsum.photos/seed/shinguard/800/800",
+    image: "/images/shop/placeholder.svg",
     rating: 4.7,
     description: "Triple-density foam for maximum protection during sparring."
   }
@@ -78,7 +79,7 @@ export default function ProductsPage() {
       price: parseFloat(newProduct.price) || 0,
       category: newProduct.category,
       description: newProduct.description || "Elite training product.",
-      image: newProduct.image || "https://picsum.photos/seed/invictus-gear/800/800",
+      image: newProduct.image || "/images/shop/placeholder.svg",
       rating: parseFloat(newProduct.rating) || 5.0
     };
     const updated = [newlyCreated, ...products];
@@ -118,7 +119,7 @@ export default function ProductsPage() {
           price: parseFloat(editingProductForm.price) || 0,
           category: editingProductForm.category,
           description: editingProductForm.description || "Elite training product.",
-          image: editingProductForm.image || "https://picsum.photos/seed/invictus-gear/800/800",
+          image: editingProductForm.image || "/images/shop/placeholder.svg",
           rating: parseFloat(editingProductForm.rating) || 5.0
         };
       }
@@ -471,7 +472,7 @@ export default function ProductsPage() {
                           <td className="py-4 p-2">
                             <div className="flex items-center gap-3">
                               <div className="relative w-10 h-10 rounded-lg overflow-hidden shrink-0 border border-brand-border bg-brand-primary">
-                                <img src={prod.image} alt={prod.name} className="object-cover w-full h-full grayscale" />
+                                <Image src={prod.image} alt={prod.name} width={40} height={40} className="object-cover w-full h-full grayscale" />
                               </div>
                               <div>
                                 <div className="font-bold text-white text-sm">{prod.name}</div>
@@ -523,7 +524,7 @@ export default function ProductsPage() {
                   <div key={prod.id} className="p-5 bg-brand-secondary/40 border border-brand-border rounded-[1.5rem] space-y-4 shadow-sm">
                     <div className="flex items-start gap-3">
                       <div className="relative w-14 h-14 rounded-xl overflow-hidden shrink-0 border border-brand-border bg-brand-primary">
-                        <img src={prod.image} alt={prod.name} className="object-cover w-full h-full grayscale" />
+                        <Image src={prod.image} alt={prod.name} width={56} height={56} className="object-cover w-full h-full grayscale" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="font-bold text-white text-sm leading-tight truncate">{prod.name}</h3>
