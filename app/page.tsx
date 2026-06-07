@@ -242,7 +242,7 @@ export default function PortfolioPage() {
   // Elite Gear homepage local states & carousel limit configurations
   const [currentProducts, setCurrentProducts] = React.useState<any[]>(defaultHomepageProducts);
   const [productIdx, setProductIdx] = React.useState(defaultHomepageProducts.length);
-  const [disableTransition, setDisableTransition] = React.useState(false);
+  const skipTransitionRef = React.useRef(false);
   const [itemWidth, setItemWidth] = React.useState(440);
   const [carouselGap, setCarouselGap] = React.useState(24);
   const [isCarouselHovered, setIsCarouselHovered] = React.useState(false);
@@ -349,28 +349,28 @@ export default function PortfolioPage() {
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [currentProducts.length]);
+  }, []);
 
   const nextProduct = () => {
-    if (disableTransition) return;
     setProductIdx((prev) => prev + 1);
   };
 
   const prevProduct = () => {
-    if (disableTransition) return;
     setProductIdx((prev) => prev - 1);
   };
 
   const handleTransitionEnd = () => {
     const N = currentProducts.length;
-    if (N === 0) return;
-    
+    if (N <= 1) return;
+    if (skipTransitionRef.current) return;
+
     setProductIdx((prev) => {
       if (prev >= N * 2) {
-        setDisableTransition(true);
+        skipTransitionRef.current = true;
         return prev - N;
-      } else if (prev < N) {
-        setDisableTransition(true);
+      }
+      if (prev < N) {
+        skipTransitionRef.current = true;
         return prev + N;
       }
       return prev;
@@ -378,15 +378,13 @@ export default function PortfolioPage() {
   };
 
   React.useEffect(() => {
-    if (disableTransition) {
+    if (skipTransitionRef.current) {
       const raf = requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          setDisableTransition(false);
-        });
+        skipTransitionRef.current = false;
       });
       return () => cancelAnimationFrame(raf);
     }
-  }, [disableTransition]);
+  });
 
   React.useEffect(() => {
     const timer = setInterval(() => {
@@ -1463,7 +1461,7 @@ export default function PortfolioPage() {
             style={{ 
               transform: `translateX(calc(50% - (${itemWidth}px / 2) - (${productIdx} * (${itemWidth}px + ${carouselGap}px))))`,
               gap: `${carouselGap}px`,
-              transition: disableTransition ? 'none' : 'transform 500ms cubic-bezier(0.25, 1, 0.5, 1)'
+              transition: skipTransitionRef.current ? 'none' : 'transform 500ms cubic-bezier(0.25, 1, 0.5, 1)'
             }}
             onTransitionEnd={handleTransitionEnd}
           >
@@ -1480,7 +1478,7 @@ export default function PortfolioPage() {
                   className={`shrink-0 group block cursor-pointer transition-all duration-500 transform ${
                     isActive 
                       ? 'scale-100 opacity-100 z-10' 
-                      : 'scale-[0.88] opacity-35 z-0'
+                      : 'scale-[0.92] opacity-60 z-0'
                   }`}
                 >
                   <div className={`relative aspect-square rounded-3xl overflow-hidden bg-brand-secondary border transition-all duration-500 mb-5 sm:mb-6 ${
@@ -1494,8 +1492,8 @@ export default function PortfolioPage() {
                       fill 
                       className={`object-cover transition-all duration-700 ${
                         isActive 
-                          ? 'grayscale-0 scale-102' 
-                          : 'grayscale scale-100 group-hover:scale-102 group-hover:grayscale-[50%]'
+                      ? 'grayscale-0 scale-102' 
+                      : 'grayscale-[60%] scale-100 group-hover:scale-102 group-hover:grayscale-0'
                       }`}
                       referrerPolicy="no-referrer"
                     />
@@ -1512,7 +1510,7 @@ export default function PortfolioPage() {
 
                   {/* Title & Price blocks fading slightly when keeping off-focus */}
                   <div className={`flex justify-between items-start gap-4 transition-opacity duration-500 ${
-                    isActive ? 'opacity-100' : 'opacity-40 group-hover:opacity-80'
+                    isActive ? 'opacity-100' : 'opacity-60 group-hover:opacity-100'
                   }`}>
                     <span className="font-bold text-base sm:text-lg text-white group-hover:text-brand-accent transition-colors leading-snug">
                       {product.name}
