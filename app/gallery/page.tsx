@@ -9,34 +9,24 @@ import { gallery as galleryApi, loadWithFallback } from '@/lib/api';
 import type { GalleryImage } from '@/lib/types';
 import { GalleryGridSkeleton } from '../../components/PageSkeletons';
 
-const galleryImages = [
-  { id: 1, url: "/images/gallery/placeholder.svg", title: "WBC Refereeing", category: "Events" },
-  { id: 2, url: "/images/gallery/placeholder.svg", title: "Sparring Session", category: "Training" },
-  { id: 3, url: "/images/gallery/placeholder.svg", title: "Championship Belt", category: "Awards" },
-  { id: 4, url: "/images/gallery/placeholder.svg", title: "Heavy Bag Work", category: "Training" },
-  { id: 5, url: "/images/gallery/placeholder.svg", title: "Team Photo", category: "Events" },
-  { id: 6, url: "/images/gallery/placeholder.svg", title: "Grappling Drill", category: "Training" },
-  { id: 7, url: "/images/gallery/placeholder.svg", title: "WBC Certification", category: "Awards" },
-  { id: 8, url: "/images/gallery/placeholder.svg", title: "Cornering a Fight", category: "Events" },
-  { id: 9, url: "/images/gallery/placeholder.svg", title: "Youth Program", category: "Training" },
-];
-
 export default function GalleryPage() {
-  const [selectedImage, setSelectedImage] = React.useState<null | typeof galleryImages[0]>(null);
+  const [selectedImage, setSelectedImage] = React.useState<GalleryImage | null>(null);
   const [filter, setFilter] = React.useState('All');
-  const [images, setImages] = React.useState<GalleryImage[]>(galleryImages);
+  const [images, setImages] = React.useState<GalleryImage[]>([]);
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
     const load = async () => {
       setLoading(true);
-      const result = await loadWithFallback(
-        () => galleryApi.list(),
-        'invictus_gallery',
-        galleryImages
-      );
-      if (Array.isArray(result) && result.length > 0) {
-        setImages(result);
+      const res = await galleryApi.list();
+      if (res.success && res.data) {
+        setImages(res.data.filter(i => !i.url.includes('picsum.photos')));
+        localStorage.setItem('invictus_gallery', JSON.stringify(res.data));
+      } else {
+        const stored = localStorage.getItem('invictus_gallery');
+        if (stored) {
+          try { setImages(JSON.parse(stored).filter((i: any) => !i.url.includes('picsum.photos'))); } catch {}
+        }
       }
       setLoading(false);
     };
@@ -105,7 +95,7 @@ export default function GalleryPage() {
                 fill
                 quality={75}
                 loading="lazy"
-                className="object-cover transition-transform duration-700 group-hover:scale-110 grayscale hover:grayscale-0"
+                className="object-cover transition-transform duration-700 group-hover:scale-110"
                 referrerPolicy="no-referrer"
               />
               <div className="absolute inset-0 bg-brand-primary/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6 border border-brand-accent/20">

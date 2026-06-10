@@ -118,11 +118,11 @@ export default function ProductsCarousel({
                     src={displayImg}
                     alt={product.name}
                     fill
-                    className={`object-cover transition-all duration-700 ${
-                      isActive
-                    ? 'grayscale-0 scale-102'
-                    : 'grayscale-[60%] scale-100 group-hover:scale-102 group-hover:grayscale-0'
-                    }`}
+                       className={`object-cover transition-all duration-700 ${
+                       isActive
+                     ? 'scale-102'
+                     : 'scale-100 group-hover:scale-102'
+                     }`}
                     loading="lazy"
                     quality={75}
                     referrerPolicy="no-referrer"

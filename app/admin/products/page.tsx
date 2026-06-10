@@ -472,7 +472,7 @@ export default function ProductsPage() {
                           <td className="py-4 p-2">
                             <div className="flex items-center gap-3">
                               <div className="relative w-10 h-10 rounded-lg overflow-hidden shrink-0 border border-brand-border bg-brand-primary">
-                                <Image src={prod.image} alt={prod.name} width={40} height={40} className="object-cover w-full h-full grayscale" />
+                                <Image src={prod.image} alt={prod.name} width={40} height={40} className="object-cover w-full h-full" />
                               </div>
                               <div>
                                 <div className="font-bold text-white text-sm">{prod.name}</div>
@@ -524,7 +524,7 @@ export default function ProductsPage() {
                   <div key={prod.id} className="p-5 bg-brand-secondary/40 border border-brand-border rounded-[1.5rem] space-y-4 shadow-sm">
                     <div className="flex items-start gap-3">
                       <div className="relative w-14 h-14 rounded-xl overflow-hidden shrink-0 border border-brand-border bg-brand-primary">
-                        <Image src={prod.image} alt={prod.name} width={56} height={56} className="object-cover w-full h-full grayscale" />
+                        <Image src={prod.image} alt={prod.name} width={56} height={56} className="object-cover w-full h-full" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="font-bold text-white text-sm leading-tight truncate">{prod.name}</h3>

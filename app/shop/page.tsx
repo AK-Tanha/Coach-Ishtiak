@@ -429,7 +429,7 @@ export default function ShopPage() {
   src={product.image} 
   alt={product.name} 
   fill 
-  className="object-cover grayscale brightness-[0.82] transition-all duration-700 ease-out group-hover:grayscale-0 group-hover:scale-103 group-hover:brightness-95"
+  className="object-cover brightness-[0.82] transition-all duration-700 ease-out group-hover:scale-103 group-hover:brightness-95"
   referrerPolicy="no-referrer"
   quality={75}
   loading="lazy"
@@ -535,7 +535,7 @@ export default function ShopPage() {
   src={quickViewProduct.image} 
   alt={quickViewProduct.name} 
   fill 
-  className="object-cover grayscale hover:grayscale-0 transition-all duration-700"
+  className="object-cover transition-all duration-700"
   referrerPolicy="no-referrer"
   quality={75}
   loading="lazy"
@@ -733,7 +733,7 @@ export default function ShopPage() {
   src={item.product.image} 
   alt={item.product.name} 
   fill 
-  className="object-cover grayscale"
+  className="object-cover"
   referrerPolicy="no-referrer"
   quality={75}
   loading="lazy"

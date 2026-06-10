@@ -5,16 +5,7 @@ import { Briefcase, Edit3, Trash2, Save } from 'lucide-react';
 import { experience as experienceApi } from '@/lib/api';
 import ConfirmDialog from '@/components/admin/ConfirmDialog';
 
-const defaultExperience = [
-  { id: "exp-1", role: "Owner / Head Coach", company: "Xtreme MMA", period: "2014 - Present", description: "Driving elite combat sports training and organizational growth since inception." },
-  { id: "exp-2", role: "Owner / Head Coach", company: "Invictus BJJ & MMA", period: "2018 - Present", description: "Leading a premier academy for Brazilian Jiu-Jitsu and Mixed Martial Arts in Bangladesh." },
-  { id: "exp-3", role: "Boxing Coach", company: "Bangladesh Army", period: "February 1, 2021 - Present", description: "Providing tactical boxing instructions and training for military personnel." },
-  { id: "exp-4", role: "Professional Boxing Referee", company: "World Boxing Council (WBC)", period: "September 8, 2022 - Present", description: "WBC Ring Official Panel registered and certified as an Official Referee Level 1." },
-  { id: "exp-5", role: "Official / Assistant Coach", company: "Bangladesh Amateur Boxing Federation", period: "2018 - 2025", description: "Former Assistant Coach (March 2018) and continues contributing to national boxing development." },
-  { id: "exp-6", role: "Fighter Manager", company: "One Warrior Series", period: "2018", description: "Managed professional fighters in Singapore for the One Warrior Series." },
-  { id: "exp-7", role: "Fighter Manager", company: "ONE Championship", period: "2017", description: "Managed professional athletes for ONE Championship in Bangkok, Thailand." },
-  { id: "exp-8", role: "Second (Cornerman)", company: "ONE Championship", period: "2016", description: "Served as a professional seconds/cornerman in Myanmar events." }
-];
+
 
 export default function ExperiencePage() {
   const [experienceData, setExperienceData] = React.useState<any[]>([]);
@@ -47,10 +38,7 @@ export default function ExperiencePage() {
       const stored = localStorage.getItem('invictus_experience');
       if (stored) {
         setExperienceData(JSON.parse(stored));
-      } else {
-        setExperienceData(defaultExperience);
-        syncToStorage('invictus_experience', defaultExperience);
-      }
+      } 
     };
     load();
   }, []);

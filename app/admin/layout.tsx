@@ -4,7 +4,7 @@ import * as React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  Shield, Users, Calendar, Sliders, Mail, ShoppingBag, Package, Briefcase, Compass,
+  Shield, Users, Calendar, Sliders, Mail, ShoppingBag, Package, Briefcase, Compass, Image as ImageIcon,
   ArrowLeft, Zap, CircleAlert, X, Menu, ChevronRight
 } from 'lucide-react';
 import { auth as authApi } from '@/lib/api';
@@ -40,6 +40,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { id: 'orders', label: 'Shop Orders', icon: Package, href: '/admin/orders' },
     { id: 'experience', label: 'Experience Timeline', icon: Briefcase, href: '/admin/experience' },
     { id: 'content', label: 'Hero & About CMS', icon: Compass, href: '/admin/content' },
+    { id: 'gallery', label: 'Gallery', icon: ImageIcon, href: '/admin/gallery' },
   ];
 
   const activeTab = pathname.split('/')[2] || 'dashboard';
@@ -258,6 +259,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             {activeTab === 'orders' && 'Orders'}
             {activeTab === 'experience' && 'Experience'}
             {activeTab === 'content' && 'CMS'}
+            {activeTab === 'gallery' && 'Gallery'}
           </span>
         </div>
         <div className="flex items-center gap-2">

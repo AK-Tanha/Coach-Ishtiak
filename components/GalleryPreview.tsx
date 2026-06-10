@@ -5,8 +5,23 @@ import { motion } from 'motion/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Images } from 'lucide-react';
+import { gallery as galleryApi } from '@/lib/api';
 
 export default function GalleryPreview() {
+  const [images, setImages] = React.useState<any[]>([]);
+
+  React.useEffect(() => {
+    const load = async () => {
+      const res = await galleryApi.list();
+      if (res.success && res.data && res.data.length > 0) {
+        setImages(res.data.filter((i: any) => !i.url.includes('picsum.photos')).slice(0, 4));
+      }
+    };
+    load();
+  }, []);
+
+  if (images.length === 0) return null;
+
   return (
     <section className="py-10 px-4 sm:py-32 sm:px-12 lg:px-24 bg-brand-secondary/30">
       <div className="container max-w-7xl mx-auto">
@@ -37,18 +52,15 @@ export default function GalleryPreview() {
             className="md:col-span-2 relative h-[250px] md:h-full rounded-2xl sm:rounded-3xl overflow-hidden group border border-brand-border shadow-xl"
           >
             <Image
-              src="/images/placeholder.svg"
-              alt="WBC Refereeing"
+              src={images[0]?.url || '/images/placeholder.svg'}
+              alt={images[0]?.title || 'Gallery'}
               fill
               className="object-cover transition-transform duration-700 group-hover:scale-110"
               loading="lazy"
               quality={75}
               referrerPolicy="no-referrer"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-brand-primary/95 via-transparent to-transparent p-6 sm:p-8 flex flex-col justify-end">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-brand-accent mb-1">International Presence</p>
-              <p className="text-xl sm:text-2xl font-bold font-display text-white">WBC Global Refereeing</p>
-            </div>
+            <div className="absolute inset-0 bg-gradient-to-t from-brand-primary/20 via-transparent to-transparent" />
           </motion.div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-4 md:h-full">
@@ -61,17 +73,15 @@ export default function GalleryPreview() {
               className="relative h-[180px] sm:h-[220px] md:h-full rounded-2xl sm:rounded-3xl overflow-hidden group border border-brand-border shadow-lg"
             >
               <Image
-                src="/images/placeholder.svg"
-                alt="Training Workshop"
+                src={images[1]?.url || '/images/placeholder.svg'}
+                alt={images[1]?.title || 'Gallery'}
                 fill
                 className="object-cover transition-transform duration-700 group-hover:scale-110"
                 loading="lazy"
                 quality={75}
                 referrerPolicy="no-referrer"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-brand-primary/95 via-transparent to-transparent p-5 sm:p-6 flex flex-col justify-end">
-                <p className="text-lg sm:text-xl font-bold font-display leading-tight text-white">Elite Workshops</p>
-              </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-brand-primary/20 via-transparent to-transparent" />
             </motion.div>
             <motion.div
               whileInView={{ opacity: 1, y: 0 }}
@@ -82,17 +92,15 @@ export default function GalleryPreview() {
               className="relative h-[180px] sm:h-[220px] md:h-full rounded-2xl sm:rounded-3xl overflow-hidden group border border-brand-border shadow-lg"
             >
               <Image
-                src="/images/placeholder.svg"
-                alt="Championship Night"
+                src={images[2]?.url || '/images/placeholder.svg'}
+                alt={images[2]?.title || 'Gallery'}
                 fill
                 className="object-cover transition-transform duration-700 group-hover:scale-110"
                 loading="lazy"
                 quality={75}
                 referrerPolicy="no-referrer"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-brand-primary/95 via-transparent to-transparent p-5 sm:p-6 flex flex-col justify-end">
-                <p className="text-lg sm:text-xl font-bold font-display leading-tight text-white">Championship Nights</p>
-              </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-brand-primary/20 via-transparent to-transparent" />
             </motion.div>
           </div>
 
@@ -105,17 +113,15 @@ export default function GalleryPreview() {
             className="relative h-[250px] sm:h-[350px] md:h-full rounded-2xl sm:rounded-3xl overflow-hidden group border border-brand-border shadow-xl col-span-1 sm:col-span-2 md:col-span-1"
           >
             <Image
-              src="/images/placeholder.svg"
-              alt="Personal Training"
+              src={images[3]?.url || '/images/placeholder.svg'}
+              alt={images[3]?.title || 'Gallery'}
               fill
               className="object-cover transition-transform duration-700 group-hover:scale-110"
               loading="lazy"
               quality={75}
               referrerPolicy="no-referrer"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-brand-primary/95 via-transparent to-transparent p-6 sm:p-8 flex flex-col justify-end">
-              <p className="text-xl sm:text-2xl font-bold font-display leading-tight text-white">Private Mentorship</p>
-            </div>
+            <div className="absolute inset-0 bg-gradient-to-t from-brand-primary/20 via-transparent to-transparent" />
           </motion.div>
         </div>
       </div>
