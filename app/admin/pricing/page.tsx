@@ -15,28 +15,8 @@ interface PricingPlan {
   originalPrice?: string;
 }
 
-const defaultPricing: PricingPlan[] = [
-  {
-    id: "plan-monthly",
-    title: "Monthly Plan",
-    price: "3,000/-",
-    features: ["No Admission Fee", "All Standard Classes", "Access to MMA & Boxing"],
-    highlight: false,
-    badge: ""
-  },
-  {
-    id: "plan-quarterly",
-    title: "3 Months Course",
-    price: "8,000/-",
-    originalPrice: "9,000/-",
-    features: ["Muay Thai & Boxing Focus", "Intensive Training Course", "Special Discounted Rate"],
-    highlight: true,
-    badge: "Most Popular"
-  }
-];
-
 export default function PricingPage() {
-  const [pricingData, setPricingData] = React.useState<PricingPlan[]>(defaultPricing);
+  const [pricingData, setPricingData] = React.useState<PricingPlan[]>([]);
   const [editingPlanId, setEditingPlanId] = React.useState<string | null>(null);
   const [creatingNew, setCreatingNew] = React.useState(false);
   const [newPlanForm, setNewPlanForm] = React.useState({ title: '', price: '', originalPrice: '', highlight: false, badge: '', features: '' });
