@@ -112,7 +112,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               COACH <span className="text-brand-accent">CONSOLE</span>
             </h1>
             <p className="text-xs font-bold text-brand-muted tracking-widest uppercase">
-              INVICTUS ATHLETICS SECURE AUDIT
+              ATHLETICS SECURE AUDIT
             </p>
           </div>
 
@@ -185,7 +185,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="px-2">
             <Link href="/admin" className="inline-block group">
               <span className="text-xl font-display font-black tracking-tight text-white group-hover:text-brand-accent transition-colors">
-                INVICTUS <span className="text-brand-accent font-extrabold text-2xl">.</span>
+                BUNKER <span className="text-brand-accent font-extrabold text-2xl">.</span>
               </span>
               <span className="block text-[10px] uppercase tracking-widest font-mono text-brand-muted mt-1 font-bold">
                 COACH ADMIN PORTAL

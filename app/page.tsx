@@ -1358,7 +1358,7 @@ export default function PortfolioPage() {
             {/* Column 1: Brand Info */}
             <div className="border-b border-brand-border/30 pb-8 md:border-b-0 md:pb-0">
               <div className="font-display font-black text-2xl mb-4 text-white leading-none">
-                INVICTUS <span className="text-brand-accent">.</span>
+                COACH <span className='text-[#780000]'>ISHTIAK</span>
               </div>
               <p className="text-brand-muted text-sm leading-relaxed max-w-xs mx-auto md:mx-0">
                 Pioneering professional MMA & Boxing development in Bangladesh. 

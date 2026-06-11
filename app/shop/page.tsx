@@ -296,7 +296,7 @@ export default function ShopPage() {
           
           <div className="flex items-center gap-2">
             <span className="text-sm font-display font-black tracking-widest text-white uppercase sm:text-base">
-              INVICTUS <span className="text-brand-accent inline-flex items-center gap-1">LAB <span className="w-1.5 h-1.5 rounded-full bg-brand-accent animate-pulse" /></span>
+              BUNKER <span className="text-brand-accent inline-flex items-center gap-1">LAB <span className="w-1.5 h-1.5 rounded-full bg-brand-accent animate-pulse" /></span>
             </span>
           </div>
 
